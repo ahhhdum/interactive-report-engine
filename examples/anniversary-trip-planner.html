@@ -475,8 +475,68 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       </div>
     </div>
 
-    <!-- Alert cards (5-7) will be added next -->
-</div>
+
+    <!-- Card 5: Room Block Deadline -->
+    <div class="alert-card severity-action anim-up" style="--i:11" data-alert-id="alert-room-block" data-severity="action">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-room-block')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Room Block Deadline: April 16</div>
+        <div class="alert-meta">
+          <span class="badge badge--red">26 days away</span>
+          <span class="badge badge--amber">35 rooms needed</span>
+        </div>
+        <div class="alert-desc">Group rates at all four venues require a signed room block contract 60 days before arrival. For a June 15 arrival, the deadline is April 16. Missing this deadline means paying rack rates, which adds $15K-$22K to the total budget depending on the venue. The recommendation is to place holds at the top 2 venues now, then release the one not selected.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Draft room block hold requests for top 2 venues" onclick="selectAction(this)">Draft hold requests</span>
+          <span class="quick-action" data-action="Extend deadline negotiation with preferred venue" onclick="selectAction(this)">Negotiate extension</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-room-block')">+ Add note</div>
+        <div id="note-alert-room-block" style="display:none"><textarea class="alert-note" data-id="alert-room-block" placeholder="Notes..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- Card 6: June Heat Advisory -->
+    <div class="alert-card severity-review anim-up" style="--i:12" data-alert-id="alert-heat" data-severity="review">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-heat')"></label>
+      <div class="alert-content">
+        <div class="alert-title">June Heat Advisory for Desert Venues</div>
+        <div class="alert-meta">
+          <span class="badge badge--red">Avg high 105°F</span>
+          <span class="badge">Palm Desert only</span>
+        </div>
+        <div class="alert-desc">Average high temperature in Palm Desert in mid-June is 105°F. Outdoor activities like golf, pool parties, and group dinners on the terrace are comfortable only before 10am and after 7pm. This applies to JW Marriott Desert Springs only. The three coastal venues (Carlsbad, Palos Verdes, Coronado) average 72-76°F in June.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Add heat mitigation plan to JW Marriott itinerary" onclick="selectAction(this)">Plan heat mitigation</span>
+          <span class="quick-action" data-action="Research average June evening temperatures in Palm Desert for outdoor dinner feasibility" onclick="selectAction(this)">Research evening temps</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-heat')">+ Add note</div>
+        <div id="note-alert-heat" style="display:none"><textarea class="alert-note" data-id="alert-heat" placeholder="Notes..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- Card 7: Kids Program Coverage Gap -->
+    <div class="alert-card severity-review anim-up" style="--i:13" data-alert-id="alert-kids" data-severity="review">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-kids')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Kids Program Coverage Gap</div>
+        <div class="alert-meta">
+          <span class="badge badge--amber">12 kids expected</span>
+          <span class="badge">Ages 2-14</span>
+        </div>
+        <div class="alert-desc">All four venues have some kids programming, but none fully covers this group's needs. La Costa and Coronado have year-round programs for ages 4-12 during daytime hours. Terranea's program is seasonal and unconfirmed for June. JW Marriott's club closes at 2pm. No venue covers children under 4 (the youngest in the group is 2), and none offers evening programming. All four venues need supplemental childcare for evening group events (welcome dinner, awards dinner) and dedicated arrangements for the under-4 children.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Get childcare vendor quotes for evening coverage at all venues" onclick="selectAction(this)">Get childcare quotes</span>
+          <span class="quick-action" data-action="Confirm Terranea June kids program availability" onclick="selectAction(this)">Confirm Terranea kids</span>
+          <span class="quick-action" data-action="Research hotel babysitting services for children under 4 at all venues" onclick="selectAction(this)">Research under-4 care</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-kids')">+ Add note</div>
+        <div id="note-alert-kids" style="display:none"><textarea class="alert-note" data-id="alert-kids" placeholder="Notes..."></textarea></div>
+      </div>
+    </div>
+
+</div><!-- /alerts-container -->
+
+<!-- Standalone tables and footer will be added next -->
 
 <!-- Keyboard Hint -->
 <div class="kbd-hint" id="kbd-hint">
