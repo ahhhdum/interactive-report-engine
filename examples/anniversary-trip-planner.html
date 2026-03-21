@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><!-- REPORT_TITLE: Replace with your report title --></title>
+<title>EPCVIP Anniversary Trip 2026 — Planning Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ================================================================
@@ -273,127 +273,92 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 }
 </style>
 </head>
-
-<!--
-  BODY ATTRIBUTES (feature flags):
-    data-multiaction  — allow selecting multiple action pills per card
-    data-annotatable  — enable click-to-annotate on [data-annotatable] elements
-    data-no-persist   — disable localStorage state saving
-    data-report-title — title used in the Copy Review Summary heading
-    data-report-date  — date used in the summary heading (YYYY-MM-DD)
--->
-<body data-report-title="Report" data-report-date="">
-
+<body data-multiaction data-annotatable data-report-title="Decision" data-report-date="2026-03-21">
 <div class="container">
-
-  <!-- ============================================================
-       HERO SECTION
-       Replace eyebrow, h1, subtitle, and meta with your content.
-       ============================================================ -->
   <header class="hero anim-up" style="--i:0">
-    <div class="hero-eyebrow"><!-- HERO_EYEBROW: e.g. "Compliance Review Tool" --></div>
-    <h1><!-- HERO_TITLE: e.g. "CCPA Compliance Review" --></h1>
-    <div class="hero-sub"><!-- HERO_SUBTITLE: e.g. "Review, classify, and act on pending requests." --></div>
-    <div class="hero-meta"><!-- HERO_META: e.g. "March 20, 2026 | 13 requests | Interactive" --></div>
+    <div class="hero-eyebrow">Planning Dashboard</div>
+    <h1>EPCVIP Anniversary Trip 2026</h1>
+    <div class="hero-sub">Review venue options, flag concerns, and build a structured decision for the team.</div>
+    <div class="hero-meta">March 21, 2026 | 70 guests | 4 venues researched | 4-5 days</div>
   </header>
 
-  <!-- ============================================================
-       KPI CARDS
-       Use kpi-card--accent, --green, --amber, --red for coloring.
-       Duplicate or remove cards as needed.
-       ============================================================ -->
   <div class="kpi-row">
-    <div class="kpi-card anim-scale" style="--i:1">
-      <div class="kpi-card__value"><!-- KPI_1_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_1_LABEL --></div>
+    <div class="kpi-card kpi-card--accent anim-scale" style="--i:1">
+      <div class="kpi-card__value" data-annotation-id="kpi-guests">70</div>
+      <div class="kpi-card__label">Total Guests</div>
     </div>
     <div class="kpi-card kpi-card--green anim-scale" style="--i:2">
-      <div class="kpi-card__value"><!-- KPI_2_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_2_LABEL --></div>
+      <div class="kpi-card__value">4</div>
+      <div class="kpi-card__label">Venues Researched</div>
     </div>
     <div class="kpi-card kpi-card--amber anim-scale" style="--i:3">
-      <div class="kpi-card__value"><!-- KPI_3_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_3_LABEL --></div>
+      <div class="kpi-card__value" data-annotation-id="kpi-budget">$69K-$99K</div>
+      <div class="kpi-card__label">Est. Budget Range</div>
     </div>
     <div class="kpi-card kpi-card--red anim-scale" style="--i:4">
-      <div class="kpi-card__value"><!-- KPI_4_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_4_LABEL --></div>
+      <div class="kpi-card__value" data-annotation-id="kpi-dates">Jun 15-19</div>
+      <div class="kpi-card__label">Proposed Dates</div>
     </div>
   </div>
 
-  <!-- ============================================================
-       PIPELINE (optional)
-       Shows workflow steps. Remove this section if not needed.
-       Use pipe-step--done, --active, --pending for state.
-       ============================================================ -->
   <div class="pipeline-section anim-up" style="--i:5">
-    <div class="section-label"><!-- PIPELINE_LABEL: e.g. "Processing Pipeline" --></div>
+    <div class="section-label">Planning Pipeline</div>
     <div class="pipeline">
-      <!-- PIPELINE_STEPS: Repeat this pattern for each step:
-      <div class="pipe-step pipe-step--done">
-        <div class="pipe-step__num">01</div>
-        <div class="pipe-step__name">Step Name</div>
-      </div>
+      <div class="pipe-step pipe-step--done"><div class="pipe-step__num">01</div><div class="pipe-step__name">Research</div></div>
       <div class="pipe-arrow">&rarr;</div>
-      -->
+      <div class="pipe-step pipe-step--done"><div class="pipe-step__num">02</div><div class="pipe-step__name">Shortlist</div></div>
+      <div class="pipe-arrow">&rarr;</div>
+      <div class="pipe-step pipe-step--active"><div class="pipe-step__num">03</div><div class="pipe-step__name">Review</div></div>
+      <div class="pipe-arrow">&rarr;</div>
+      <div class="pipe-step pipe-step--pending"><div class="pipe-step__num">04</div><div class="pipe-step__name">Book</div></div>
+      <div class="pipe-arrow">&rarr;</div>
+      <div class="pipe-step pipe-step--pending"><div class="pipe-step__num">05</div><div class="pipe-step__name">Confirm</div></div>
     </div>
   </div>
 
-  <!-- ============================================================
-       FILTER BAR
-       Add filter buttons matching your severity types.
-       ============================================================ -->
   <div class="anim-up" style="--i:6">
-    <div class="section-label"><!-- SECTION_LABEL: e.g. "Alerts" --></div>
+    <div class="section-label">Options &amp; Alerts</div>
     <div class="filter-bar">
       <button class="filter-btn active" onclick="filterCards('all')">All</button>
-      <!-- FILTER_BUTTONS: Add one per severity type:
-      <button class="filter-btn" onclick="filterCards('action')">Action</button>
-      <button class="filter-btn" onclick="filterCards('review')">Review</button>
-      <button class="filter-btn" onclick="filterCards('routine')">Routine</button>
-      -->
+      <button class="filter-btn" onclick="filterCards('routine')">Recommended</button>
+      <button class="filter-btn" onclick="filterCards('anomaly')">Options</button>
+      <button class="filter-btn" onclick="filterCards('review')">Needs Review</button>
+      <button class="filter-btn" onclick="filterCards('action')">Action Required</button>
       <span class="filter-count" id="visible-count"></span>
     </div>
   </div>
 
-  <!-- ============================================================
-       ALERT CARDS
-       Each card needs:
-         data-alert-id="unique-id"
-         data-severity="action|review|anomaly|routine|ok|info|..."
-
-       Quick action pills need:
-         data-action="The literal instruction for Claude"
-
-       For collapsible tables inside cards, use <details> with
-       a .data-table inside. Table rows need data-row-id="unique".
-       ============================================================ -->
   <div class="alerts-container" id="alerts-container">
 
-    <!-- ALERT_CARDS: Repeat this pattern for each alert:
-
-    <div class="alert-card severity-ACTION_TYPE anim-up" style="--i:N" data-alert-id="UNIQUE_ID" data-severity="TYPE">
-      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('UNIQUE_ID')"></label>
+    <!-- Card 1: Omni La Costa Resort -->
+    <div class="alert-card severity-routine anim-up" style="--i:7" data-alert-id="venue-la-costa" data-severity="routine">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('venue-la-costa')"></label>
       <div class="alert-content">
-        <div class="alert-title">Alert Title</div>
+        <div class="alert-title">Omni La Costa Resort, Carlsbad</div>
         <div class="alert-meta">
-          <span class="badge badge--green">Badge Text</span>
+          <span class="badge badge--green">$289/night</span>
+          <span class="badge">4.3 stars</span>
+          <span class="badge badge--green">12 min from office</span>
+          <span class="badge badge--green">Kids club 4-12</span>
         </div>
-        <div class="alert-desc">Description with <code>inline code</code>.</div>
+        <div class="alert-desc">Full-service resort with golf, spa, pools, and kids camp. Similar vibe to last year's La Quinta. Known quantity for the team. <span data-annotation-id="ann-la-costa-group">Group rate confirmed for 35+ rooms</span>. Two 18-hole golf courses on property. The most logistically simple option since most employees are local to North County.</div>
         <div class="alert-actions">
-          <span class="quick-action" data-action="Literal instruction for Claude" onclick="selectAction(this)">Button Label</span>
+          <span class="quick-action" data-action="Request group rate quote from Omni La Costa for 35 rooms, June 15-19" onclick="selectAction(this)">Request group quote</span>
+          <span class="quick-action" data-action="Build a detailed 5-day itinerary around La Costa with golf, spa, and kids camp" onclick="selectAction(this)">Build itinerary</span>
+          <span class="quick-action" data-action="Draft announcement email to team with La Costa as the selected venue" onclick="selectAction(this)">Draft announcement</span>
         </div>
-        <div class="alert-note-toggle" onclick="toggleNote('UNIQUE_ID')">+ Add note</div>
-        <div id="note-UNIQUE_ID" style="display:none"><textarea class="alert-note" data-id="UNIQUE_ID" placeholder="Notes..."></textarea></div>
-
-        OPTIONAL: Collapsible detail table
+        <div class="alert-note-toggle" onclick="toggleNote('venue-la-costa')">+ Add note</div>
+        <div id="note-venue-la-costa" style="display:none"><textarea class="alert-note" data-id="venue-la-costa" placeholder="Notes..."></textarea></div>
         <details>
-          <summary>Detail Label (N items)</summary>
+          <summary>Room Options (4 types)</summary>
           <div style="overflow-x:auto; padding: 0 0 8px;">
-            <table class="data-table" data-table-id="TABLE_ID">
-              <thead><tr><th>Col 1</th><th class="num">Col 2</th></tr></thead>
+            <table>
+              <thead><tr><th>Room Type</th><th>Nightly Rate</th><th>Sleeps</th><th>Available</th></tr></thead>
               <tbody>
-                <tr data-row-id="ROW_ID"><td>Value</td><td class="num">123</td></tr>
+                <tr><td>Standard King</td><td>$289</td><td>2</td><td>40</td></tr>
+                <tr><td>Resort Suite</td><td>$419</td><td>4</td><td>12</td></tr>
+                <tr><td>Family Suite</td><td>$489</td><td>6</td><td>8</td></tr>
+                <tr><td>Villa</td><td>$629</td><td>8</td><td>4</td></tr>
               </tbody>
             </table>
           </div>
@@ -401,37 +366,236 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       </div>
     </div>
 
-    -->
+    <!-- Card 2: Terranea Resort -->
+    <div class="alert-card severity-anomaly anim-up" style="--i:8" data-alert-id="venue-terranea" data-severity="anomaly">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('venue-terranea')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Terranea Resort, Rancho Palos Verdes</div>
+        <div class="alert-meta">
+          <span class="badge badge--amber">$399/night</span>
+          <span class="badge badge--green">4.6 stars</span>
+          <span class="badge badge--amber">90 min from office</span>
+          <span class="badge">Ocean cliffs</span>
+        </div>
+        <div class="alert-desc">Oceanfront cliffside resort on the Palos Verdes peninsula. The most visually striking venue. Spa is top-rated in LA County. Fine dining, tide pools, archery, falconry. Kids program exists but is seasonal. Need to confirm June availability. The 90-minute drive from the office means some employees may want to carpool or take a shuttle.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Request group rate quote from Terranea for 35 rooms, June 15-19" onclick="selectAction(this)">Request group quote</span>
+          <span class="quick-action" data-action="Confirm Terranea kids program availability for June 15-19" onclick="selectAction(this)">Confirm kids program</span>
+          <span class="quick-action" data-action="Research shuttle options from Carlsbad office to Terranea for 70 guests" onclick="selectAction(this)">Research shuttles</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('venue-terranea')">+ Add note</div>
+        <div id="note-venue-terranea" style="display:none"><textarea class="alert-note" data-id="venue-terranea" placeholder="Notes..."></textarea></div>
+        <details>
+          <summary>Room Options (3 types)</summary>
+          <div style="overflow-x:auto; padding: 0 0 8px;">
+            <table>
+              <thead><tr><th>Room Type</th><th>Nightly Rate</th><th>Sleeps</th><th>Available</th></tr></thead>
+              <tbody>
+                <tr><td>Ocean View</td><td>$399</td><td>2</td><td>35</td></tr>
+                <tr><td>Casita</td><td>$529</td><td>4</td><td>10</td></tr>
+                <tr><td>Bungalow</td><td>$689</td><td>6</td><td>6</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+    </div>
 
-  </div>
+    <!-- Card 3: JW Marriott Desert Springs -->
+    <div class="alert-card severity-review anim-up" style="--i:9" data-alert-id="venue-desert-springs" data-severity="review">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('venue-desert-springs')"></label>
+      <div class="alert-content">
+        <div class="alert-title">JW Marriott Desert Springs, Palm Desert</div>
+        <div class="alert-meta">
+          <span class="badge badge--green">$249/night</span>
+          <span class="badge">4.1 stars</span>
+          <span class="badge badge--amber">2.5 hrs from office</span>
+          <span class="badge">Gondola rides</span>
+          <span class="badge badge--red">105°F in June</span>
+        </div>
+        <div class="alert-desc">Largest property at 450 acres with indoor gondola waterways, five pools, lazy river, and two golf courses. Best value per night across all options. The major concern is June heat in the desert: <span data-annotation-id="ann-desert-heat">average high of 105°F</span> limits outdoor activities to early morning and evening. The 2.5-hour drive also means a full travel day on arrival and departure. Some team members flagged desert heat as a dealbreaker when it came up last year.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Request group rate quote from JW Marriott for 35 rooms, June 15-19" onclick="selectAction(this)">Request group quote</span>
+          <span class="quick-action" data-action="Research indoor and evening activity options for extreme heat days" onclick="selectAction(this)">Research heat options</span>
+          <span class="quick-action" data-action="Compare JW Marriott costs with La Costa including transportation" onclick="selectAction(this)">Compare total costs</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('venue-desert-springs')">+ Add note</div>
+        <div id="note-venue-desert-springs" style="display:none"><textarea class="alert-note" data-id="venue-desert-springs" placeholder="Notes..."></textarea></div>
+        <details>
+          <summary>Room Options (4 types)</summary>
+          <div style="overflow-x:auto; padding: 0 0 8px;">
+            <table>
+              <thead><tr><th>Room Type</th><th>Nightly Rate</th><th>Sleeps</th><th>Available</th></tr></thead>
+              <tbody>
+                <tr><td>Resort View</td><td>$249</td><td>2</td><td>50</td></tr>
+                <tr><td>Pool View</td><td>$289</td><td>3</td><td>20</td></tr>
+                <tr><td>Suite</td><td>$379</td><td>4</td><td>10</td></tr>
+                <tr><td>Presidential</td><td>$599</td><td>6</td><td>3</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+    </div>
 
-  <!-- ============================================================
-       STANDALONE TABLES (optional)
-       For tables outside of alert cards. Same flagging behavior.
-       ============================================================ -->
-  <!-- STANDALONE_TABLES: Use section-label + data-table pattern:
+    <!-- Card 4: Hotel del Coronado -->
+    <div class="alert-card severity-anomaly anim-up" style="--i:10" data-alert-id="venue-coronado" data-severity="anomaly">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('venue-coronado')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Hotel del Coronado, Coronado Island</div>
+        <div class="alert-meta">
+          <span class="badge badge--amber">$349/night</span>
+          <span class="badge badge--green">4.4 stars</span>
+          <span class="badge badge--green">25 min from office</span>
+          <span class="badge badge--green">Beach access</span>
+          <span class="badge">Historic landmark</span>
+        </div>
+        <div class="alert-desc">Iconic beachfront hotel built in 1888. Walking distance to shops and restaurants on Orange Avenue. Beach bonfires available for private group events. The concern is that Coronado is 25 minutes from the office, so it may not feel like a "getaway" for local employees. The flip side: zero travel logistics, no flight costs, and anyone can drive home if they need to. The beach and historic setting are genuinely memorable.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Request group rate quote from Hotel del Coronado for 35 rooms, June 15-19" onclick="selectAction(this)">Request group quote</span>
+          <span class="quick-action" data-action="Build a detailed 5-day itinerary around Coronado with beach and downtown activities" onclick="selectAction(this)">Build itinerary</span>
+          <span class="quick-action" data-action="Research private beach bonfire event packages at Hotel del Coronado" onclick="selectAction(this)">Research bonfires</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('venue-coronado')">+ Add note</div>
+        <div id="note-venue-coronado" style="display:none"><textarea class="alert-note" data-id="venue-coronado" placeholder="Notes..."></textarea></div>
+        <details>
+          <summary>Room Options (4 types)</summary>
+          <div style="overflow-x:auto; padding: 0 0 8px;">
+            <table>
+              <thead><tr><th>Room Type</th><th>Nightly Rate</th><th>Sleeps</th><th>Available</th></tr></thead>
+              <tbody>
+                <tr><td>Victorian Room</td><td>$349</td><td>2</td><td>30</td></tr>
+                <tr><td>Ocean View</td><td>$429</td><td>2</td><td>15</td></tr>
+                <tr><td>Cabana Suite</td><td>$549</td><td>4</td><td>8</td></tr>
+                <tr><td>Cottage</td><td>$729</td><td>6</td><td>4</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+    </div>
 
-  <div class="anim-up" style="--i:N">
-    <div class="section-label">Table Section Title</div>
-    <table class="data-table" data-table-id="TABLE_ID">
-      <thead><tr><th>Col</th><th class="num">Value</th></tr></thead>
-      <tbody>
-        <tr data-row-id="ROW_ID"><td>Name</td><td class="num">123</td></tr>
-      </tbody>
-    </table>
-  </div>
 
-  -->
+    <!-- Card 5: Room Block Deadline -->
+    <div class="alert-card severity-action anim-up" style="--i:11" data-alert-id="alert-room-block" data-severity="action">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-room-block')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Room Block Deadline: April 16</div>
+        <div class="alert-meta">
+          <span class="badge badge--red">26 days away</span>
+          <span class="badge badge--amber">35 rooms needed</span>
+        </div>
+        <div class="alert-desc">Group rates at all four venues require a signed room block contract 60 days before arrival. For a June 15 arrival, the deadline is April 16. Missing this deadline means paying rack rates, which adds $15K-$22K to the total budget depending on the venue. The recommendation is to place holds at the top 2 venues now, then release the one not selected.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Draft room block hold requests for top 2 venues" onclick="selectAction(this)">Draft hold requests</span>
+          <span class="quick-action" data-action="Extend deadline negotiation with preferred venue" onclick="selectAction(this)">Negotiate extension</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-room-block')">+ Add note</div>
+        <div id="note-alert-room-block" style="display:none"><textarea class="alert-note" data-id="alert-room-block" placeholder="Notes..."></textarea></div>
+      </div>
+    </div>
 
-  <!-- ============================================================
-       FOOTER
-       ============================================================ -->
-  <div class="footer anim-up" style="--i:99">
-    <!-- FOOTER_TEXT: e.g. "Generated by Claude Code on March 20, 2026." -->
-    <br>Keyboard shortcuts: press <kbd>?</kbd> for help.
-  </div>
+    <!-- Card 6: June Heat Advisory -->
+    <div class="alert-card severity-review anim-up" style="--i:12" data-alert-id="alert-heat" data-severity="review">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-heat')"></label>
+      <div class="alert-content">
+        <div class="alert-title">June Heat Advisory for Desert Venues</div>
+        <div class="alert-meta">
+          <span class="badge badge--red">Avg high 105°F</span>
+          <span class="badge">Palm Desert only</span>
+        </div>
+        <div class="alert-desc">Average high temperature in Palm Desert in mid-June is 105°F. Outdoor activities like golf, pool parties, and group dinners on the terrace are comfortable only before 10am and after 7pm. This applies to JW Marriott Desert Springs only. The three coastal venues (Carlsbad, Palos Verdes, Coronado) average 72-76°F in June.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Add heat mitigation plan to JW Marriott itinerary" onclick="selectAction(this)">Plan heat mitigation</span>
+          <span class="quick-action" data-action="Research average June evening temperatures in Palm Desert for outdoor dinner feasibility" onclick="selectAction(this)">Research evening temps</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-heat')">+ Add note</div>
+        <div id="note-alert-heat" style="display:none"><textarea class="alert-note" data-id="alert-heat" placeholder="Notes..."></textarea></div>
+      </div>
+    </div>
 
+    <!-- Card 7: Kids Program Coverage Gap -->
+    <div class="alert-card severity-review anim-up" style="--i:13" data-alert-id="alert-kids" data-severity="review">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-kids')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Kids Program Coverage Gap</div>
+        <div class="alert-meta">
+          <span class="badge badge--amber">12 kids expected</span>
+          <span class="badge">Ages 2-14</span>
+        </div>
+        <div class="alert-desc">All four venues have some kids programming, but none fully covers this group's needs. La Costa and Coronado have year-round programs for ages 4-12 during daytime hours. Terranea's program is seasonal and unconfirmed for June. JW Marriott's club closes at 2pm. No venue covers children under 4 (the youngest in the group is 2), and none offers evening programming. All four venues need supplemental childcare for evening group events (welcome dinner, awards dinner) and dedicated arrangements for the under-4 children.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Get childcare vendor quotes for evening coverage at all venues" onclick="selectAction(this)">Get childcare quotes</span>
+          <span class="quick-action" data-action="Confirm Terranea June kids program availability" onclick="selectAction(this)">Confirm Terranea kids</span>
+          <span class="quick-action" data-action="Research hotel babysitting services for children under 4 at all venues" onclick="selectAction(this)">Research under-4 care</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-kids')">+ Add note</div>
+        <div id="note-alert-kids" style="display:none"><textarea class="alert-note" data-id="alert-kids" placeholder="Notes..."></textarea></div>
+      </div>
+    </div>
+
+</div><!-- /alerts-container -->
+
+<div class="anim-up" style="--i:14">
+  <div class="section-label">Activity Comparison Across Venues</div>
+  <table class="data-table" data-table-id="activities">
+    <thead>
+      <tr>
+        <th>Activity</th>
+        <th>La Costa</th>
+        <th>Terranea</th>
+        <th>Desert Springs</th>
+        <th>Coronado</th>
+        <th class="num">Est. Cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-row-id="act-welcome"><td>Welcome dinner</td><td>Courtyard terrace</td><td>Ocean terrace</td><td>Lakeside pavilion</td><td>Beach bonfire</td><td class="num">$4,200-$6,800</td></tr>
+      <tr data-row-id="act-golf"><td>Golf tournament</td><td>On-site (36 holes)</td><td>Nearby (Trump Nat'l)</td><td>On-site (36 holes)</td><td>Nearby (Coronado GC)</td><td class="num">$3,500-$5,200</td></tr>
+      <tr data-row-id="act-spa"><td>Spa half-day</td><td>On-site</td><td>On-site (top rated)</td><td>On-site</td><td>On-site</td><td class="num">$2,800-$4,100</td></tr>
+      <tr data-row-id="act-pool"><td>Pool party</td><td>3 pools</td><td>1 pool + ocean</td><td>5 pools + lazy river</td><td>2 pools + beach</td><td class="num">$1,200-$2,400</td></tr>
+      <tr data-row-id="act-kids"><td>Kids day camp</td><td>On-site (ages 4-12)</td><td>Seasonal (TBD)</td><td>On-site (closes 2pm)</td><td>On-site (ages 4-12)</td><td class="num">$800-$1,200</td></tr>
+      <tr data-row-id="act-team"><td>Team building</td><td>Escape room pkg</td><td>Kayak + paddleboard</td><td>Desert jeep tour</td><td>Sailing charter</td><td class="num">$2,400-$3,600</td></tr>
+      <tr data-row-id="act-awards"><td>Awards dinner</td><td>Grand ballroom</td><td>Catalina room</td><td>Desert ballroom</td><td>Crown room</td><td class="num">$5,800-$8,200</td></tr>
+      <tr data-row-id="act-free"><td>Free day options</td><td>Beach, shops, Legoland</td><td>Tide pools, hiking</td><td>Outlet mall, Indian Wells</td><td>Beach, Gaslamp, zoo</td><td class="num">$0 (self-directed)</td></tr>
+    </tbody>
+  </table>
 </div>
+
+<div class="anim-up" style="--i:15">
+  <div class="section-label">Budget Breakdown by Venue</div>
+  <table class="data-table" data-table-id="budget">
+    <thead>
+      <tr>
+        <th>Line Item</th>
+        <th class="num">La Costa</th>
+        <th class="num">Terranea</th>
+        <th class="num">Desert Springs</th>
+        <th class="num">Coronado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-row-id="bud-rooms"><td>Rooms (35 rooms x 4 nights)</td><td class="num">$40,460</td><td class="num">$55,860</td><td class="num">$34,860</td><td class="num">$48,860</td></tr>
+      <tr data-row-id="bud-welcome"><td>Welcome dinner</td><td class="num">$4,200</td><td class="num">$5,800</td><td class="num">$4,400</td><td class="num">$6,800</td></tr>
+      <tr data-row-id="bud-golf"><td>Golf tournament</td><td class="num">$3,500</td><td class="num">$5,200</td><td class="num">$3,800</td><td class="num">$4,200</td></tr>
+      <tr data-row-id="bud-spa"><td>Spa package</td><td class="num">$2,800</td><td class="num">$4,100</td><td class="num">$2,800</td><td class="num">$3,200</td></tr>
+      <tr data-row-id="bud-pool"><td>Pool party + activities</td><td class="num">$3,600</td><td class="num">$3,400</td><td class="num">$3,200</td><td class="num">$3,600</td></tr>
+      <tr data-row-id="bud-team"><td>Team building event</td><td class="num">$2,400</td><td class="num">$3,600</td><td class="num">$2,800</td><td class="num">$3,400</td></tr>
+      <tr data-row-id="bud-awards"><td>Awards dinner</td><td class="num">$5,800</td><td class="num">$7,200</td><td class="num">$5,600</td><td class="num">$8,200</td></tr>
+      <tr data-row-id="bud-kids"><td>Kids program</td><td class="num">$800</td><td class="num">$1,200</td><td class="num">$900</td><td class="num">$800</td></tr>
+      <tr data-row-id="bud-transport"><td>Transportation/shuttles</td><td class="num">$1,200</td><td class="num">$3,800</td><td class="num">$4,200</td><td class="num">$1,400</td></tr>
+      <tr data-row-id="bud-contingency"><td>Contingency (10%)</td><td class="num">$6,476</td><td class="num">$9,016</td><td class="num">$6,256</td><td class="num">$8,046</td></tr>
+      <tr data-row-id="bud-total"><td><strong>Total</strong></td><td class="num"><strong>$71,236</strong></td><td class="num"><strong>$99,176</strong></td><td class="num"><strong>$68,816</strong></td><td class="num"><strong>$88,506</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="footer anim-up" style="--i:99">
+  Generated by Claude Code on March 21, 2026. Data sourced from venue websites, Google Reviews, and historical weather averages.
+  <br>Keyboard shortcuts: press <kbd>?</kbd> for help.
+</div>
+
+</div><!-- /container -->
 
 <!-- Keyboard Hint -->
 <div class="kbd-hint" id="kbd-hint">
@@ -454,7 +618,6 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     <button class="action-btn" id="copy-btn" onclick="copySummary()">Copy Review Summary</button>
   </div>
 </div>
-
 <script>
 /* ================================================================
    INTERACTIVE REPORT ENGINE — JavaScript
@@ -733,6 +896,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 
     var el = document.getElementById('visible-count');
     if (el) el.textContent = 'Showing ' + visible + ' of ' + totalActive;
+
     document.querySelectorAll('.filter-btn').forEach(function(btn) {
       var onclick = btn.getAttribute('onclick') || '';
       var match = onclick.match(/filterCards\('([^']+)'\)/);
