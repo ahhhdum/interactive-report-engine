@@ -50,7 +50,7 @@ Every annotatable element requires an explicit `data-annotation-id` attribute. T
 | `kpi-budget` | "$69K-$99K" KPI value | KPI card 3 | Reviewer might note "board approved up to $95K" |
 | `kpi-dates` | "Jun 15-19" KPI value | KPI card 4 | Reviewer might note "conflicts with Q2 close" |
 | `ann-la-costa-group` | "Group rate confirmed for 35+ rooms" | Card 1 description | Reviewer might challenge the room count |
-| `ann-desert-heat` | "average high of 105 deg F" | Card 3 description | Reviewer might note source or dispute the figure |
+| `ann-desert-heat` | "average high of 105°F" | Card 3 description | Reviewer might note source or dispute the figure |
 
 In the HTML, annotation targets are `<span>` elements wrapping the specific text:
 ```html
@@ -139,8 +139,8 @@ Filter buttons (using engine terms, but with planning-friendly labels):
 
 - **alert-id:** `venue-desert-springs`
 - **severity:** `review` (amber)
-- **Badges:** `$249/night` (green), `4.1 stars` (muted), `2.5 hrs from office` (amber), `Gondola rides` (muted), `105 deg F in June` (red)
-- **Description:** Largest property at 450 acres with indoor gondola waterways, five pools, lazy river, and two golf courses. Best value per night across all options. The major concern is June heat in the desert: average high of 105 deg F limits outdoor activities to early morning and evening. The 2.5-hour drive also means a full travel day on arrival and departure. Some team members flagged desert heat as a dealbreaker when it came up last year.
+- **Badges:** `$249/night` (green), `4.1 stars` (muted), `2.5 hrs from office` (amber), `Gondola rides` (muted), `105°F in June` (red)
+- **Description:** Largest property at 450 acres with indoor gondola waterways, five pools, lazy river, and two golf courses. Best value per night across all options. The major concern is June heat in the desert: average high of 105°F limits outdoor activities to early morning and evening. The 2.5-hour drive also means a full travel day on arrival and departure. Some team members flagged desert heat as a dealbreaker when it came up last year.
 - **Quick actions:**
   1. "Request group rate quote from JW Marriott for 35 rooms, June 15-19"
   2. "Research indoor and evening activity options for extreme heat days"
@@ -187,8 +187,8 @@ Filter buttons (using engine terms, but with planning-friendly labels):
 
 - **alert-id:** `alert-heat`
 - **severity:** `review` (amber)
-- **Badges:** `Avg high 105 deg F` (red), `Palm Desert only` (muted)
-- **Description:** Average high temperature in Palm Desert in mid-June is 105 deg F. Outdoor activities like golf, pool parties, and group dinners on the terrace are comfortable only before 10am and after 7pm. This applies to JW Marriott Desert Springs only. The three coastal venues (Carlsbad, Palos Verdes, Coronado) average 72-76 deg F in June.
+- **Badges:** `Avg high 105°F` (red), `Palm Desert only` (muted)
+- **Description:** Average high temperature in Palm Desert in mid-June is 105°F. Outdoor activities like golf, pool parties, and group dinners on the terrace are comfortable only before 10am and after 7pm. This applies to JW Marriott Desert Springs only. The three coastal venues (Carlsbad, Palos Verdes, Coronado) average 72-76 deg F in June.
 - **Quick actions:**
   1. "Add heat mitigation plan to JW Marriott itinerary"
   2. "Research average June evening temperatures in Palm Desert for outdoor dinner feasibility"

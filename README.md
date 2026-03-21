@@ -111,7 +111,7 @@ The JavaScript portion of the template is a single IIFE (immediately invoked fun
 - **Inline notes.** A "+ Add note" toggle reveals a textarea below each alert card.
 - **Table row flagging.** Clicking a row in any data table highlights it and inserts an inline text input for a note explaining why the row was flagged.
 - **Inline annotations.** When the annotation feature flag is enabled on the page, elements marked with `data-annotation-id` become clickable. Clicking opens a textarea for annotation text. This allows reviewers to annotate KPI values, badge labels, or any other element. The feature is off by default and controlled by a single attribute on the page container.
-- **Keyboard navigation.** `j`/`k` move focus between cards, `x` dismisses the focused card, `1` through `5` select quick actions, `n` opens the note field, `c` copies the review summary, `s` copies a shareable URL.
+- **Keyboard navigation.** `j`/`k` move focus between cards, `x` dismisses the focused card, `1` through `5` select quick actions, `n` opens the note field, `Escape` exits the focused note or annotation field, `c` copies the review summary, `s` copies a shareable URL.
 - **Filter bar.** Buttons that show/hide alert cards by severity type.
 
 The CSS portion is approximately 200 lines. It provides a dark-mode design system with automatic light-mode support via `prefers-color-scheme`. Severity levels map to border colors: red for action items, amber for items needing review, blue for anomalies or informational items, green for routine items. All colors use CSS custom properties that adapt to the color scheme.
