@@ -1,6 +1,6 @@
 # Planning Dashboard: Design Notes
 
-Status: grooming. Not yet built. Captured from March 20, 2026 conversation.
+Status: built. Example at `examples/anniversary-trip-planner.html`. Original design notes captured from March 20, 2026 conversation.
 
 ## What This Is
 
@@ -51,7 +51,7 @@ Each option card should have:
 - A collapsible detail section with supporting data
 - Room for inline annotation on specific claims
 
-The summary should be titled "Decision Summary" and include a clear "Preferred" section, not just "Actions Selected."
+The implemented example uses `data-report-title="Decision"`, which produces the heading "Decision Review" in the Copy Summary output. The engine appends " Review" automatically.
 
 ## What the Skill Guidance Should Say
 
@@ -68,10 +68,10 @@ Superpowers brainstorming and the planning dashboard serve different stages:
 
 They are complementary. Brainstorming produces the options. The dashboard structures the evaluation. The decision summary feeds back into Claude for execution.
 
-## Next Steps
+## Remaining Work
 
-1. Build the planning example HTML (using the engine template from this repo)
-2. Test all interactions: prefer/reject options, annotate specific claims, copy decision summary
+1. ~~Build the planning example HTML~~ Done: `examples/anniversary-trip-planner.html`
+2. ~~Test all interactions~~ Done: verified in browser and via automated checks
 3. Update the /action-report skill to mention planning as a use case with examples
-4. Publish as the showcase example on docs.epcvip.vip by Monday
-5. Update the README with the planning use case alongside operations and compliance
+4. Publish as the showcase example on docs.epcvip.vip
+5. ~~Update the README with the planning use case~~ Done
