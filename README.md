@@ -26,7 +26,8 @@ interactive-report-engine/
 │   └── architecture.md                     # Concise architecture overview
 ├── examples/
 │   ├── operations-dashboard.html           # Working example with demo data
-│   └── operations-dashboard-prompt.md      # Prompt template for the example
+│   ├── operations-dashboard-prompt.md      # Prompt template for the example
+│   └── anniversary-trip-planner.html       # Planning dashboard example
 └── .gitignore
 ```
 
@@ -110,7 +111,7 @@ The JavaScript portion of the template is a single IIFE (immediately invoked fun
 - **Inline notes.** A "+ Add note" toggle reveals a textarea below each alert card.
 - **Table row flagging.** Clicking a row in any data table highlights it and inserts an inline text input for a note explaining why the row was flagged.
 - **Inline annotations.** When the annotation feature flag is enabled on the page, elements marked with `data-annotation-id` become clickable. Clicking opens a textarea for annotation text. This allows reviewers to annotate KPI values, badge labels, or any other element. The feature is off by default and controlled by a single attribute on the page container.
-- **Keyboard navigation.** `j`/`k` move focus between cards, `x` dismisses the focused card, `1` through `5` select quick actions, `n` opens the note field, `c` copies the review summary, `s` copies a shareable URL.
+- **Keyboard navigation.** `j`/`k` move focus between cards, `x` dismisses the focused card, `1` through `5` select quick actions, `n` opens the note field, `Escape` exits the focused note or annotation field, `c` copies the review summary, `s` copies a shareable URL.
 - **Filter bar.** Buttons that show/hide alert cards by severity type.
 
 The CSS portion is approximately 200 lines. It provides a dark-mode design system with automatic light-mode support via `prefers-color-scheme`. Severity levels map to border colors: red for action items, amber for items needing review, blue for anomalies or informational items, green for routine items. All colors use CSS custom properties that adapt to the color scheme.
@@ -187,6 +188,18 @@ Alert cards use severity based on experiment status: red for experiments showing
 Quick actions include: extend duration by one week, stop experiment (negative result), graduate winner, request additional power analysis, and defer to next review. Collapsible detail tables show per-variant metrics (lift, p-value, sample size, confidence interval).
 
 This example has not been built as a working dashboard. It is included to illustrate how the pattern generalizes to a third domain.
+
+### Example 4: Planning Dashboard
+
+A company plans an anniversary trip for 70 people across 4 venue options. Claude researches venues, pricing, activities, and logistics, then generates a planning dashboard for structured human review.
+
+Alert cards represent venue options (4) and logistics alerts (3). Venue cards use severity to signal the recommendation: routine (green) for the recommended venue, anomaly (blue) for viable alternatives, and review (amber) for options with concerns. Logistics cards flag time-sensitive deadlines (action, red) and risks that affect specific venues (review, amber).
+
+Quick actions are executable Claude instructions: "Request group rate quote from Omni La Costa for 35 rooms, June 15-19," "Build a detailed 5-day itinerary around La Costa with golf, spa, and kids camp." Dismissing a venue uses the checkbox with an inline note explaining the rejection, keeping the action pills clean for executable work.
+
+Two standalone tables compare activities and budgets across all venues with row flagging. The reviewer flags specific line items ("Awards dinner at Coronado is $8,200 vs La Costa's $5,800") and annotates KPI values ("Board approved up to $95K"). The decision summary feeds back into Claude for execution: request quotes, build itineraries, draft hold requests.
+
+This example exercises every engine feature: multi-action pills, inline annotations, collapsible detail tables, standalone tables with row flagging, severity filtering across 4 types, pipeline visualization, keyboard navigation, Share State for co-planners, and localStorage persistence.
 
 ## How to Build Your Own
 
