@@ -439,6 +439,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   <kbd>x</kbd> dismiss &nbsp;
   <kbd>1</kbd>-<kbd>5</kbd> action &nbsp;
   <kbd>n</kbd> note &nbsp;
+  <kbd>esc</kbd> exit note &nbsp;
   <kbd>c</kbd> copy &nbsp;
   <kbd>s</kbd> share &nbsp;
   <kbd>?</kbd> help
@@ -721,6 +722,31 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     });
     var el = document.getElementById('visible-count');
     if (el) el.textContent = 'Showing ' + visible + ' of ' + all.length;
+
+    // Update filter button counts
+    var counts = {};
+    var totalActive = 0;
+    all.forEach(function(c) {
+      if (!c.classList.contains('dismissed')) {
+        var sev = c.getAttribute('data-severity');
+        counts[sev] = (counts[sev] || 0) + 1;
+        totalActive++;
+      }
+    });
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+      var onclick = btn.getAttribute('onclick') || '';
+      var match = onclick.match(/filterCards\('([^']+)'\)/);
+      if (!match) return;
+      var sev = match[1];
+      var label = btn.textContent.replace(/\s*\(\d+\)/, '');
+      if (sev === 'all') {
+        btn.textContent = label + ' (' + totalActive + ')';
+      } else if (counts[sev] !== undefined) {
+        btn.textContent = label + ' (' + counts[sev] + ')';
+      } else {
+        btn.textContent = label + ' (0)';
+      }
+    });
   }
 
   // --- Action Bar ---
@@ -1063,7 +1089,13 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 
   document.addEventListener('keydown', function(e) {
     var tag = (e.target.tagName || '').toLowerCase();
-    if (tag === 'input' || tag === 'textarea') return;
+    if (tag === 'input' || tag === 'textarea') {
+      if (e.key === 'Escape') {
+        e.target.blur();
+        e.preventDefault();
+      }
+      return;
+    }
 
     var cards = getVisibleCards();
     var card, id, cb;
