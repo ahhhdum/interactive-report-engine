@@ -88,11 +88,12 @@ Severity mapping:
 Filter buttons (using engine terms, but with planning-friendly labels):
 
 ```html
-<button class="filter-btn active" onclick="filterCards('all')">All <span class="count"></span></button>
-<button class="filter-btn" onclick="filterCards('routine')">Recommended <span class="count"></span></button>
-<button class="filter-btn" onclick="filterCards('anomaly')">Options <span class="count"></span></button>
-<button class="filter-btn" onclick="filterCards('review')">Needs Review <span class="count"></span></button>
-<button class="filter-btn" onclick="filterCards('action')">Action Required <span class="count"></span></button>
+<button class="filter-btn active" onclick="filterCards('all')">All</button>
+<button class="filter-btn" onclick="filterCards('routine')">Recommended</button>
+<button class="filter-btn" onclick="filterCards('anomaly')">Options</button>
+<button class="filter-btn" onclick="filterCards('review')">Needs Review</button>
+<button class="filter-btn" onclick="filterCards('action')">Action Required</button>
+<!-- JS overwrites button textContent with dynamic counts at runtime -->
 ```
 
 ## Alert Cards (7)
@@ -306,6 +307,6 @@ This output is deterministic and machine-parseable. Claude can read it back and 
 - Use existing severity CSS classes (`severity-routine`, `severity-anomaly`, `severity-review`, `severity-action`). No new CSS needed.
 - Filter button labels can differ from severity values. The `onclick="filterCards('routine')"` matches the `data-severity` attribute, while the button text says "Recommended."
 - Dollar amounts in tables use the `.num` class for right-alignment.
-- Collapsible room tables inside venue cards are display-only. They do not need `data-table-id` or `data-row-id` attributes and are not flaggable. The standalone activity and budget tables are the flaggable ones.
+- Collapsible room tables inside venue cards are display-only. They do not need `data-table-id` or `data-row-id` attributes and are not flaggable. Use a plain `<table>` without the `.data-table` class to avoid the pointer/hover styling that implies row interactivity. The standalone activity and budget tables use `.data-table` and are the flaggable ones.
 - Badge colors not explicitly specified default to muted (no color class). Specified colors: green for positive attributes, amber for moderate concerns, red for significant concerns.
 - The example prompt template (`examples/anniversary-trip-prompt.md`) is out of scope for this spec. It can be added later to show how Claude would generate this dashboard from a natural language request.
