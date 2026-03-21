@@ -1,0 +1,23 @@
+id: interactive-report-engine
+title: "Interactive Report Engine: Template"
+description: "Domain-agnostic HTML template for building interactive review dashboards. Includes alert cards with severity colors, action pill selection, table row flagging, inline annotations, keyboard navigation, localStorage persistence, shareable URL state, and a structured feedback loop that exports review decisions as markdown."
+author: Adam Shapira
+created: "2026-03-20"
+updated: "2026-03-20"
+tags:
+  - ai-workflow
+  - training
+  - interactive-reports
+  - templates
+  - feedback-loop
+interactive_kind: template
+tech_stack: "Vanilla HTML/CSS/JS"
+maintainer: Adam Shapira
+
+publish_to:
+  docs_site: true
+  category: general
+  parent: ai-workflow-training
+  order: 6
+  status: published
+  sensitivity: internal

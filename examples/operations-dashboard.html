@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace — Daily Action Dashboard</title>
+<style>
+  :root {
+    --bg-page: #1a1f2e;
+    --bg-card: #21263a;
+    --bg-alt-row: #2c313c;
+    --text-body: #abb2bf;
+    --text-heading: #e5e9f0;
+    --text-secondary: #636d83;
+    --accent-red: #e06c75;
+    --accent-amber: #e5c07b;
+    --accent-blue: #61afef;
+    --accent-green: #98c379;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --font-sans: system-ui, -apple-system, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-page);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 24px 24px 72px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  h1, h2, h3 { color: var(--text-heading); font-weight: 600; }
+
+  .generated-date {
+    color: var(--text-secondary);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 24px;
+  }
+
+  /* Hero Stats */
+  .hero {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .hero-stat {
+    flex: 1;
+    min-width: 180px;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-alt-row);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .hero-stat .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .hero-stat .value {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-heading);
+  }
+
+  .hero-stat .value.positive { color: var(--accent-green); }
+  .hero-stat .value.negative { color: var(--accent-red); }
+  .hero-stat .value.neutral { color: var(--accent-blue); }
+
+  /* Section headers */
+  .section-header {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--bg-alt-row);
+    padding-bottom: 8px;
+    margin: 32px 0 16px;
+  }
+
+  /* Alert cards */
+  .alerts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .alert-card {
+    background: var(--bg-card);
+    border-radius: 6px;
+    padding: 14px 18px;
+    border-left: 4px solid;
+    font-size: 13px;
+    line-height: 1.5;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .alert-card.severity-action { border-left-color: var(--accent-red); }
+  .alert-card.severity-anomaly { border-left-color: var(--accent-blue); }
+  .alert-card.severity-todo { border-left-color: var(--accent-amber); }
+  .alert-card.severity-info { border-left-color: var(--text-secondary); }
+  .alert-card.severity-ok { border-left-color: var(--accent-green); }
+
+  .alert-card .alert-title {
+    font-weight: 600;
+    color: var(--text-heading);
+    margin-bottom: 4px;
+  }
+
+  .alert-card.severity-action .alert-title { color: var(--accent-red); }
+  .alert-card.severity-anomaly .alert-title { color: var(--accent-blue); }
+  .alert-card.severity-todo .alert-title { color: var(--accent-amber); }
+  .alert-card.severity-ok .alert-title { color: var(--accent-green); }
+
+  .alert-content { flex: 1; }
+
+  /* Alert interactivity */
+  .alert-checkbox {
+    display: flex;
+    align-items: flex-start;
+    margin-right: 12px;
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .alert-checkbox input[type="checkbox"] {
+    accent-color: var(--accent-green);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  .alert-card.dismissed {
+    max-height: 0;
+    padding: 0 18px;
+    margin: 0;
+    opacity: 0;
+    overflow: hidden;
+    border-left-color: var(--text-secondary) !important;
+    transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
+  }
+
+  .alert-card:not(.dismissed) {
+    max-height: 500px;
+    transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease 0.1s;
+  }
+
+  .alert-card.dismissed .alert-title {
+    text-decoration: line-through;
+    color: var(--text-secondary) !important;
+  }
+
+  .alert-note-toggle {
+    font-size: 11px;
+    color: var(--accent-blue);
+    cursor: pointer;
+    margin-top: 6px;
+    user-select: none;
+  }
+
+  .alert-note-toggle:hover { text-decoration: underline; }
+
+  .alert-note {
+    width: 100%;
+    background: var(--bg-page);
+    border: 1px solid var(--bg-alt-row);
+    border-radius: 4px;
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    padding: 8px;
+    margin-top: 6px;
+    resize: vertical;
+    min-height: 48px;
+  }
+
+  .alert-note:focus {
+    outline: 1px solid var(--accent-blue);
+    border-color: var(--accent-blue);
+  }
+
+  /* Quick actions */
+  .alert-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .quick-action {
+    display: inline-block;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: rgba(97, 175, 239, 0.1);
+    color: var(--accent-blue);
+    cursor: pointer;
+    border: 1px solid rgba(97, 175, 239, 0.2);
+    user-select: none;
+    transition: all 0.15s;
+  }
+
+  .quick-action:hover {
+    background: rgba(97, 175, 239, 0.2);
+    border-color: var(--accent-blue);
+  }
+
+  .quick-action.selected {
+    background: var(--accent-blue);
+    color: #fff;
+    border-color: var(--accent-blue);
+  }
+
+  /* Keyboard focus */
+  .alert-card.focused {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: -2px;
+  }
+
+  .kbd-hint {
+    position: fixed;
+    bottom: 48px;
+    right: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-alt-row);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    z-index: 101;
+    line-height: 1.8;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  .kbd-hint.visible { opacity: 1; }
+
+  .kbd-hint kbd {
+    display: inline-block;
+    background: var(--bg-alt-row);
+    color: var(--text-heading);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    margin-right: 2px;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+
+  thead th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--bg-alt-row);
+    font-weight: 600;
+  }
+
+  thead th.amt { text-align: right; }
+
+  tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(44, 49, 60, 0.5);
+  }
+
+  tbody tr:nth-child(even) { background: var(--bg-alt-row); }
+  tbody tr { cursor: pointer; transition: background 0.15s; }
+  tbody tr:hover { background: rgba(97, 175, 239, 0.05); }
+  tbody tr.flagged { background: rgba(97, 175, 239, 0.08) !important; border-left: 3px solid var(--accent-blue); }
+
+  .account-note-row td {
+    padding: 0 12px 8px !important;
+    border-bottom: none !important;
+    background: rgba(97, 175, 239, 0.04) !important;
+  }
+
+  .account-note-row .account-note-input {
+    width: 100%;
+    background: var(--bg-page);
+    border: 1px solid var(--bg-alt-row);
+    border-radius: 4px;
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    padding: 6px 8px;
+    resize: none;
+    min-height: 32px;
+  }
+
+  .account-note-row .account-note-input:focus {
+    outline: 1px solid var(--accent-blue);
+    border-color: var(--accent-blue);
+  }
+
+  td.amt {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  td.amt.positive { color: var(--accent-green); }
+  td.amt.negative { color: var(--accent-red); }
+
+  td.stale { color: var(--accent-amber); }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .badge-stale { background: rgba(229, 192, 123, 0.15); color: var(--accent-amber); }
+  .badge-fresh { background: rgba(152, 195, 121, 0.15); color: var(--accent-green); }
+  .badge-manual { background: rgba(99, 109, 131, 0.15); color: var(--text-secondary); }
+
+  /* System health details */
+  details {
+    background: var(--bg-card);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid var(--bg-alt-row);
+  }
+
+  details summary {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-heading);
+    list-style: none;
+  }
+
+  details summary::before {
+    content: '\25B6';
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 10px;
+    color: var(--text-secondary);
+    transition: transform 0.15s;
+  }
+
+  details[open] summary::before { transform: rotate(90deg); }
+
+  details .details-content {
+    padding: 0 16px 16px;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+
+  .status-dot.green { background: var(--accent-green); }
+  .status-dot.amber { background: var(--accent-amber); }
+  .status-dot.red { background: var(--accent-red); }
+
+  /* Data quality */
+  .dq-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg-card);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+
+  .dq-item .dq-count {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  .dq-item .dq-count.warn { color: var(--accent-amber); }
+  .dq-item .dq-count.ok { color: var(--accent-green); }
+
+  /* Sticky action bar */
+  .action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border-top: 2px solid var(--bg-alt-row);
+    padding: 10px 24px;
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    z-index: 100;
+  }
+
+  .action-bar.visible { display: flex; }
+
+  .action-bar-stats { color: var(--text-secondary); }
+
+  .copy-btn {
+    background: var(--accent-blue);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+
+  .copy-btn:hover { opacity: 0.9; }
+  .copy-btn.copied { background: var(--accent-green); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    body { padding: 12px 12px 72px; }
+    .hero { flex-direction: column; }
+    .hero-stat .value { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="generated-date">Acme Marketplace &mdash; Daily Action Dashboard &mdash; Generated 2026-03-20 08:15</div>
+
+<div class="hero">
+  <div class="hero-stat">
+    <div class="label">Yesterday Revenue</div>
+    <div class="value positive">$287,430</div>
+  </div>
+  <div class="hero-stat">
+    <div class="label">Blended EPC</div>
+    <div class="value neutral">$1.42</div>
+  </div>
+  <div class="hero-stat">
+    <div class="label">Sell Rate</div>
+    <div class="value positive">68.4%</div>
+  </div>
+  <div class="hero-stat">
+    <div class="label">Active Experiments</div>
+    <div class="value neutral">9</div>
+  </div>
+</div>
+
+<h2 class="section-header">Alerts &amp; Recommendations</h2>
+<div class="alerts-container">
+
+  <!-- RED: Revenue impact -->
+  <div class="alert-card severity-action" data-alert-id="alert-1">
+    <label class="alert-checkbox">
+      <input type="checkbox" onchange="toggleDismiss('alert-1')">
+    </label>
+    <div class="alert-content">
+      <div class="alert-title">Partner &ldquo;CreditServe&rdquo; &mdash; EPL Down 34% Day-Over-Day</div>
+      EPL dropped from $42.80 to $28.20 yesterday. This partner accounts for 18% of total revenue. No corresponding decline in lead volume (2,840 leads sent vs. 2,910 avg). Possible causes: buyer-side cap hit, campaign paused, or quality filtering tightened.
+      <div class="alert-actions">
+        <span class="quick-action" data-action="Query CreditServe daily EPL, sell rate, and reject reasons for the last 14 days. Break down by traffic type. Flag any day where EPL dropped more than 15%." onclick="selectAction(this)">Query analytics</span>
+        <span class="quick-action" data-action="Draft a Slack message for #partnerships: 'Seeing a 34% EPL drop on CreditServe yesterday — want to flag before the weekly call. Investigating reject reasons now.'" onclick="selectAction(this)">Draft Slack message</span>
+        <span class="quick-action" data-action="Create a ticket: 'Investigate CreditServe EPL decline — 34% drop on 2026-03-19. Check reject reasons, cap status, buyer-side filtering.' Priority High." onclick="selectAction(this)">Create a ticket</span>
+      </div>
+      <div class="alert-note-toggle" onclick="toggleNote('alert-1')">+ Add note</div>
+      <div id="note-alert-1" style="display:none">
+        <textarea class="alert-note" data-id="alert-1" placeholder="Notes for Claude..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLUE: SMS volume anomaly -->
+  <div class="alert-card severity-anomaly" data-alert-id="alert-2">
+    <label class="alert-checkbox">
+      <input type="checkbox" onchange="toggleDismiss('alert-2')">
+    </label>
+    <div class="alert-content">
+      <div class="alert-title">SMS Traffic &mdash; Volume 2.4x Weekly Average</div>
+      SMS channel delivered 12,400 clicks yesterday vs. 5,200 weekly average. EPC held steady at $1.38 (within 3% of norm). Sell rate is 71.2% (above average). Likely cause: new SMS campaign &ldquo;SpringCash-03&rdquo; launched Monday by affiliate &ldquo;PulseMedia.&rdquo;
+      <div class="alert-actions">
+        <span class="quick-action" data-action="Expected — PulseMedia launched SpringCash-03 SMS campaign on Monday. Volume spike is intentional. Monitor EPC for 3 more days before adjusting." onclick="selectAction(this)">Expected (new campaign)</span>
+        <span class="quick-action" data-action="Query analytics: SMS traffic quality for the last 7 days — show duplicate rate, reject rate by reason, and app completion rate. Compare PulseMedia vs. other SMS affiliates." onclick="selectAction(this)">Check quality</span>
+        <span class="quick-action" data-action="Pull PulseMedia affiliate scorecard for March: total clicks, leads sold, EPC, duplicate rate, reject rate. Compare to their February performance." onclick="selectAction(this)">Review affiliate</span>
+      </div>
+      <div class="alert-note-toggle" onclick="toggleNote('alert-2')">+ Add note</div>
+      <div id="note-alert-2" style="display:none">
+        <textarea class="alert-note" data-id="alert-2" placeholder="Notes for Claude..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLUE: Funnel dropout -->
+  <div class="alert-card severity-anomaly" data-alert-id="alert-3">
+    <label class="alert-checkbox">
+      <input type="checkbox" onchange="toggleDismiss('alert-3')">
+    </label>
+    <div class="alert-content">
+      <div class="alert-title">Application Funnel Step 3&rarr;4 Conversion Down 11%</div>
+      Application completion (step 3 to step 4) dropped from 62% to 55.2% starting Tuesday. Affects all traffic types equally. No code deploys in that window. Possible causes: third-party lookup service latency, form field validation change, or mobile rendering issue.
+      <div class="alert-actions">
+        <span class="quick-action" data-action="Query the application lookup service response times for the last 7 days. Show p50 and p95 by provider. Flag any provider where p95 exceeded 3 seconds." onclick="selectAction(this)">Check lookup latency</span>
+        <span class="quick-action" data-action="Create a ticket on the Engineering board: 'Investigate application step 3→4 dropout — 11% decline since Tuesday, no corresponding deploy. Check lookup service latency and mobile rendering.' Priority High." onclick="selectAction(this)">Create a ticket</span>
+        <span class="quick-action" data-action="Query analytics: application funnel conversion by step, broken down by device type (mobile vs desktop), for the last 7 days. Did the drop happen on mobile only?" onclick="selectAction(this)">Check by device</span>
+      </div>
+      <div class="alert-note-toggle" onclick="toggleNote('alert-3')">+ Add note</div>
+      <div id="note-alert-3" style="display:none">
+        <textarea class="alert-note" data-id="alert-3" placeholder="Notes for Claude..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- AMBER: Experiment ready -->
+  <div class="alert-card severity-todo" data-alert-id="alert-4">
+    <label class="alert-checkbox">
+      <input type="checkbox" onchange="toggleDismiss('alert-4')">
+    </label>
+    <div class="alert-content">
+      <div class="alert-title">Experiment &ldquo;RLA-ReAsk-v2&rdquo; &mdash; Reached Statistical Significance</div>
+      Running 18 days with 24,000 leads per variant. Results: +8.2% EPL lift in treatment (p=0.003). Control EPL $31.40, treatment EPL $33.98. Scheduled for a 14-day minimum &mdash; ready for a ship/kill decision.
+      <div class="alert-actions">
+        <span class="quick-action" data-action="Draft a Slack message for #experimentation: 'RLA-ReAsk-v2 hit significance at +8.2% EPL lift (p=0.003, 18 days, 24K/variant). Recommending we ship to 100%. Objections by EOD Thursday?'" onclick="selectAction(this)">Ship it</span>
+        <span class="quick-action" data-action="Extending RLA-ReAsk-v2 for 7 more days to confirm stability. The 8.2% lift is promising but I want to see weekend traffic patterns before shipping." onclick="selectAction(this)">Extend 7 days</span>
+        <span class="quick-action" data-action="Run /experiment-report for RLA-ReAsk-v2. Include daily EPL by variant, cumulative lift chart, confidence interval, and segment breakdown (traffic type, partner)." onclick="selectAction(this)">Pull full report</span>
+      </div>
+      <div class="alert-note-toggle" onclick="toggleNote('alert-4')">+ Add note</div>
+      <div id="note-alert-4" style="display:none">
+        <textarea class="alert-note" data-id="alert-4" placeholder="Notes for Claude..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- AMBER: Stale pipeline -->
+  <div class="alert-card severity-todo" data-alert-id="alert-5">
+    <label class="alert-checkbox">
+      <input type="checkbox" onchange="toggleDismiss('alert-5')">
+    </label>
+    <div class="alert-content">
+      <div class="alert-title">QuickSight &ldquo;Daily Partner Revenue&rdquo; &mdash; Data 4h Stale</div>
+      Dashboard last refreshed at 4:12 AM. Expected refresh cycle is hourly. The ETL job <code>partner_revenue_rollup</code> shows status &ldquo;running&rdquo; since 4:08 AM. All other QuickSight dashboards refreshed within the last 45 minutes.
+      <div class="alert-actions">
+        <span class="quick-action" data-action="Check the status of the partner_revenue_rollup ETL job. If stuck, restart the Athena query and trigger a manual QuickSight dataset refresh for Daily Partner Revenue." onclick="selectAction(this)">Restart ETL</span>
+        <span class="quick-action" data-action="Expected — the partner_revenue_rollup job sometimes hangs on large backfill days. It should self-recover within an hour. Monitor and escalate if still stale by 10 AM." onclick="selectAction(this)">Known issue</span>
+      </div>
+      <div class="alert-note-toggle" onclick="toggleNote('alert-5')">+ Add note</div>
+      <div id="note-alert-5" style="display:none">
+        <textarea class="alert-note" data-id="alert-5" placeholder="Notes for Claude..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAY: Contract renewals -->
+  <div class="alert-card severity-info" data-alert-id="alert-6">
+    <label class="alert-checkbox">
+      <input type="checkbox" onchange="toggleDismiss('alert-6')">
+    </label>
+    <div class="alert-content">
+      <div class="alert-title">3 Partner Contracts Up for Renewal This Month</div>
+      NorthBridge Financial (renews Mar 25, $84K/mo), QuickFund Direct (renews Mar 28, $52K/mo), and PeakLend Solutions (renews Mar 31, $31K/mo). Combined monthly revenue at risk: $167K. No renewal discussions logged in CRM for PeakLend.
+      <div class="alert-actions">
+        <span class="quick-action" data-action="Query analytics: monthly EPL, lead volume, and sell rate for NorthBridge Financial, QuickFund Direct, and PeakLend Solutions for the last 6 months. Format as a comparison table." onclick="selectAction(this)">Pull scorecards</span>
+        <span class="quick-action" data-action="Draft a Slack message for #client-relations: 'PeakLend Solutions contract renews March 31 — no renewal discussion logged in CRM yet. Can someone confirm status? They are $31K/mo.'" onclick="selectAction(this)">Flag PeakLend</span>
+        <span class="quick-action" data-action="For each of these 3 partners (NorthBridge, QuickFund, PeakLend), generate a 1-page renewal brief: trailing 6-month EPL trend, volume trend, contract terms, and recommended pricing action." onclick="selectAction(this)">Draft renewal prep</span>
+      </div>
+      <div class="alert-note-toggle" onclick="toggleNote('alert-6')">+ Add note</div>
+      <div id="note-alert-6" style="display:none">
+        <textarea class="alert-note" data-id="alert-6" placeholder="Notes for Claude..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAY: Weekly scorecard -->
+  <div class="alert-card severity-info" data-alert-id="alert-7">
+    <label class="alert-checkbox">
+      <input type="checkbox" onchange="toggleDismiss('alert-7')">
+    </label>
+    <div class="alert-content">
+      <div class="alert-title">Weekly Scorecard &mdash; Due by 11 AM Friday</div>
+      Covers Mon&ndash;Thu data. Traffic mix: 42% Internal Media Buy, 23% External Media Buy, 18% SMS, 9% Email, 8% Other. All data sources are fresh. Revenue tracking 4% above weekly forecast.
+      <div class="alert-actions">
+        <span class="quick-action" data-action="Run /weekly-scorecard for all traffic types, week of 2026-03-17. Include revenue, EPC, EPL, sell rate, and margin by traffic type. Highlight any metric that moved more than 10% week-over-week." onclick="selectAction(this)">Generate scorecard</span>
+        <span class="quick-action" data-action="Reviewed — revenue on pace, data fresh. Standard scorecard, no special callouts needed." onclick="selectAction(this)">Looks good</span>
+      </div>
+      <div class="alert-note-toggle" onclick="toggleNote('alert-7')">+ Add note</div>
+      <div id="note-alert-7" style="display:none">
+        <textarea class="alert-note" data-id="alert-7" placeholder="Notes for Claude..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- GREEN: All systems go -->
+  <div class="alert-card severity-ok" data-alert-id="alert-8">
+    <label class="alert-checkbox">
+      <input type="checkbox" onchange="toggleDismiss('alert-8')">
+    </label>
+    <div class="alert-content">
+      <div class="alert-title">All Ping Trees Active &mdash; Lead Flow Normal</div>
+      14 active ping trees, all responding within SLA. Total leads sold yesterday: 6,840. Average response time: 320ms (within 500ms target). No partner timeouts in the last 24 hours. Fund rate: 42.1% (within 2% of monthly average).
+      <div class="alert-actions">
+        <span class="quick-action" data-action="Looks good — all systems green, lead flow normal. Dismiss." onclick="selectAction(this)">Looks good</span>
+      </div>
+      <div class="alert-note-toggle" onclick="toggleNote('alert-8')">+ Add note</div>
+      <div id="note-alert-8" style="display:none">
+        <textarea class="alert-note" data-id="alert-8" placeholder="Notes for Claude..."></textarea>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h2 class="section-header">Partner Performance</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Partner</th>
+      <th>Status</th>
+      <th>Leads Sold</th>
+      <th class="amt">EPL</th>
+      <th class="amt">Revenue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr data-account="CreditServe">
+      <td>CreditServe</td>
+      <td><span class="badge badge-stale">DECLINING</span></td>
+      <td style="font-family: var(--font-mono);">2,840</td>
+      <td class="amt negative">$28.20</td>
+      <td class="amt negative">$80,088</td>
+    </tr>
+    <tr data-account="NorthBridge Financial">
+      <td>NorthBridge Financial</td>
+      <td><span class="badge badge-fresh">ACTIVE</span></td>
+      <td style="font-family: var(--font-mono);">1,420</td>
+      <td class="amt positive">$44.60</td>
+      <td class="amt positive">$63,332</td>
+    </tr>
+    <tr data-account="QuickFund Direct">
+      <td>QuickFund Direct</td>
+      <td><span class="badge badge-fresh">ACTIVE</span></td>
+      <td style="font-family: var(--font-mono);">1,180</td>
+      <td class="amt positive">$38.90</td>
+      <td class="amt positive">$45,902</td>
+    </tr>
+    <tr data-account="PeakLend Solutions">
+      <td>PeakLend Solutions</td>
+      <td><span class="badge badge-fresh">ACTIVE</span></td>
+      <td style="font-family: var(--font-mono);">890</td>
+      <td class="amt positive">$34.50</td>
+      <td class="amt positive">$30,705</td>
+    </tr>
+    <tr data-account="MeridianCap">
+      <td>MeridianCap</td>
+      <td><span class="badge badge-fresh">ACTIVE</span></td>
+      <td style="font-family: var(--font-mono);">510</td>
+      <td class="amt positive">$32.10</td>
+      <td class="amt positive">$16,371</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="section-header">Traffic Source Health</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Traffic Type</th>
+      <th>Source</th>
+      <th>Clicks</th>
+      <th class="amt">EPC</th>
+      <th class="amt">Margin %</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr data-account="Internal Media Buy">
+      <td>Internal Media Buy</td>
+      <td>&mdash;</td>
+      <td style="font-family: var(--font-mono);">84,200</td>
+      <td class="amt positive">$1.52</td>
+      <td class="amt positive">38.2%</td>
+    </tr>
+    <tr data-account="External Media Buy">
+      <td>External Media Buy</td>
+      <td>&mdash;</td>
+      <td style="font-family: var(--font-mono);">46,100</td>
+      <td class="amt positive">$1.34</td>
+      <td class="amt positive">31.7%</td>
+    </tr>
+    <tr data-account="SMS">
+      <td>SMS</td>
+      <td>PulseMedia</td>
+      <td style="font-family: var(--font-mono);">12,400</td>
+      <td class="amt positive">$1.38</td>
+      <td class="amt positive">44.1%</td>
+    </tr>
+    <tr data-account="Email">
+      <td>Email</td>
+      <td>&mdash;</td>
+      <td style="font-family: var(--font-mono);">18,600</td>
+      <td class="amt positive">$1.18</td>
+      <td class="amt positive">28.9%</td>
+    </tr>
+    <tr data-account="Push">
+      <td>Push</td>
+      <td>&mdash;</td>
+      <td style="font-family: var(--font-mono);">9,200</td>
+      <td class="amt">$0.94</td>
+      <td class="amt positive">22.4%</td>
+    </tr>
+    <tr data-account="Affiliate">
+      <td>Affiliate</td>
+      <td>TrafficMax</td>
+      <td style="font-family: var(--font-mono);">22,800</td>
+      <td class="amt positive">$1.61</td>
+      <td class="amt positive">41.3%</td>
+    </tr>
+    <tr data-account="Marketplace">
+      <td>Marketplace</td>
+      <td>&mdash;</td>
+      <td style="font-family: var(--font-mono);">8,900</td>
+      <td class="amt">$1.08</td>
+      <td class="amt positive">19.6%</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="section-header">Active Experiments</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Experiment</th>
+      <th>Area</th>
+      <th>Days Running</th>
+      <th>Sample Size</th>
+      <th class="amt">Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr data-account="RLA-ReAsk-v2">
+      <td>RLA-ReAsk-v2</td>
+      <td>Monetization</td>
+      <td style="font-family: var(--font-mono);">18</td>
+      <td style="font-family: var(--font-mono);">48,000</td>
+      <td class="amt positive">+8.2% EPL</td>
+    </tr>
+    <tr data-account="SoftTimeout-300ms">
+      <td>SoftTimeout-300ms</td>
+      <td>Monetization</td>
+      <td style="font-family: var(--font-mono);">12</td>
+      <td style="font-family: var(--font-mono);">31,200</td>
+      <td class="amt positive">+3.1% sell rate</td>
+    </tr>
+    <tr data-account="ProcessingScreen-v4">
+      <td>ProcessingScreen-v4</td>
+      <td>Application</td>
+      <td style="font-family: var(--font-mono);">9</td>
+      <td style="font-family: var(--font-mono);">18,400</td>
+      <td class="amt">0.0% (collecting)</td>
+    </tr>
+    <tr data-account="MobileForm-2Step">
+      <td>MobileForm-2Step</td>
+      <td>Application</td>
+      <td style="font-family: var(--font-mono);">6</td>
+      <td style="font-family: var(--font-mono);">12,800</td>
+      <td class="amt positive">+5.7% completion</td>
+    </tr>
+    <tr data-account="EngageTier-Rebalance">
+      <td>EngageTier-Rebalance</td>
+      <td>Router</td>
+      <td style="font-family: var(--font-mono);">21</td>
+      <td style="font-family: var(--font-mono);">62,000</td>
+      <td class="amt negative">-1.4% EPC</td>
+    </tr>
+    <tr data-account="EmailSubject-Urgency">
+      <td>EmailSubject-Urgency</td>
+      <td>Email</td>
+      <td style="font-family: var(--font-mono);">4</td>
+      <td style="font-family: var(--font-mono);">8,200</td>
+      <td class="amt">+1.2% (not sig)</td>
+    </tr>
+    <tr data-account="PushTiming-Evening">
+      <td>PushTiming-Evening</td>
+      <td>Push</td>
+      <td style="font-family: var(--font-mono);">7</td>
+      <td style="font-family: var(--font-mono);">6,400</td>
+      <td class="amt positive">+4.8% CTR</td>
+    </tr>
+    <tr data-account="AffiliateLP-Redesign">
+      <td>AffiliateLP-Redesign</td>
+      <td>Application</td>
+      <td style="font-family: var(--font-mono);">14</td>
+      <td style="font-family: var(--font-mono);">22,600</td>
+      <td class="amt positive">+6.3% app rate</td>
+    </tr>
+    <tr data-account="DynamicRLA-Caps">
+      <td>DynamicRLA-Caps</td>
+      <td>Monetization</td>
+      <td style="font-family: var(--font-mono);">3</td>
+      <td style="font-family: var(--font-mono);">4,800</td>
+      <td class="amt">collecting</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="section-header">Data Quality</h2>
+<div>
+  <div class="dq-item">
+    <span>Stale data pipelines</span>
+    <span class="dq-count warn">1</span>
+  </div>
+  <div class="dq-item">
+    <span>Leads processed this month</span>
+    <span class="dq-count ok">142,680</span>
+  </div>
+</div>
+
+<h2 class="section-header">System Health</h2>
+<details open>
+  <summary><span class="status-dot amber"></span>Data Pipeline Status</summary>
+  <div class="details-content">
+    <table>
+      <thead>
+        <tr><th>Pipeline</th><th>Last Refresh</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Lead Events</td><td>8 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
+        <tr><td>Funnel Metrics</td><td>15 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
+        <tr><td>Traffic Router Clicks</td><td>22 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
+        <tr><td>Partner Revenue Rollup</td><td class="stale">4 hours ago</td><td><span class="badge badge-stale">STALE</span></td></tr>
+        <tr><td>QuickSight Datasets</td><td>35 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+<details>
+  <summary><span class="status-dot green"></span>Partner API Health</summary>
+  <div class="details-content">
+    <table>
+      <thead>
+        <tr><th>Partner</th><th>Last Ping</th><th>Response Time</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>CreditServe</td><td>2 min ago</td><td style="font-family: var(--font-mono);">280ms</td><td><span class="badge badge-fresh">OK</span></td></tr>
+        <tr><td>NorthBridge Financial</td><td>5 min ago</td><td style="font-family: var(--font-mono);">310ms</td><td><span class="badge badge-fresh">OK</span></td></tr>
+        <tr><td>QuickFund Direct</td><td>3 min ago</td><td style="font-family: var(--font-mono);">245ms</td><td><span class="badge badge-fresh">OK</span></td></tr>
+        <tr><td>PeakLend Solutions</td><td>8 min ago</td><td style="font-family: var(--font-mono);">390ms</td><td><span class="badge badge-fresh">OK</span></td></tr>
+        <tr><td>MeridianCap</td><td>4 min ago</td><td style="font-family: var(--font-mono);">260ms</td><td><span class="badge badge-fresh">OK</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+<details>
+  <summary><span class="status-dot green"></span>Experiment Infrastructure</summary>
+  <div class="details-content">
+    <table>
+      <thead>
+        <tr><th>Component</th><th>Status</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Assignment Service</td><td><span class="badge badge-fresh">OK</span></td><td>9 experiments active</td></tr>
+        <tr><td>Event Logging</td><td><span class="badge badge-fresh">OK</span></td><td>142K events/day</td></tr>
+        <tr><td>Stats Engine</td><td><span class="badge badge-fresh">OK</span></td><td>Last significance calc: 12 min ago</td></tr>
+        <tr><td>Sample Size Monitor</td><td><span class="badge badge-fresh">OK</span></td><td>2 experiments at target</td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<!-- Keyboard shortcuts hint -->
+<div class="kbd-hint" id="kbd-hint">
+  <kbd>j</kbd><kbd>k</kbd> navigate &nbsp;
+  <kbd>x</kbd> dismiss &nbsp;
+  <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> action &nbsp;
+  <kbd>n</kbd> note &nbsp;
+  <kbd>c</kbd> copy &nbsp;
+  <kbd>?</kbd> help
+</div>
+
+<!-- Action bar (hidden until user interacts) -->
+<div class="action-bar" id="action-bar">
+  <span class="action-bar-stats" id="action-bar-stats"></span>
+  <button class="copy-btn" id="copy-btn" onclick="copySummary()">Copy Review Summary</button>
+</div>
+
+<script>
+(function() {
+  var state = {
+    dismissed: new Set(),
+    notes: {},
+    actions: {},
+    flaggedAccounts: new Set(),
+    accountNotes: {}
+  };
+
+  function copyToClipboard(text, onSuccess) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(function() {
+        fallbackCopy(text, onSuccess);
+      });
+    } else {
+      fallbackCopy(text, onSuccess);
+    }
+  }
+
+  function fallbackCopy(text, onSuccess) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;left:-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e) { ok = false; }
+    document.body.removeChild(ta);
+    if (ok) {
+      if (onSuccess) onSuccess();
+    } else {
+      window.prompt('Copy failed. Select the text below:', text);
+    }
+  }
+
+  function getReportDate() {
+    var el = document.querySelector('.generated-date');
+    if (!el) return new Date().toISOString().slice(0, 10);
+    var m = el.textContent.match(/\d{4}-\d{2}-\d{2}/);
+    return m ? m[0] : new Date().toISOString().slice(0, 10);
+  }
+
+  window.toggleDismiss = function(id) {
+    var card = document.querySelector('[data-alert-id="' + id + '"]');
+    if (!card) return;
+    if (state.dismissed.has(id)) {
+      state.dismissed.delete(id);
+      card.classList.remove('dismissed');
+    } else {
+      state.dismissed.add(id);
+      card.classList.add('dismissed');
+    }
+    updateActionBar();
+  };
+
+  window.selectAction = function(el) {
+    var action = el.getAttribute('data-action');
+    var card = el.closest('.alert-card');
+    var id = card.getAttribute('data-alert-id');
+
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      delete state.actions[id];
+    } else {
+      card.querySelectorAll('.quick-action.selected').forEach(function(s) { s.classList.remove('selected'); });
+      el.classList.add('selected');
+      state.actions[id] = action;
+    }
+
+    copyToClipboard(action);
+    updateActionBar();
+  };
+
+  window.toggleNote = function(id) {
+    var area = document.getElementById('note-' + id);
+    if (!area) return;
+    area.style.display = area.style.display === 'none' ? 'block' : 'none';
+    if (area.style.display === 'block') {
+      area.querySelector('textarea').focus();
+    }
+  };
+
+  document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('alert-note')) {
+      var id = e.target.getAttribute('data-id');
+      if (e.target.value.trim()) {
+        state.notes[id] = e.target.value.trim();
+      } else {
+        delete state.notes[id];
+      }
+      updateActionBar();
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.account-note-row')) return;
+    if (e.target.classList.contains('account-note-input')) return;
+
+    var row = e.target.closest('tbody tr[data-account]');
+    if (!row) return;
+    var name = row.getAttribute('data-account');
+    var noteRow = row.nextElementSibling;
+    var hasNoteRow = noteRow && noteRow.classList.contains('account-note-row');
+
+    if (state.flaggedAccounts.has(name)) {
+      state.flaggedAccounts.delete(name);
+      delete state.accountNotes[name];
+      row.classList.remove('flagged');
+      if (hasNoteRow) noteRow.remove();
+    } else {
+      state.flaggedAccounts.add(name);
+      row.classList.add('flagged');
+      var cols = row.querySelectorAll('td').length;
+      var nr = document.createElement('tr');
+      nr.className = 'account-note-row';
+      nr.innerHTML = '<td colspan="' + cols + '"><input type="text" class="account-note-input" data-account="' + name.replace(/"/g, '&quot;') + '" placeholder="Why are you flagging ' + name.replace(/"/g, '&quot;') + '?"></td>';
+      row.after(nr);
+      nr.querySelector('input').focus();
+    }
+    updateActionBar();
+  });
+
+  document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('account-note-input')) {
+      var name = e.target.getAttribute('data-account');
+      if (e.target.value.trim()) {
+        state.accountNotes[name] = e.target.value.trim();
+      } else {
+        delete state.accountNotes[name];
+      }
+      updateActionBar();
+    }
+  });
+
+  function updateActionBar() {
+    var hasAlerts = document.querySelectorAll('.alert-card[data-alert-id]').length > 0;
+    var interactions = state.dismissed.size + Object.keys(state.notes).length + Object.keys(state.actions).length + state.flaggedAccounts.size;
+    var bar = document.getElementById('action-bar');
+    if (hasAlerts || interactions > 0) {
+      bar.classList.add('visible');
+      var parts = [];
+      if (state.dismissed.size) parts.push(state.dismissed.size + ' dismissed');
+      if (Object.keys(state.actions).length) parts.push(Object.keys(state.actions).length + ' action' + (Object.keys(state.actions).length > 1 ? 's' : ''));
+      if (Object.keys(state.notes).length) parts.push(Object.keys(state.notes).length + ' note' + (Object.keys(state.notes).length > 1 ? 's' : ''));
+      if (state.flaggedAccounts.size) parts.push(state.flaggedAccounts.size + ' flagged');
+      document.getElementById('action-bar-stats').textContent = parts.length ? parts.join(', ') : 'Review complete \u2014 copy summary';
+    } else {
+      bar.classList.remove('visible');
+    }
+    var btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copy Review Summary';
+    btn.classList.remove('copied');
+  }
+
+  updateActionBar();
+
+  window.copySummary = function() {
+    var lines = ['## Action Dashboard Review \u2014 ' + getReportDate(), ''];
+    var allCards = document.querySelectorAll('.alert-card[data-alert-id]');
+
+    var actionEntries = Object.keys(state.actions);
+    if (actionEntries.length) {
+      lines.push('### Quick Actions');
+      actionEntries.forEach(function(id) {
+        var card = document.querySelector('[data-alert-id="' + id + '"]');
+        var title = card ? card.querySelector('.alert-title').textContent.trim() : id;
+        lines.push('- ' + title + ': "' + state.actions[id] + '"');
+      });
+      lines.push('');
+    }
+
+    var dismissedItems = [];
+    var openItems = [];
+    allCards.forEach(function(card) {
+      var id = card.getAttribute('data-alert-id');
+      var title = card.querySelector('.alert-title');
+      if (!title) return;
+      var text = title.textContent.trim();
+      if (state.dismissed.has(id)) {
+        dismissedItems.push('- [x] ' + text);
+      } else {
+        openItems.push('- [ ] ' + text);
+      }
+    });
+
+    if (dismissedItems.length) {
+      lines.push('### Dismissed');
+      lines = lines.concat(dismissedItems);
+      lines.push('');
+    }
+
+    var noteEntries = Object.keys(state.notes);
+    if (noteEntries.length) {
+      lines.push('### Notes');
+      noteEntries.forEach(function(id) {
+        var card = document.querySelector('[data-alert-id="' + id + '"]');
+        var title = card ? card.querySelector('.alert-title').textContent.trim() : id;
+        lines.push('- ' + title + ': "' + state.notes[id] + '"');
+      });
+      lines.push('');
+    }
+
+    if (state.flaggedAccounts.size) {
+      lines.push('### Flagged Items');
+      state.flaggedAccounts.forEach(function(name) {
+        var note = state.accountNotes[name];
+        if (note) {
+          lines.push('- ' + name + ': "' + note + '"');
+        } else {
+          lines.push('- ' + name);
+        }
+      });
+      lines.push('');
+    }
+
+    if (openItems.length) {
+      lines.push('### Still Open');
+      lines = lines.concat(openItems);
+      lines.push('');
+    }
+
+    var text = lines.join('\n');
+    copyToClipboard(text, function() {
+      var btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy Review Summary';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  };
+
+  // === Keyboard navigation ===
+  var focusedIndex = -1;
+  var hintTimeout;
+
+  function getVisibleCards() {
+    return Array.from(document.querySelectorAll('.alert-card[data-alert-id]:not(.dismissed)'));
+  }
+
+  function focusCard(index) {
+    var cards = getVisibleCards();
+    document.querySelectorAll('.alert-card.focused').forEach(function(c) { c.classList.remove('focused'); });
+    if (index < 0 || index >= cards.length) { focusedIndex = -1; return; }
+    focusedIndex = index;
+    cards[index].classList.add('focused');
+    cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    showHint();
+  }
+
+  function getFocusedCard() {
+    var cards = getVisibleCards();
+    if (focusedIndex < 0 || focusedIndex >= cards.length) return null;
+    return cards[focusedIndex];
+  }
+
+  function showHint() {
+    var hint = document.getElementById('kbd-hint');
+    hint.classList.add('visible');
+    clearTimeout(hintTimeout);
+    hintTimeout = setTimeout(function() { hint.classList.remove('visible'); }, 4000);
+  }
+
+  document.addEventListener('keydown', function(e) {
+    var tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+
+    var cards = getVisibleCards();
+    var card, id, cb;
+
+    switch (e.key) {
+      case 'j':
+        e.preventDefault();
+        focusCard(Math.min(focusedIndex + 1, cards.length - 1));
+        break;
+
+      case 'k':
+        e.preventDefault();
+        focusCard(Math.max(focusedIndex - 1, 0));
+        break;
+
+      case 'x':
+        card = getFocusedCard();
+        if (!card) break;
+        e.preventDefault();
+        id = card.getAttribute('data-alert-id');
+        cb = card.querySelector('input[type="checkbox"]');
+        if (cb) cb.checked = !cb.checked;
+        toggleDismiss(id);
+        if (focusedIndex >= getVisibleCards().length) {
+          focusedIndex = getVisibleCards().length - 1;
+        }
+        if (focusedIndex >= 0) focusCard(focusedIndex);
+        break;
+
+      case '1': case '2': case '3':
+        card = getFocusedCard();
+        if (!card) break;
+        e.preventDefault();
+        var actions = card.querySelectorAll('.quick-action');
+        var idx = parseInt(e.key) - 1;
+        if (actions[idx]) selectAction(actions[idx]);
+        break;
+
+      case 'n':
+        card = getFocusedCard();
+        if (!card) break;
+        e.preventDefault();
+        id = card.getAttribute('data-alert-id');
+        toggleNote(id);
+        break;
+
+      case 'c':
+        e.preventDefault();
+        copySummary();
+        break;
+
+      case '?':
+        e.preventDefault();
+        var hint = document.getElementById('kbd-hint');
+        if (hint.classList.contains('visible')) {
+          hint.classList.remove('visible');
+          clearTimeout(hintTimeout);
+        } else {
+          showHint();
+        }
+        break;
+
+      case 'Escape':
+        document.querySelectorAll('.alert-card.focused').forEach(function(c) { c.classList.remove('focused'); });
+        focusedIndex = -1;
+        document.getElementById('kbd-hint').classList.remove('visible');
+        break;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
