@@ -10,7 +10,7 @@ This example serves as the showcase for the engine's planning use case, demonstr
 
 `examples/anniversary-trip-planner.html`
 
-Copies CSS and JS verbatim from `interactive-report-engine.html`. Only the HTML content zone differs.
+Copies CSS and JS verbatim from `interactive-report-engine.html`. The `<body>` tag, `<title>`, and HTML content zone are customized per this spec. CSS and JS require no changes.
 
 ## Body Attributes
 
@@ -19,7 +19,7 @@ Copies CSS and JS verbatim from `interactive-report-engine.html`. Only the HTML 
 ```
 
 - `data-multiaction`: Venue cards support selecting multiple actions simultaneously (e.g., "Request quote" + "Build itinerary").
-- `data-annotatable`: KPI values and specific claims in descriptions can be annotated inline.
+- `data-annotatable`: Elements with `data-annotation-id` attributes become click-to-annotate targets. This example marks 3 KPI values and 2 in-card claims (see Annotation Targets below).
 - `data-report-title="Decision"`: The engine appends " Review" automatically, producing the heading "Decision Review — 2026-03-21". Setting the title to "Decision" reads naturally in the output.
 - `data-report-date="2026-03-21"`: Date stamp for the summary output.
 - No `data-no-persist`: localStorage persistence is on. The reviewer can close the tab and return later.
@@ -40,6 +40,23 @@ Copies CSS and JS verbatim from `interactive-report-engine.html`. Only the HTML 
 | 3 | $69K-$99K | Est. Budget Range | `kpi-card--amber` | `kpi-budget` | Reviewer might note "board approved up to $95K" |
 | 4 | Jun 15-19 | Proposed Dates | `kpi-card--red` | `kpi-dates` | Reviewer might note "conflicts with Q2 close" |
 
+## Annotation Targets
+
+Every annotatable element requires an explicit `data-annotation-id` attribute. The `data-annotatable` body flag enables the behavior; the per-element IDs define the targets.
+
+| Annotation ID | Element | Location | Why Annotatable |
+|---------------|---------|----------|-----------------|
+| `kpi-guests` | "70" KPI value | KPI card 1 | Reviewer might note "includes 12 kids under 10" |
+| `kpi-budget` | "$69K-$99K" KPI value | KPI card 3 | Reviewer might note "board approved up to $95K" |
+| `kpi-dates` | "Jun 15-19" KPI value | KPI card 4 | Reviewer might note "conflicts with Q2 close" |
+| `ann-la-costa-group` | "Group rate confirmed for 35+ rooms" | Card 1 description | Reviewer might challenge the room count |
+| `ann-desert-heat` | "average high of 105 deg F" | Card 3 description | Reviewer might note source or dispute the figure |
+
+In the HTML, annotation targets are `<span>` elements wrapping the specific text:
+```html
+<span data-annotation-id="ann-la-costa-group">Group rate confirmed for 35+ rooms</span>
+```
+
 ## Pipeline
 
 **Planning Pipeline** with 5 steps:
@@ -54,15 +71,7 @@ Copies CSS and JS verbatim from `interactive-report-engine.html`. Only the HTML 
 
 ## Severity Types and Filter Bar
 
-| Severity | CSS Class | Color | Used By |
-|----------|-----------|-------|---------|
-| recommended | `severity-recommended` | green | Omni La Costa |
-| option | `severity-option` | blue | Terranea, Coronado |
-| concern | `severity-concern` | amber | JW Marriott Desert Springs |
-| action | `severity-action` | red | Room block deadline |
-| review | `severity-review` | amber | Heat advisory, kids program gap |
-
-The engine's CSS defines `severity-action`, `severity-review`, `severity-routine`, and `severity-anomaly`. The `data-severity` attribute values must match these existing CSS classes. No new CSS needed.
+The engine's CSS defines four severity classes: `severity-routine` (green), `severity-anomaly` (blue), `severity-review` (amber), and `severity-action` (red). The `data-severity` attribute on each card must use one of these values. Filter button labels can use planning-friendly text while the `onclick` handler references the engine's severity string.
 
 Severity mapping:
 
@@ -116,7 +125,7 @@ Filter buttons (using engine terms, but with planning-friendly labels):
 - **Quick actions:**
   1. "Request group rate quote from Terranea for 35 rooms, June 15-19"
   2. "Confirm Terranea kids program availability for June 15-19"
-  3. "Too expensive, remove from consideration"
+  3. "Research shuttle options from Carlsbad office to Terranea for 70 guests"
 - **Collapsible table:** "Room Options (3 types)"
 
   | Room Type | Nightly Rate | Sleeps | Available |
@@ -134,7 +143,7 @@ Filter buttons (using engine terms, but with planning-friendly labels):
 - **Quick actions:**
   1. "Request group rate quote from JW Marriott for 35 rooms, June 15-19"
   2. "Research indoor and evening activity options for extreme heat days"
-  3. "Too hot in June, remove from consideration"
+  3. "Compare JW Marriott costs with La Costa including transportation"
 - **Collapsible table:** "Room Options (4 types)"
 
   | Room Type | Nightly Rate | Sleeps | Available |
@@ -153,7 +162,7 @@ Filter buttons (using engine terms, but with planning-friendly labels):
 - **Quick actions:**
   1. "Request group rate quote from Hotel del Coronado for 35 rooms, June 15-19"
   2. "Build a detailed 5-day itinerary around Coronado with beach and downtown activities"
-  3. "Too close to home, remove from consideration"
+  3. "Research private beach bonfire event packages at Hotel del Coronado"
 - **Collapsible table:** "Room Options (4 types)"
 
   | Room Type | Nightly Rate | Sleeps | Available |
@@ -181,18 +190,18 @@ Filter buttons (using engine terms, but with planning-friendly labels):
 - **Description:** Average high temperature in Palm Desert in mid-June is 105 deg F. Outdoor activities like golf, pool parties, and group dinners on the terrace are comfortable only before 10am and after 7pm. This applies to JW Marriott Desert Springs only. The three coastal venues (Carlsbad, Palos Verdes, Coronado) average 72-76 deg F in June.
 - **Quick actions:**
   1. "Add heat mitigation plan to JW Marriott itinerary"
-  2. "Dismiss, already factored into venue evaluation"
+  2. "Research average June evening temperatures in Palm Desert for outdoor dinner feasibility"
 
 ### Card 7: Kids Program Coverage Gap
 
 - **alert-id:** `alert-kids`
 - **severity:** `review` (amber)
 - **Badges:** `12 kids expected` (amber), `Ages 2-14` (muted)
-- **Description:** Omni La Costa and Hotel del Coronado have confirmed year-round kids programs covering ages 4-12. Terranea's kids program is seasonal and not yet confirmed for June. JW Marriott has a kids club that closes at 2pm daily. For evening group events (welcome dinner, awards dinner), three of four venues need supplemental childcare arrangements. The youngest child in the group is 2, which is below most hotel program minimums.
+- **Description:** All four venues have some kids programming, but none fully covers this group's needs. La Costa and Coronado have year-round programs for ages 4-12 during daytime hours. Terranea's program is seasonal and unconfirmed for June. JW Marriott's club closes at 2pm. No venue covers children under 4 (the youngest in the group is 2), and none offers evening programming. All four venues need supplemental childcare for evening group events (welcome dinner, awards dinner) and dedicated arrangements for the under-4 children.
 - **Quick actions:**
   1. "Get childcare vendor quotes for evening coverage at all venues"
   2. "Confirm Terranea June kids program availability"
-  3. "Dismiss, parents will self-organize childcare"
+  3. "Research hotel babysitting services for children under 4 at all venues"
 
 ## Standalone Tables
 
@@ -257,8 +266,8 @@ When the user clicks "Copy Review Summary," the engine produces structured markd
 - Terranea Resort, Rancho Palos Verdes: "Beautiful venue but $99K total is over the $95K board cap. Could work if we cut golf tournament."
 
 ### Flagged Items
-- Awards dinner (act-awards): "Crown room at Coronado is $8,200, nearly double La Costa's $5,800"
-- Rooms (bud-rooms): "Terranea rooms alone are $55K, that is 56% of $95K budget"
+- Awards dinner (act-awards): "Crown room at Coronado is $8,200 vs La Costa's $5,800, a $2,400 difference"
+- Rooms (bud-rooms): "Terranea rooms alone are $55,860, that is 59% of the $95K budget cap"
 
 ### Annotations
 - [kpi-budget] "$69K-$99K": "Board approved up to $95K. Terranea is over."
@@ -282,7 +291,7 @@ This output is deterministic and machine-parseable. Claude can read it back and 
 | Standalone tables | Activity comparison (8 rows) + budget breakdown (11 rows) |
 | Row flagging | Flag specific activities or budget line items across 19 flaggable rows |
 | Inline notes | Free-text per card for reviewer commentary |
-| Annotations | 3 annotatable KPI values (guests, budget, dates) |
+| Annotations | 5 annotatable targets: 3 KPI values + 2 in-card description claims |
 | Pipeline | 5-step planning workflow with step 3 active |
 | Keyboard navigation | j/k through 7 cards, x to dismiss, number keys for actions, n for note |
 | Copy summary | "Decision Review" heading with all 6 structured sections |
