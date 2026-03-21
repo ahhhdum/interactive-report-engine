@@ -275,7 +275,48 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 </head>
 <body data-multiaction data-annotatable data-report-title="Decision" data-report-date="2026-03-21">
 <div class="container">
-  <!-- CONTENT PLACEHOLDER: Replace with dashboard content -->
+  <header class="hero anim-up" style="--i:0">
+    <div class="hero-eyebrow">Planning Dashboard</div>
+    <h1>EPCVIP Anniversary Trip 2026</h1>
+    <div class="hero-sub">Review venue options, flag concerns, and build a structured decision for the team.</div>
+    <div class="hero-meta">March 21, 2026 | 70 guests | 4 venues researched | 4-5 days</div>
+  </header>
+
+  <div class="kpi-row">
+    <div class="kpi-card kpi-card--accent anim-scale" style="--i:1">
+      <div class="kpi-card__value" data-annotation-id="kpi-guests">70</div>
+      <div class="kpi-card__label">Total Guests</div>
+    </div>
+    <div class="kpi-card kpi-card--green anim-scale" style="--i:2">
+      <div class="kpi-card__value">4</div>
+      <div class="kpi-card__label">Venues Researched</div>
+    </div>
+    <div class="kpi-card kpi-card--amber anim-scale" style="--i:3">
+      <div class="kpi-card__value" data-annotation-id="kpi-budget">$69K-$99K</div>
+      <div class="kpi-card__label">Est. Budget Range</div>
+    </div>
+    <div class="kpi-card kpi-card--red anim-scale" style="--i:4">
+      <div class="kpi-card__value" data-annotation-id="kpi-dates">Jun 15-19</div>
+      <div class="kpi-card__label">Proposed Dates</div>
+    </div>
+  </div>
+
+  <div class="pipeline-section anim-up" style="--i:5">
+    <div class="section-label">Planning Pipeline</div>
+    <div class="pipeline">
+      <div class="pipe-step pipe-step--done"><div class="pipe-step__num">01</div><div class="pipe-step__name">Research</div></div>
+      <div class="pipe-arrow">&rarr;</div>
+      <div class="pipe-step pipe-step--done"><div class="pipe-step__num">02</div><div class="pipe-step__name">Shortlist</div></div>
+      <div class="pipe-arrow">&rarr;</div>
+      <div class="pipe-step pipe-step--active"><div class="pipe-step__num">03</div><div class="pipe-step__name">Review</div></div>
+      <div class="pipe-arrow">&rarr;</div>
+      <div class="pipe-step pipe-step--pending"><div class="pipe-step__num">04</div><div class="pipe-step__name">Book</div></div>
+      <div class="pipe-arrow">&rarr;</div>
+      <div class="pipe-step pipe-step--pending"><div class="pipe-step__num">05</div><div class="pipe-step__name">Confirm</div></div>
+    </div>
+  </div>
+
+  <!-- Filter bar and alert cards will be added next -->
 </div>
 
 <!-- Keyboard Hint -->
