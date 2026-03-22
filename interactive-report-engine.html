@@ -132,6 +132,32 @@ body {
 .section-label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 .section-label::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 
+/* --- Decision Groups ---
+   Use when items are alternatives to each other (e.g., Option A vs B).
+   Options inside are standard alert cards wrapped in a .decision-options
+   container. They use the same state system (dismiss, notes, actions).
+   Filter bar does NOT apply to decision group cards.
+*/
+.decision-group { background: var(--bg-subtle); border: 1px solid var(--border-bright); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.decision-header { margin-bottom: 16px; }
+.decision-question { font-family: var(--font-display); font-size: 22px; color: var(--text-bright); line-height: 1.3; margin-bottom: 6px; }
+.decision-context { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+.decision-options { display: flex; flex-direction: column; gap: 10px; }
+.decision-group .alert-card { background: var(--surface-elevated); }
+.decision-group .alert-card details { background: var(--bg); }
+.decision-divider { display: flex; align-items: center; gap: 12px; padding: 2px 0; }
+.decision-divider::before, .decision-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-bright); }
+.decision-divider span { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+
+/* --- Comparison Table (non-interactive, inside decision groups) --- */
+.comparison-table { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.5; }
+.comparison-table th { font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border-bright); }
+.comparison-table td { padding: 6px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+.comparison-table td.positive { color: var(--green); }
+.comparison-table td.negative { color: var(--red); }
+.comparison-table td.neutral { color: var(--text-dim); }
+.comparison-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+
 /* --- Filter Bar --- */
 .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
 .filter-btn { font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); cursor: pointer; transition: all 0.15s; }
@@ -270,6 +296,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   .pipeline { flex-wrap: wrap; gap: 6px; }
   .pipe-arrow { display: none; }
   .hero h1 { font-size: 32px; }
+  .decision-question { font-size: 18px; }
 }
 </style>
 </head>
@@ -340,8 +367,57 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   </div>
 
   <!-- ============================================================
+       DECISION GROUPS (optional)
+       Use when items are alternatives to each other (e.g., Option A
+       vs Option B for a delivery approach). Options inside are
+       standard alert cards wrapped in a .decision-options container.
+       They use the same state system (dismiss, notes, actions).
+       The filter bar does NOT apply to cards inside decision groups.
+
+       Remove this section if your report has only independent items.
+       ============================================================ -->
+  <!-- DECISION_GROUPS: Repeat this pattern for each decision:
+
+  <div class="anim-up" style="--i:6">
+    <div class="section-label">Decision</div>
+  </div>
+
+  <div class="decision-group anim-up" style="--i:7">
+    <div class="decision-header">
+      <div class="decision-question">What is the question being decided?</div>
+      <div class="decision-context">Instructions for the reviewer.</div>
+    </div>
+    <div class="decision-options">
+
+      OPTION CARDS: Standard alert cards. Use severity to signal status:
+        routine (green)  = recommended option
+        anomaly (blue)   = viable alternative
+        review  (amber)  = option with concerns
+      Add badge--green "Recommended" badge ONLY when there is a clear rec.
+
+      <div class="alert-card severity-routine" data-alert-id="opt-a" data-severity="routine">
+        ... standard alert card structure ...
+      </div>
+      <div class="decision-divider"><span>or</span></div>
+      <div class="alert-card severity-anomaly" data-alert-id="opt-b" data-severity="anomaly">
+        ... standard alert card structure ...
+      </div>
+
+    </div>
+
+    OPTIONAL: Side-by-side comparison table (non-interactive).
+    Use .comparison-table class (no row flagging). Use .positive,
+    .negative, .neutral classes on <td> for color coding.
+
+  </div>
+
+  -->
+
+  <!-- ============================================================
        FILTER BAR
        Add filter buttons matching your severity types.
+       The filter bar applies only to the flat alerts-container
+       below, not to decision group cards above.
        ============================================================ -->
   <div class="anim-up" style="--i:6">
     <div class="section-label"><!-- SECTION_LABEL: e.g. "Alerts" --></div>
