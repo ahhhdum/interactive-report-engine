@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marketplace — Daily Action Dashboard</title>
+<title>SaaS Platform: Daily Action Dashboard</title>
 <style>
   :root {
     --bg-page: #1a1f2e;
@@ -452,7 +452,7 @@
 </head>
 <body>
 
-<div class="generated-date">Acme Marketplace &mdash; Daily Action Dashboard &mdash; Generated 2026-03-20 08:15</div>
+<div class="generated-date">Acme SaaS Platform / Daily Action Dashboard / Generated 2026-03-20 08:15</div>
 
 <div class="hero">
   <div class="hero-stat">
@@ -460,11 +460,11 @@
     <div class="value positive">$287,430</div>
   </div>
   <div class="hero-stat">
-    <div class="label">Blended EPC</div>
+    <div class="label">Blended RPC</div>
     <div class="value neutral">$1.42</div>
   </div>
   <div class="hero-stat">
-    <div class="label">Sell Rate</div>
+    <div class="label">Conversion Rate</div>
     <div class="value positive">68.4%</div>
   </div>
   <div class="hero-stat">
@@ -482,12 +482,12 @@
       <input type="checkbox" onchange="toggleDismiss('alert-1')">
     </label>
     <div class="alert-content">
-      <div class="alert-title">Partner &ldquo;CreditServe&rdquo; &mdash; EPL Down 34% Day-Over-Day</div>
-      EPL dropped from $42.80 to $28.20 yesterday. This partner accounts for 18% of total revenue. No corresponding decline in lead volume (2,840 leads sent vs. 2,910 avg). Possible causes: buyer-side cap hit, campaign paused, or quality filtering tightened.
+      <div class="alert-title">Partner &ldquo;CreditServe&rdquo;: RPT Down 34% Day-Over-Day</div>
+      RPT dropped from $42.80 to $28.20 yesterday. This partner accounts for 18% of total revenue. No corresponding decline in transaction volume (2,840 transactions sent vs. 2,910 avg). Possible causes: client-side cap hit, campaign paused, or quality filtering tightened.
       <div class="alert-actions">
-        <span class="quick-action" data-action="Query CreditServe daily EPL, sell rate, and reject reasons for the last 14 days. Break down by traffic type. Flag any day where EPL dropped more than 15%." onclick="selectAction(this)">Query analytics</span>
-        <span class="quick-action" data-action="Draft a Slack message for #partnerships: 'Seeing a 34% EPL drop on CreditServe yesterday — want to flag before the weekly call. Investigating reject reasons now.'" onclick="selectAction(this)">Draft Slack message</span>
-        <span class="quick-action" data-action="Create a ticket: 'Investigate CreditServe EPL decline — 34% drop on 2026-03-19. Check reject reasons, cap status, buyer-side filtering.' Priority High." onclick="selectAction(this)">Create a ticket</span>
+        <span class="quick-action" data-action="Query CreditServe daily RPT, conversion rate, and reject reasons for the last 14 days. Break down by traffic type. Flag any day where RPT dropped more than 15%." onclick="selectAction(this)">Query analytics</span>
+        <span class="quick-action" data-action="Draft a Slack message for #partnerships: 'Seeing a 34% RPT drop on CreditServe yesterday, want to flag before the weekly call. Investigating reject reasons now.'" onclick="selectAction(this)">Draft Slack message</span>
+        <span class="quick-action" data-action="Create a ticket: 'Investigate CreditServe RPT decline, 34% drop on 2026-03-19. Check reject reasons, cap status, client-side filtering.' Priority High." onclick="selectAction(this)">Create a ticket</span>
       </div>
       <div class="alert-note-toggle" onclick="toggleNote('alert-1')">+ Add note</div>
       <div id="note-alert-1" style="display:none">
@@ -502,12 +502,12 @@
       <input type="checkbox" onchange="toggleDismiss('alert-2')">
     </label>
     <div class="alert-content">
-      <div class="alert-title">SMS Traffic &mdash; Volume 2.4x Weekly Average</div>
-      SMS channel delivered 12,400 clicks yesterday vs. 5,200 weekly average. EPC held steady at $1.38 (within 3% of norm). Sell rate is 71.2% (above average). Likely cause: new SMS campaign &ldquo;SpringCash-03&rdquo; launched Monday by affiliate &ldquo;PulseMedia.&rdquo;
+      <div class="alert-title">SMS Traffic: Volume 2.4x Weekly Average</div>
+      SMS channel delivered 12,400 clicks yesterday vs. 5,200 weekly average. RPC held steady at $1.38 (within 3% of norm). Conversion rate is 71.2% (above average). Likely cause: new SMS campaign &ldquo;SpringCash-03&rdquo; launched Monday by affiliate &ldquo;PulseMedia.&rdquo;
       <div class="alert-actions">
-        <span class="quick-action" data-action="Expected — PulseMedia launched SpringCash-03 SMS campaign on Monday. Volume spike is intentional. Monitor EPC for 3 more days before adjusting." onclick="selectAction(this)">Expected (new campaign)</span>
-        <span class="quick-action" data-action="Query analytics: SMS traffic quality for the last 7 days — show duplicate rate, reject rate by reason, and app completion rate. Compare PulseMedia vs. other SMS affiliates." onclick="selectAction(this)">Check quality</span>
-        <span class="quick-action" data-action="Pull PulseMedia affiliate scorecard for March: total clicks, leads sold, EPC, duplicate rate, reject rate. Compare to their February performance." onclick="selectAction(this)">Review affiliate</span>
+        <span class="quick-action" data-action="Expected, PulseMedia launched SpringCash-03 SMS campaign on Monday. Volume spike is intentional. Monitor RPC for 3 more days before adjusting." onclick="selectAction(this)">Expected (new campaign)</span>
+        <span class="quick-action" data-action="Query analytics: SMS traffic quality for the last 7 days. Show duplicate rate, reject rate by reason, and app completion rate. Compare PulseMedia vs. other SMS affiliates." onclick="selectAction(this)">Check quality</span>
+        <span class="quick-action" data-action="Pull PulseMedia affiliate scorecard for March: total clicks, transactions sold, RPC, duplicate rate, reject rate. Compare to their February performance." onclick="selectAction(this)">Review affiliate</span>
       </div>
       <div class="alert-note-toggle" onclick="toggleNote('alert-2')">+ Add note</div>
       <div id="note-alert-2" style="display:none">
@@ -526,7 +526,7 @@
       Application completion (step 3 to step 4) dropped from 62% to 55.2% starting Tuesday. Affects all traffic types equally. No code deploys in that window. Possible causes: third-party lookup service latency, form field validation change, or mobile rendering issue.
       <div class="alert-actions">
         <span class="quick-action" data-action="Query the application lookup service response times for the last 7 days. Show p50 and p95 by provider. Flag any provider where p95 exceeded 3 seconds." onclick="selectAction(this)">Check lookup latency</span>
-        <span class="quick-action" data-action="Create a ticket on the Engineering board: 'Investigate application step 3→4 dropout — 11% decline since Tuesday, no corresponding deploy. Check lookup service latency and mobile rendering.' Priority High." onclick="selectAction(this)">Create a ticket</span>
+        <span class="quick-action" data-action="Create a ticket on the Engineering board: 'Investigate application step 3 to 4 dropout, 11% decline since Tuesday, no corresponding deploy. Check lookup service latency and mobile rendering.' Priority High." onclick="selectAction(this)">Create a ticket</span>
         <span class="quick-action" data-action="Query analytics: application funnel conversion by step, broken down by device type (mobile vs desktop), for the last 7 days. Did the drop happen on mobile only?" onclick="selectAction(this)">Check by device</span>
       </div>
       <div class="alert-note-toggle" onclick="toggleNote('alert-3')">+ Add note</div>
@@ -542,12 +542,12 @@
       <input type="checkbox" onchange="toggleDismiss('alert-4')">
     </label>
     <div class="alert-content">
-      <div class="alert-title">Experiment &ldquo;RLA-ReAsk-v2&rdquo; &mdash; Reached Statistical Significance</div>
-      Running 18 days with 24,000 leads per variant. Results: +8.2% EPL lift in treatment (p=0.003). Control EPL $31.40, treatment EPL $33.98. Scheduled for a 14-day minimum &mdash; ready for a ship/kill decision.
+      <div class="alert-title">Experiment &ldquo;Pricing-ReAsk-v2&rdquo;: Reached Statistical Significance</div>
+      Running 18 days with 24,000 transactions per variant. Results: +8.2% RPT lift in treatment (p=0.003). Control RPT $31.40, treatment RPT $33.98. Scheduled for a 14-day minimum, ready for a ship/kill decision.
       <div class="alert-actions">
-        <span class="quick-action" data-action="Draft a Slack message for #experimentation: 'RLA-ReAsk-v2 hit significance at +8.2% EPL lift (p=0.003, 18 days, 24K/variant). Recommending we ship to 100%. Objections by EOD Thursday?'" onclick="selectAction(this)">Ship it</span>
-        <span class="quick-action" data-action="Extending RLA-ReAsk-v2 for 7 more days to confirm stability. The 8.2% lift is promising but I want to see weekend traffic patterns before shipping." onclick="selectAction(this)">Extend 7 days</span>
-        <span class="quick-action" data-action="Run /experiment-report for RLA-ReAsk-v2. Include daily EPL by variant, cumulative lift chart, confidence interval, and segment breakdown (traffic type, partner)." onclick="selectAction(this)">Pull full report</span>
+        <span class="quick-action" data-action="Draft a Slack message for #experimentation: 'Pricing-ReAsk-v2 hit significance at +8.2% RPT lift (p=0.003, 18 days, 24K/variant). Recommending we ship to 100%. Objections by EOD Thursday?'" onclick="selectAction(this)">Ship it</span>
+        <span class="quick-action" data-action="Extending Pricing-ReAsk-v2 for 7 more days to confirm stability. The 8.2% lift is promising but I want to see weekend traffic patterns before shipping." onclick="selectAction(this)">Extend 7 days</span>
+        <span class="quick-action" data-action="Run /experiment-report for Pricing-ReAsk-v2. Include daily RPT by variant, cumulative lift chart, confidence interval, and segment breakdown (traffic type, partner)." onclick="selectAction(this)">Pull full report</span>
       </div>
       <div class="alert-note-toggle" onclick="toggleNote('alert-4')">+ Add note</div>
       <div id="note-alert-4" style="display:none">
@@ -562,11 +562,11 @@
       <input type="checkbox" onchange="toggleDismiss('alert-5')">
     </label>
     <div class="alert-content">
-      <div class="alert-title">QuickSight &ldquo;Daily Partner Revenue&rdquo; &mdash; Data 4h Stale</div>
-      Dashboard last refreshed at 4:12 AM. Expected refresh cycle is hourly. The ETL job <code>partner_revenue_rollup</code> shows status &ldquo;running&rdquo; since 4:08 AM. All other QuickSight dashboards refreshed within the last 45 minutes.
+      <div class="alert-title">Dashboard &ldquo;Daily Partner Revenue&rdquo;: Data 4h Stale</div>
+      Dashboard last refreshed at 4:12 AM. Expected refresh cycle is hourly. The ETL job <code>partner_revenue_rollup</code> shows status &ldquo;running&rdquo; since 4:08 AM. All other BI dashboards refreshed within the last 45 minutes.
       <div class="alert-actions">
-        <span class="quick-action" data-action="Check the status of the partner_revenue_rollup ETL job. If stuck, restart the Athena query and trigger a manual QuickSight dataset refresh for Daily Partner Revenue." onclick="selectAction(this)">Restart ETL</span>
-        <span class="quick-action" data-action="Expected — the partner_revenue_rollup job sometimes hangs on large backfill days. It should self-recover within an hour. Monitor and escalate if still stale by 10 AM." onclick="selectAction(this)">Known issue</span>
+        <span class="quick-action" data-action="Check the status of the partner_revenue_rollup ETL job. If stuck, restart the analytics query and trigger a manual BI dataset refresh for Daily Partner Revenue." onclick="selectAction(this)">Restart ETL</span>
+        <span class="quick-action" data-action="Expected. The partner_revenue_rollup job sometimes hangs on large backfill days. It should self-recover within an hour. Monitor and escalate if still stale by 10 AM." onclick="selectAction(this)">Known issue</span>
       </div>
       <div class="alert-note-toggle" onclick="toggleNote('alert-5')">+ Add note</div>
       <div id="note-alert-5" style="display:none">
@@ -584,9 +584,9 @@
       <div class="alert-title">3 Partner Contracts Up for Renewal This Month</div>
       NorthBridge Financial (renews Mar 25, $84K/mo), QuickFund Direct (renews Mar 28, $52K/mo), and PeakLend Solutions (renews Mar 31, $31K/mo). Combined monthly revenue at risk: $167K. No renewal discussions logged in CRM for PeakLend.
       <div class="alert-actions">
-        <span class="quick-action" data-action="Query analytics: monthly EPL, lead volume, and sell rate for NorthBridge Financial, QuickFund Direct, and PeakLend Solutions for the last 6 months. Format as a comparison table." onclick="selectAction(this)">Pull scorecards</span>
-        <span class="quick-action" data-action="Draft a Slack message for #client-relations: 'PeakLend Solutions contract renews March 31 — no renewal discussion logged in CRM yet. Can someone confirm status? They are $31K/mo.'" onclick="selectAction(this)">Flag PeakLend</span>
-        <span class="quick-action" data-action="For each of these 3 partners (NorthBridge, QuickFund, PeakLend), generate a 1-page renewal brief: trailing 6-month EPL trend, volume trend, contract terms, and recommended pricing action." onclick="selectAction(this)">Draft renewal prep</span>
+        <span class="quick-action" data-action="Query analytics: monthly RPT, transaction volume, and conversion rate for NorthBridge Financial, QuickFund Direct, and PeakLend Solutions for the last 6 months. Format as a comparison table." onclick="selectAction(this)">Pull scorecards</span>
+        <span class="quick-action" data-action="Draft a Slack message for #client-relations: 'PeakLend Solutions contract renews March 31, no renewal discussion logged in CRM yet. Can someone confirm status? They are $31K/mo.'" onclick="selectAction(this)">Flag PeakLend</span>
+        <span class="quick-action" data-action="For each of these 3 partners (NorthBridge, QuickFund, PeakLend), generate a 1-page renewal brief: trailing 6-month RPT trend, volume trend, contract terms, and recommended pricing action." onclick="selectAction(this)">Draft renewal prep</span>
       </div>
       <div class="alert-note-toggle" onclick="toggleNote('alert-6')">+ Add note</div>
       <div id="note-alert-6" style="display:none">
@@ -601,11 +601,11 @@
       <input type="checkbox" onchange="toggleDismiss('alert-7')">
     </label>
     <div class="alert-content">
-      <div class="alert-title">Weekly Scorecard &mdash; Due by 11 AM Friday</div>
+      <div class="alert-title">Weekly Scorecard: Due by 11 AM Friday</div>
       Covers Mon&ndash;Thu data. Traffic mix: 42% Internal Media Buy, 23% External Media Buy, 18% SMS, 9% Email, 8% Other. All data sources are fresh. Revenue tracking 4% above weekly forecast.
       <div class="alert-actions">
-        <span class="quick-action" data-action="Run /weekly-scorecard for all traffic types, week of 2026-03-17. Include revenue, EPC, EPL, sell rate, and margin by traffic type. Highlight any metric that moved more than 10% week-over-week." onclick="selectAction(this)">Generate scorecard</span>
-        <span class="quick-action" data-action="Reviewed — revenue on pace, data fresh. Standard scorecard, no special callouts needed." onclick="selectAction(this)">Looks good</span>
+        <span class="quick-action" data-action="Run /weekly-scorecard for all traffic types, week of 2026-03-17. Include revenue, RPC, RPT, conversion rate, and margin by traffic type. Highlight any metric that moved more than 10% week-over-week." onclick="selectAction(this)">Generate scorecard</span>
+        <span class="quick-action" data-action="Reviewed: revenue on pace, data fresh. Standard scorecard, no special callouts needed." onclick="selectAction(this)">Looks good</span>
       </div>
       <div class="alert-note-toggle" onclick="toggleNote('alert-7')">+ Add note</div>
       <div id="note-alert-7" style="display:none">
@@ -620,10 +620,10 @@
       <input type="checkbox" onchange="toggleDismiss('alert-8')">
     </label>
     <div class="alert-content">
-      <div class="alert-title">All Ping Trees Active &mdash; Lead Flow Normal</div>
-      14 active ping trees, all responding within SLA. Total leads sold yesterday: 6,840. Average response time: 320ms (within 500ms target). No partner timeouts in the last 24 hours. Fund rate: 42.1% (within 2% of monthly average).
+      <div class="alert-title">All Routing Nodes Active, Transaction Flow Normal</div>
+      14 active routing nodes, all responding within SLA. Total transactions processed yesterday: 6,840. Average response time: 320ms (within 500ms target). No partner timeouts in the last 24 hours. Fulfillment rate: 42.1% (within 2% of monthly average).
       <div class="alert-actions">
-        <span class="quick-action" data-action="Looks good — all systems green, lead flow normal. Dismiss." onclick="selectAction(this)">Looks good</span>
+        <span class="quick-action" data-action="Looks good, all systems green, transaction flow normal. Dismiss." onclick="selectAction(this)">Looks good</span>
       </div>
       <div class="alert-note-toggle" onclick="toggleNote('alert-8')">+ Add note</div>
       <div id="note-alert-8" style="display:none">
@@ -640,8 +640,8 @@
     <tr>
       <th>Partner</th>
       <th>Status</th>
-      <th>Leads Sold</th>
-      <th class="amt">EPL</th>
+      <th>Transactions</th>
+      <th class="amt">RPT</th>
       <th class="amt">Revenue</th>
     </tr>
   </thead>
@@ -691,7 +691,7 @@
       <th>Traffic Type</th>
       <th>Source</th>
       <th>Clicks</th>
-      <th class="amt">EPC</th>
+      <th class="amt">RPC</th>
       <th class="amt">Margin %</th>
     </tr>
   </thead>
@@ -738,8 +738,8 @@
       <td class="amt positive">$1.61</td>
       <td class="amt positive">41.3%</td>
     </tr>
-    <tr data-account="Marketplace">
-      <td>Marketplace</td>
+    <tr data-account="Platform">
+      <td>Platform</td>
       <td>&mdash;</td>
       <td style="font-family: var(--font-mono);">8,900</td>
       <td class="amt">$1.08</td>
@@ -760,19 +760,19 @@
     </tr>
   </thead>
   <tbody>
-    <tr data-account="RLA-ReAsk-v2">
-      <td>RLA-ReAsk-v2</td>
+    <tr data-account="Pricing-ReAsk-v2">
+      <td>Pricing-ReAsk-v2</td>
       <td>Monetization</td>
       <td style="font-family: var(--font-mono);">18</td>
       <td style="font-family: var(--font-mono);">48,000</td>
-      <td class="amt positive">+8.2% EPL</td>
+      <td class="amt positive">+8.2% RPT</td>
     </tr>
     <tr data-account="SoftTimeout-300ms">
       <td>SoftTimeout-300ms</td>
       <td>Monetization</td>
       <td style="font-family: var(--font-mono);">12</td>
       <td style="font-family: var(--font-mono);">31,200</td>
-      <td class="amt positive">+3.1% sell rate</td>
+      <td class="amt positive">+3.1% conv rate</td>
     </tr>
     <tr data-account="ProcessingScreen-v4">
       <td>ProcessingScreen-v4</td>
@@ -793,7 +793,7 @@
       <td>Router</td>
       <td style="font-family: var(--font-mono);">21</td>
       <td style="font-family: var(--font-mono);">62,000</td>
-      <td class="amt negative">-1.4% EPC</td>
+      <td class="amt negative">-1.4% RPC</td>
     </tr>
     <tr data-account="EmailSubject-Urgency">
       <td>EmailSubject-Urgency</td>
@@ -816,8 +816,8 @@
       <td style="font-family: var(--font-mono);">22,600</td>
       <td class="amt positive">+6.3% app rate</td>
     </tr>
-    <tr data-account="DynamicRLA-Caps">
-      <td>DynamicRLA-Caps</td>
+    <tr data-account="DynamicPricing-Caps">
+      <td>DynamicPricing-Caps</td>
       <td>Monetization</td>
       <td style="font-family: var(--font-mono);">3</td>
       <td style="font-family: var(--font-mono);">4,800</td>
@@ -833,7 +833,7 @@
     <span class="dq-count warn">1</span>
   </div>
   <div class="dq-item">
-    <span>Leads processed this month</span>
+    <span>Transactions processed this month</span>
     <span class="dq-count ok">142,680</span>
   </div>
 </div>
@@ -847,11 +847,11 @@
         <tr><th>Pipeline</th><th>Last Refresh</th><th>Status</th></tr>
       </thead>
       <tbody>
-        <tr><td>Lead Events</td><td>8 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
+        <tr><td>Transaction Events</td><td>8 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
         <tr><td>Funnel Metrics</td><td>15 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
         <tr><td>Traffic Router Clicks</td><td>22 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
         <tr><td>Partner Revenue Rollup</td><td class="stale">4 hours ago</td><td><span class="badge badge-stale">STALE</span></td></tr>
-        <tr><td>QuickSight Datasets</td><td>35 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
+        <tr><td>BI Datasets</td><td>35 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
       </tbody>
     </table>
   </div>

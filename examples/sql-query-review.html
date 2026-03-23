@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DRLA Price Reject Join Review</title>
+<title>RAP Price Reject Join Review</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ================================================================
@@ -314,7 +314,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 </style>
 </head>
 
-<body data-annotatable data-report-title="DRLA Price Reject Join Review" data-report-date="2026-03-22">
+<body data-annotatable data-report-title="RAP Price Reject Join Review" data-report-date="2026-03-22">
 
 <div class="container">
 
@@ -324,8 +324,8 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   <header class="hero anim-up" style="--i:0">
     <div class="hero-eyebrow">SQL Query Review</div>
     <h1>Price Reject Joins: How Revenue Flows</h1>
-    <div class="hero-sub">Understanding campaign attribution in DOIS for Dynamic RLA training data.</div>
-    <div class="hero-meta">DRLA Pipeline | 4 Tables | 3 Join Strategies | Interactive</div>
+    <div class="hero-sub">Understanding campaign attribution in the routing system for Revenue Attribution Pipeline training data.</div>
+    <div class="hero-meta">RAP Pipeline | 4 Tables | 3 Join Strategies | Interactive</div>
   </header>
 
   <!-- ============================================================
@@ -608,7 +608,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
           </details>
           <div class="alert-actions">
             <span class="quick-action" data-action="Accept Option A: simpler join, overcount acceptable for this use case" onclick="selectAction(this)">Accept: simpler, overcount acceptable</span>
-            <span class="quick-action" data-action="Reject Option A: overcount not acceptable for DRLA precision" onclick="selectAction(this)">Reject: overcounts for DRLA</span>
+            <span class="quick-action" data-action="Reject Option A: overcount not acceptable for RAP precision" onclick="selectAction(this)">Reject: overcounts for RAP</span>
           </div>
           <div class="alert-note-toggle" onclick="toggleNote('join-option-a')">+ Add note</div>
           <div id="note-join-option-a" style="display:none"><textarea class="alert-note" data-id="join-option-a" placeholder="Notes..."></textarea></div>
@@ -686,7 +686,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 
   <!-- Summary -->
   <div class="callout callout--blue anim-up" style="--i:16">
-    <strong>Summary:</strong> Option B (join on <code>application_id + campaign_id</code>) produces correct attribution for both price reject setups and direct buys. The production ETL uses Option A because the overcount is acceptable for reporting. For the Dynamic RLA algorithm, precision matters more.
+    <strong>Summary:</strong> Option B (join on <code>application_id + campaign_id</code>) produces correct attribution for both price reject setups and direct buys. The production ETL uses Option A because the overcount is acceptable for reporting. For the Revenue Attribution Pipeline, precision matters more.
   </div>
 
   <!-- ============================================================

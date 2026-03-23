@@ -96,7 +96,6 @@ Set on the `<body>` element to toggle behavior:
 |---------|------|---------------------|
 | Operations Dashboard | `examples/operations-dashboard.html` | Alert triage, KPI cards, data tables with row flagging |
 | SQL Query Review | `examples/sql-query-review.html` | Literate SQL sections, annotatable clauses, decision groups, sample data |
-| Technical Ticket Review | `examples/dois-2587-technical-review.html` | Decision groups, comparison tables, independent concerns |
 | Anniversary Trip Planner | `examples/anniversary-trip-planner.html` | Multi-action pills, annotations, pipeline steps, venue comparison |
 | Config Chooser | `examples/config-chooser.html` | Standalone visual picker (not engine-based) |
 

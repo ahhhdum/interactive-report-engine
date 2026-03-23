@@ -267,9 +267,9 @@ The interactive-report-engine template handles triage and review workflows where
 
 **Configuration choices** (color palettes, font pairings, theme variants) need a visual picker with a live preview and a copy button that emits structured code, not markdown. The engine's alert-card model does not fit this interaction. See `examples/config-chooser.html` for a standalone variant where the user picks a value from a visual option space and the feedback is a Python dict or JSON object rather than a review summary.
 
-**Planning decisions** with connected options use the engine template's decision group component to group alternatives under a question. See `examples/dois-2587-technical-review.html` for a technical ticket review that separates delivery approach decisions from independent technical concerns.
+**Planning decisions** with connected options use the engine template's decision group component to group alternatives under a question. See `examples/sql-query-review.html` for decision groups that separate strategy choices from independent technical concerns.
 
-**SQL query walkthroughs** with annotatable clauses, literate explanations, and strategy comparisons use the engine template's decision group and annotation mechanisms with additional inline CSS for SQL-specific layout (literate sections, data flow diagrams, diff highlighting). See `examples/sql-query-review.html` for a DRLA price-reject joins scenario that demonstrates all five SQL component patterns.
+**SQL query walkthroughs** with annotatable clauses, literate explanations, and strategy comparisons use the engine template's decision group and annotation mechanisms with additional inline CSS for SQL-specific layout (literate sections, data flow diagrams, diff highlighting). See `examples/sql-query-review.html` for a revenue attribution pipeline scenario that demonstrates all five SQL component patterns.
 
 The 3-layer pattern (prompt generates visual artifact, human interacts, structured feedback returns to the AI) is the reusable abstraction. The engine template is one rendering of it. Other renderings are valid when the domain does not fit the alert-card model.
 
@@ -280,7 +280,6 @@ The 3-layer pattern (prompt generates visual artifact, human interacts, structur
 | Engine template | `interactive-report-engine.html` | Domain-agnostic CSS + JS + placeholder HTML |
 | Operations demo | `examples/operations-dashboard.html` | Triage workflow example |
 | Anniversary trip | `examples/anniversary-trip-planner.html` | Planning dashboard with venue options |
-| DOIS-2587 review | `examples/dois-2587-technical-review.html` | Technical ticket review with decision groups |
 | Config chooser | `examples/config-chooser.html` | Standalone visual config picker (not engine-based) |
 | Config chooser prompt | `examples/config-chooser-prompt.md` | Prompt template for config choosers |
 | Pattern guide | `docs/pattern-guide.md` | Comprehensive pattern documentation (this file) |
