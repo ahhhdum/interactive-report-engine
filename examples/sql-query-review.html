@@ -370,10 +370,10 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 
   <div class="dag-container anim-up" style="--i:6">
     <div class="dag-row">
-      <div class="dag-node" data-annotation-id="dag-applications" onclick="document.getElementById('section-campaign-roles').scrollIntoView({behavior:'smooth'})">applications</div>
-      <div class="dag-node" data-annotation-id="dag-attempts" onclick="document.getElementById('section-example-app').scrollIntoView({behavior:'smooth'})">attempts</div>
-      <div class="dag-node" data-annotation-id="dag-conversions" onclick="document.getElementById('section-conversion').scrollIntoView({behavior:'smooth'})">conversions</div>
-      <div class="dag-node" data-annotation-id="dag-tier-campaign-buffer" onclick="document.getElementById('section-campaign-roles').scrollIntoView({behavior:'smooth'})">tier_campaign_buffer</div>
+      <div class="dag-node" onclick="document.getElementById('section-campaign-roles').scrollIntoView({behavior:'smooth'})" title="Click to jump to Campaign Roles">applications</div>
+      <div class="dag-node" onclick="document.getElementById('section-example-app').scrollIntoView({behavior:'smooth'})" title="Click to jump to Example Application">attempts</div>
+      <div class="dag-node" onclick="document.getElementById('section-conversion').scrollIntoView({behavior:'smooth'})" title="Click to jump to The Conversion">conversions</div>
+      <div class="dag-node" onclick="document.getElementById('section-campaign-roles').scrollIntoView({behavior:'smooth'})" title="Click to jump to Campaign Roles">tier_campaign_buffer</div>
     </div>
     <div class="dag-row">
       <div class="dag-edge-label">application_id</div>
@@ -384,7 +384,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       <div class="dag-arrow">&darr;</div>
     </div>
     <div class="dag-row">
-      <div class="dag-node cte" data-annotation-id="dag-attempt-revenue" onclick="document.getElementById('section-join-strategies').scrollIntoView({behavior:'smooth'})">attempt_revenue</div>
+      <div class="dag-node cte" onclick="document.getElementById('section-join-strategies').scrollIntoView({behavior:'smooth'})" title="Click to jump to Join Strategies">attempt_revenue</div>
     </div>
     <div class="dag-row">
       <div class="dag-edge-label">GROUP BY parent_campaign_id</div>
