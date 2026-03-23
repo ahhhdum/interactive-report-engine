@@ -16,11 +16,6 @@ Side-by-side prose and code, annotatable SQL clauses, decision groups for compar
 
 ![SQL Query Review](docs/screenshots/sql-query-review.png)
 
-### Technical Ticket Review
-Decision groups for choosing between delivery approaches, independent alert cards for risks and concerns, comparison tables for side-by-side evaluation.
-
-![DOIS Technical Review](docs/screenshots/dois-2587-technical-review.png)
-
 ### Config Chooser
 Visual picker with live preview and structured code output. A standalone variant that uses the same generate-review-feedback pattern without the engine template.
 
