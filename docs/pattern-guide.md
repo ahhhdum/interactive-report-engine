@@ -269,6 +269,8 @@ The interactive-report-engine template handles triage and review workflows where
 
 **Planning decisions** with connected options use the engine template's decision group component to group alternatives under a question. See `examples/dois-2587-technical-review.html` for a technical ticket review that separates delivery approach decisions from independent technical concerns.
 
+**SQL query walkthroughs** with annotatable clauses, literate explanations, and strategy comparisons use the engine template's decision group and annotation mechanisms with additional inline CSS for SQL-specific layout (literate sections, data flow diagrams, diff highlighting). See `examples/sql-query-review.html` for a DRLA price-reject joins scenario that demonstrates all five SQL component patterns.
+
 The 3-layer pattern (prompt generates visual artifact, human interacts, structured feedback returns to the AI) is the reusable abstraction. The engine template is one rendering of it. Other renderings are valid when the domain does not fit the alert-card model.
 
 ## File Locations

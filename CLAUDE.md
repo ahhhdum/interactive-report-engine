@@ -20,7 +20,8 @@ interactive-report-engine/
 │   ├── anniversary-trip-planner.html  # Planning dashboard with venue options
 │   ├── dois-2587-technical-review.html # Technical ticket review with decision groups
 │   ├── config-chooser.html            # Visual config picker (standalone variant)
-│   └── config-chooser-prompt.md       # Prompt template for config choosers
+│   ├── config-chooser-prompt.md       # Prompt template for config choosers
+│   └── sql-query-review.html          # SQL query walkthrough with annotatable clauses
 └── .gitignore
 ```
 
