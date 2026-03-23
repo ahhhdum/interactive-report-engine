@@ -3,919 +3,848 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marketplace — Daily Action Dashboard</title>
+<title>SaaS Platform Operations Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ================================================================
+   INTERACTIVE REPORT ENGINE — CSS
+   Domain-agnostic styles for the 3-layer feedback pattern.
+   Extracted from CCPA Compliance Review + Action Dashboard.
+
+   USAGE: Copy this file. Replace placeholder comments in HTML
+   zone with your domain data. CSS and JS work unchanged.
+
+   FEATURES (toggle via data-* attributes on <body>):
+     data-multiaction     — allow multiple action pills per card
+     data-annotatable     — enable inline annotations on elements
+     data-no-persist      — disable localStorage state persistence
+   (localStorage enabled by default; shareable URL always available)
+   ================================================================ */
+
+:root {
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  --bg: #0f1318;
+  --bg-subtle: #141921;
+  --surface: #1a2028;
+  --surface-elevated: #1f2733;
+  --border: rgba(255,255,255,0.06);
+  --border-bright: rgba(255,255,255,0.12);
+  --text: #d8dde6;
+  --text-bright: #f0f2f5;
+  --text-dim: #6b7a8d;
+
+  --accent: #3b82f6;
+  --accent-dim: rgba(59,130,246,0.1);
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.1);
+  --amber: #eab308;
+  --amber-dim: rgba(234,179,8,0.1);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.1);
+  --blue: #60a5fa;
+  --blue-dim: rgba(96,165,250,0.1);
+  --slate: #475569;
+}
+
+@media (prefers-color-scheme: light) {
   :root {
-    --bg-page: #1a1f2e;
-    --bg-card: #21263a;
-    --bg-alt-row: #2c313c;
-    --text-body: #abb2bf;
-    --text-heading: #e5e9f0;
-    --text-secondary: #636d83;
-    --accent-red: #e06c75;
-    --accent-amber: #e5c07b;
-    --accent-blue: #61afef;
-    --accent-green: #98c379;
-    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-    --font-sans: system-ui, -apple-system, sans-serif;
+    --bg: #f1f3f5;
+    --bg-subtle: #e9ecef;
+    --surface: #ffffff;
+    --surface-elevated: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --border-bright: rgba(0,0,0,0.15);
+    --text: #1e293b;
+    --text-bright: #0f172a;
+    --text-dim: #64748b;
+    --accent: #2563eb;
+    --accent-dim: rgba(37,99,235,0.08);
+    --green: #16a34a;
+    --green-dim: rgba(22,163,74,0.08);
+    --amber: #ca8a04;
+    --amber-dim: rgba(202,138,4,0.08);
+    --red: #dc2626;
+    --red-dim: rgba(220,38,38,0.08);
+    --blue: #3b82f6;
+    --blue-dim: rgba(59,130,246,0.08);
+    --slate: #94a3b8;
   }
+}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
-    background: var(--bg-page);
-    color: var(--text-body);
-    font-family: var(--font-sans);
-    font-size: 14px;
-    line-height: 1.6;
-    padding: 24px 24px 72px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 30% 0%, var(--accent-dim) 0%, transparent 50%),
+    radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 100% 100%, 20px 20px;
+  color: var(--text);
+  font-family: var(--font-body);
+  padding: 40px 24px 80px;
+  overflow-wrap: break-word;
+}
 
-  h1, h2, h3 { color: var(--text-heading); font-weight: 600; }
+.container { max-width: 1000px; margin: 0 auto; }
 
-  .generated-date {
-    color: var(--text-secondary);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 24px;
-  }
+/* --- Animations --- */
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeScale { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; transition-duration:0.01ms!important; } }
+.anim-up { animation: fadeUp 0.45s ease-out both; animation-delay: calc(var(--i,0) * 0.06s); }
+.anim-scale { animation: fadeScale 0.35s ease-out both; animation-delay: calc(var(--i,0) * 0.06s); }
 
-  /* Hero Stats */
-  .hero {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-  }
+/* --- Hero --- */
+.hero { text-align: center; padding: 20px 0 40px; }
+.hero-eyebrow { font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; color: var(--accent); margin-bottom: 12px; }
+.hero h1 { font-family: var(--font-display); font-size: clamp(36px, 5vw, 52px); font-weight: 400; color: var(--text-bright); line-height: 1.1; margin-bottom: 12px; }
+.hero-sub { font-size: 16px; color: var(--text-dim); font-style: italic; margin-bottom: 8px; }
+.hero-meta { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
+.hero-meta span { margin: 0 8px; }
 
-  .hero-stat {
-    flex: 1;
-    min-width: 180px;
-    background: var(--bg-card);
-    border: 1px solid var(--bg-alt-row);
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-  }
+/* --- KPI Cards --- */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 32px; }
+.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; text-align: center; }
+.kpi-card__value { font-family: var(--font-mono); font-size: 36px; font-weight: 700; color: var(--text-bright); line-height: 1; font-variant-numeric: tabular-nums; }
+.kpi-card__label { font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); margin-top: 8px; }
+.kpi-card--accent .kpi-card__value { color: var(--accent); }
+.kpi-card--green .kpi-card__value { color: var(--green); }
+.kpi-card--amber .kpi-card__value { color: var(--amber); }
+.kpi-card--red .kpi-card__value { color: var(--red); }
 
-  .hero-stat .label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-  }
+/* --- Pipeline --- */
+.pipeline-section { margin-bottom: 32px; }
+.pipeline { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 4px 0 8px; }
+.pipe-step { flex: 1; min-width: 80px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 8px; text-align: center; position: relative; }
+.pipe-step--done { border-color: var(--green); background: var(--green-dim); }
+.pipe-step--active { border-color: var(--accent); background: var(--accent-dim); }
+.pipe-step--pending { border-color: var(--border); opacity: 0.5; }
+.pipe-step__num { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--text-dim); margin-bottom: 4px; }
+.pipe-step--done .pipe-step__num { color: var(--green); }
+.pipe-step--active .pipe-step__num { color: var(--accent); }
+.pipe-step__name { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--text); }
+.pipe-arrow { display: flex; align-items: center; padding: 0 4px; color: var(--border-bright); font-size: 16px; flex-shrink: 0; }
 
-  .hero-stat .value {
-    font-family: var(--font-mono);
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text-heading);
-  }
+/* --- Section Label --- */
+.section-label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.section-label::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 
-  .hero-stat .value.positive { color: var(--accent-green); }
-  .hero-stat .value.negative { color: var(--accent-red); }
-  .hero-stat .value.neutral { color: var(--accent-blue); }
+/* --- Filter Bar --- */
+.filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.filter-btn { font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); cursor: pointer; transition: all 0.15s; }
+.filter-btn:hover { border-color: var(--border-bright); color: var(--text); }
+.filter-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.filter-count { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin-left: auto; }
 
-  /* Section headers */
-  .section-header {
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--bg-alt-row);
-    padding-bottom: 8px;
-    margin: 32px 0 16px;
-  }
+/* --- Alert Cards --- */
+.alerts-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
 
-  /* Alert cards */
-  .alerts-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
+.alert-card {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 16px 20px;
+  border-left: 4px solid;
+  font-size: 13px;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease 0.1s, margin 0.3s ease;
+}
 
-  .alert-card {
-    background: var(--bg-card);
-    border-radius: 6px;
-    padding: 14px 18px;
-    border-left: 4px solid;
-    font-size: 13px;
-    line-height: 1.5;
-    display: flex;
-    align-items: flex-start;
-  }
+/* Severity colors */
+.alert-card.severity-action   { border-left-color: var(--red); }
+.alert-card.severity-escalate { border-left-color: var(--red); }
+.alert-card.severity-review   { border-left-color: var(--amber); }
+.alert-card.severity-anomaly  { border-left-color: var(--blue); }
+.alert-card.severity-duplicate { border-left-color: var(--blue); }
+.alert-card.severity-todo     { border-left-color: var(--amber); }
+.alert-card.severity-routine  { border-left-color: var(--green); }
+.alert-card.severity-ok       { border-left-color: var(--green); }
+.alert-card.severity-info     { border-left-color: var(--slate); }
 
-  .alert-card.severity-action { border-left-color: var(--accent-red); }
-  .alert-card.severity-anomaly { border-left-color: var(--accent-blue); }
-  .alert-card.severity-todo { border-left-color: var(--accent-amber); }
-  .alert-card.severity-info { border-left-color: var(--text-secondary); }
-  .alert-card.severity-ok { border-left-color: var(--accent-green); }
+.alert-card .alert-title { font-weight: 600; color: var(--text-bright); margin-bottom: 4px; font-size: 14px; }
+.alert-card.severity-action .alert-title,
+.alert-card.severity-escalate .alert-title { color: var(--red); }
+.alert-card.severity-review .alert-title,
+.alert-card.severity-todo .alert-title     { color: var(--amber); }
+.alert-card.severity-anomaly .alert-title,
+.alert-card.severity-duplicate .alert-title { color: var(--blue); }
+.alert-card.severity-routine .alert-title,
+.alert-card.severity-ok .alert-title       { color: var(--green); }
 
-  .alert-card .alert-title {
-    font-weight: 600;
-    color: var(--text-heading);
-    margin-bottom: 4px;
-  }
+.alert-content { flex: 1; }
 
-  .alert-card.severity-action .alert-title { color: var(--accent-red); }
-  .alert-card.severity-anomaly .alert-title { color: var(--accent-blue); }
-  .alert-card.severity-todo .alert-title { color: var(--accent-amber); }
-  .alert-card.severity-ok .alert-title { color: var(--accent-green); }
+.alert-checkbox { display: flex; align-items: flex-start; margin-right: 14px; padding-top: 2px; flex-shrink: 0; }
+.alert-checkbox input[type="checkbox"] { accent-color: var(--green); width: 16px; height: 16px; cursor: pointer; }
 
-  .alert-content { flex: 1; }
+.alert-card.dismissed { max-height: 0; padding: 0 20px; margin: 0; opacity: 0; overflow: hidden; border-left-color: var(--slate) !important; }
+.alert-card.dismissed .alert-title { text-decoration: line-through; color: var(--text-dim) !important; }
 
-  /* Alert interactivity */
-  .alert-checkbox {
-    display: flex;
-    align-items: flex-start;
-    margin-right: 12px;
-    padding-top: 2px;
-    flex-shrink: 0;
-  }
+.alert-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 
-  .alert-checkbox input[type="checkbox"] {
-    accent-color: var(--accent-green);
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-  }
+/* --- Badges --- */
+.badge { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
+.badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.badge--green { background: var(--green-dim); color: var(--green); }
+.badge--amber { background: var(--amber-dim); color: var(--amber); }
+.badge--red   { background: var(--red-dim); color: var(--red); }
+.badge--blue  { background: var(--blue-dim); color: var(--blue); }
+.badge--muted { background: var(--border); color: var(--text-dim); }
 
-  .alert-card.dismissed {
-    max-height: 0;
-    padding: 0 18px;
-    margin: 0;
-    opacity: 0;
-    overflow: hidden;
-    border-left-color: var(--text-secondary) !important;
-    transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
-  }
+.alert-desc { color: var(--text-dim); margin-bottom: 6px; }
+.alert-desc code { font-family: var(--font-mono); font-size: 11px; background: var(--accent-dim); color: var(--accent); padding: 1px 5px; border-radius: 3px; }
 
-  .alert-card:not(.dismissed) {
-    max-height: 500px;
-    transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease 0.1s;
-  }
+/* --- Quick Actions --- */
+.alert-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.quick-action { display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 12px; background: var(--accent-dim); color: var(--accent); cursor: pointer; border: 1px solid rgba(59,130,246,0.2); user-select: none; transition: all 0.15s; }
+.quick-action:hover { background: rgba(59,130,246,0.2); border-color: var(--accent); }
+.quick-action.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-  .alert-card.dismissed .alert-title {
-    text-decoration: line-through;
-    color: var(--text-secondary) !important;
-  }
+/* --- Notes --- */
+.alert-note-toggle { font-family: var(--font-mono); font-size: 11px; color: var(--accent); cursor: pointer; margin-top: 8px; user-select: none; }
+.alert-note-toggle:hover { text-decoration: underline; }
+.alert-note { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: var(--font-body); font-size: 12px; padding: 8px; margin-top: 6px; resize: vertical; min-height: 48px; }
+.alert-note:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
 
-  .alert-note-toggle {
-    font-size: 11px;
-    color: var(--accent-blue);
-    cursor: pointer;
-    margin-top: 6px;
-    user-select: none;
-  }
+/* --- Collapsible Details --- */
+.alert-card details { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 6px; margin-top: 10px; }
+.alert-card details summary { padding: 10px 14px; cursor: pointer; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text); list-style: none; user-select: none; }
+.alert-card details summary::before { content: '\25B6'; display: inline-block; margin-right: 8px; font-size: 10px; color: var(--text-dim); transition: transform 0.15s; }
+.alert-card details[open] summary::before { transform: rotate(90deg); }
 
-  .alert-note-toggle:hover { text-decoration: underline; }
+/* Standalone details (system health, etc.) */
+details.standalone { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; }
+details.standalone summary { padding: 12px 16px; cursor: pointer; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text); list-style: none; user-select: none; }
+details.standalone summary::before { content: '\25B6'; display: inline-block; margin-right: 8px; font-size: 10px; color: var(--text-dim); transition: transform 0.15s; }
+details.standalone[open] summary::before { transform: rotate(90deg); }
+details.standalone .details-content { padding: 0 16px 16px; }
 
-  .alert-note {
-    width: 100%;
-    background: var(--bg-page);
-    border: 1px solid var(--bg-alt-row);
-    border-radius: 4px;
-    color: var(--text-body);
-    font-family: var(--font-sans);
-    font-size: 12px;
-    padding: 8px;
-    margin-top: 6px;
-    resize: vertical;
-    min-height: 48px;
-  }
+/* --- Data Tables --- */
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.4; }
+.data-table th { font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.data-table th.num { text-align: right; }
+.data-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); color: var(--text); }
+.data-table td.num { text-align: right; font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums; }
+.data-table td.positive { color: var(--green); }
+.data-table td.negative { color: var(--red); }
+.data-table tbody tr { cursor: pointer; transition: background 0.15s; }
+.data-table tbody tr:nth-child(even) { background: rgba(59,130,246,0.03); }
+.data-table tbody tr:hover { background: rgba(59,130,246,0.06); }
+.data-table tbody tr.flagged { background: rgba(59,130,246,0.1) !important; border-left: 3px solid var(--accent); }
 
-  .alert-note:focus {
-    outline: 1px solid var(--accent-blue);
-    border-color: var(--accent-blue);
-  }
+.row-note-row td { padding: 0 10px 6px !important; border-bottom: none !important; background: rgba(59,130,246,0.04) !important; }
+.row-note-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: var(--font-body); font-size: 11px; padding: 4px 8px; resize: none; min-height: 28px; }
+.row-note-input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
 
-  /* Quick actions */
-  .alert-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
-  }
+/* --- Status Dots (operations-specific) --- */
+.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.status-dot.green { background: var(--green); }
+.status-dot.amber { background: var(--amber); }
+.status-dot.red { background: var(--red); }
 
-  .quick-action {
-    display: inline-block;
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    background: rgba(97, 175, 239, 0.1);
-    color: var(--accent-blue);
-    cursor: pointer;
-    border: 1px solid rgba(97, 175, 239, 0.2);
-    user-select: none;
-    transition: all 0.15s;
-  }
+/* --- Data Quality Items (operations-specific) --- */
+.dq-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px; font-size: 13px; }
+.dq-item .dq-count { font-family: var(--font-mono); font-weight: 600; font-size: 16px; }
+.dq-item .dq-count.warn { color: var(--amber); }
+.dq-item .dq-count.ok { color: var(--green); }
 
-  .quick-action:hover {
-    background: rgba(97, 175, 239, 0.2);
-    border-color: var(--accent-blue);
-  }
+/* --- Keyboard Focus --- */
+.alert-card.focused { outline: 2px solid var(--accent); outline-offset: -2px; }
 
-  .quick-action.selected {
-    background: var(--accent-blue);
-    color: #fff;
-    border-color: var(--accent-blue);
-  }
+/* --- Keyboard Hint --- */
+.kbd-hint { position: fixed; bottom: 52px; right: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 11px; color: var(--text-dim); z-index: 101; line-height: 1.9; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.kbd-hint.visible { opacity: 1; }
+.kbd-hint kbd { display: inline-block; background: var(--surface-elevated); color: var(--text-bright); border-radius: 3px; padding: 1px 5px; font-family: var(--font-mono); font-size: 10px; margin-right: 2px; border: 1px solid var(--border); }
 
-  /* Keyboard focus */
-  .alert-card.focused {
-    outline: 2px solid var(--accent-blue);
-    outline-offset: -2px;
-  }
+/* --- Action Bar --- */
+.action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 2px solid var(--accent); padding: 12px 24px; display: none; justify-content: space-between; align-items: center; font-size: 13px; z-index: 100; }
+.action-bar.visible { display: flex; }
+.action-bar-stats { color: var(--text-dim); font-family: var(--font-mono); font-size: 12px; }
+.action-bar-buttons { display: flex; gap: 8px; }
+.action-btn { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 10px 20px; font-family: var(--font-mono); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.action-btn:hover { opacity: 0.9; }
+.action-btn.copied { background: var(--green); }
+.action-btn--secondary { background: var(--surface-elevated); color: var(--text); border: 1px solid var(--border); }
+.action-btn--secondary:hover { border-color: var(--accent); color: var(--accent); }
+.action-btn--danger { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+.action-btn--danger:hover { background: var(--red); color: #fff; }
 
-  .kbd-hint {
-    position: fixed;
-    bottom: 48px;
-    right: 24px;
-    background: var(--bg-card);
-    border: 1px solid var(--bg-alt-row);
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 11px;
-    color: var(--text-secondary);
-    z-index: 101;
-    line-height: 1.8;
-    opacity: 0;
-    transition: opacity 0.2s;
-    pointer-events: none;
-  }
+/* --- Footer --- */
+.footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
 
-  .kbd-hint.visible { opacity: 1; }
-
-  .kbd-hint kbd {
-    display: inline-block;
-    background: var(--bg-alt-row);
-    color: var(--text-heading);
-    border-radius: 3px;
-    padding: 1px 5px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    margin-right: 2px;
-  }
-
-  /* Tables */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 8px;
-    font-size: 13px;
-  }
-
-  thead th {
-    text-align: left;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-secondary);
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--bg-alt-row);
-    font-weight: 600;
-  }
-
-  thead th.amt { text-align: right; }
-
-  tbody td {
-    padding: 8px 12px;
-    border-bottom: 1px solid rgba(44, 49, 60, 0.5);
-  }
-
-  tbody tr:nth-child(even) { background: var(--bg-alt-row); }
-  tbody tr { cursor: pointer; transition: background 0.15s; }
-  tbody tr:hover { background: rgba(97, 175, 239, 0.05); }
-  tbody tr.flagged { background: rgba(97, 175, 239, 0.08) !important; border-left: 3px solid var(--accent-blue); }
-
-  .account-note-row td {
-    padding: 0 12px 8px !important;
-    border-bottom: none !important;
-    background: rgba(97, 175, 239, 0.04) !important;
-  }
-
-  .account-note-row .account-note-input {
-    width: 100%;
-    background: var(--bg-page);
-    border: 1px solid var(--bg-alt-row);
-    border-radius: 4px;
-    color: var(--text-body);
-    font-family: var(--font-sans);
-    font-size: 12px;
-    padding: 6px 8px;
-    resize: none;
-    min-height: 32px;
-  }
-
-  .account-note-row .account-note-input:focus {
-    outline: 1px solid var(--accent-blue);
-    border-color: var(--accent-blue);
-  }
-
-  td.amt {
-    text-align: right;
-    font-family: var(--font-mono);
-    font-size: 13px;
-  }
-
-  td.amt.positive { color: var(--accent-green); }
-  td.amt.negative { color: var(--accent-red); }
-
-  td.stale { color: var(--accent-amber); }
-
-  .badge {
-    display: inline-block;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 3px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-  }
-
-  .badge-stale { background: rgba(229, 192, 123, 0.15); color: var(--accent-amber); }
-  .badge-fresh { background: rgba(152, 195, 121, 0.15); color: var(--accent-green); }
-  .badge-manual { background: rgba(99, 109, 131, 0.15); color: var(--text-secondary); }
-
-  /* System health details */
-  details {
-    background: var(--bg-card);
-    border-radius: 6px;
-    margin-bottom: 8px;
-    border: 1px solid var(--bg-alt-row);
-  }
-
-  details summary {
-    padding: 12px 16px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-heading);
-    list-style: none;
-  }
-
-  details summary::before {
-    content: '\25B6';
-    display: inline-block;
-    margin-right: 8px;
-    font-size: 10px;
-    color: var(--text-secondary);
-    transition: transform 0.15s;
-  }
-
-  details[open] summary::before { transform: rotate(90deg); }
-
-  details .details-content {
-    padding: 0 16px 16px;
-  }
-
-  .status-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 6px;
-  }
-
-  .status-dot.green { background: var(--accent-green); }
-  .status-dot.amber { background: var(--accent-amber); }
-  .status-dot.red { background: var(--accent-red); }
-
-  /* Data quality */
-  .dq-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
-    background: var(--bg-card);
-    border-radius: 6px;
-    margin-bottom: 6px;
-    font-size: 13px;
-  }
-
-  .dq-item .dq-count {
-    font-family: var(--font-mono);
-    font-weight: 600;
-    font-size: 16px;
-  }
-
-  .dq-item .dq-count.warn { color: var(--accent-amber); }
-  .dq-item .dq-count.ok { color: var(--accent-green); }
-
-  /* Sticky action bar */
-  .action-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--bg-card);
-    border-top: 2px solid var(--bg-alt-row);
-    padding: 10px 24px;
-    display: none;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    z-index: 100;
-  }
-
-  .action-bar.visible { display: flex; }
-
-  .action-bar-stats { color: var(--text-secondary); }
-
-  .copy-btn {
-    background: var(--accent-blue);
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-size: 13px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.2s;
-  }
-
-  .copy-btn:hover { opacity: 0.9; }
-  .copy-btn.copied { background: var(--accent-green); }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    body { padding: 12px 12px 72px; }
-    .hero { flex-direction: column; }
-    .hero-stat .value { font-size: 22px; }
-  }
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  body { padding: 20px 16px 80px; }
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .pipeline { flex-wrap: wrap; gap: 6px; }
+  .pipe-arrow { display: none; }
+  .hero h1 { font-size: 32px; }
+}
 </style>
 </head>
-<body>
 
-<div class="generated-date">Acme Marketplace &mdash; Daily Action Dashboard &mdash; Generated 2026-03-20 08:15</div>
+<body data-report-title="SaaS Platform Operations Review" data-report-date="2026-03-22">
 
-<div class="hero">
-  <div class="hero-stat">
-    <div class="label">Yesterday Revenue</div>
-    <div class="value positive">$287,430</div>
-  </div>
-  <div class="hero-stat">
-    <div class="label">Blended EPC</div>
-    <div class="value neutral">$1.42</div>
-  </div>
-  <div class="hero-stat">
-    <div class="label">Sell Rate</div>
-    <div class="value positive">68.4%</div>
-  </div>
-  <div class="hero-stat">
-    <div class="label">Active Experiments</div>
-    <div class="value neutral">9</div>
-  </div>
-</div>
+<div class="container">
 
-<h2 class="section-header">Alerts &amp; Recommendations</h2>
-<div class="alerts-container">
+  <!-- ============================================================
+       HERO SECTION
+       ============================================================ -->
+  <header class="hero anim-up" style="--i:0">
+    <div class="hero-eyebrow">Acme SaaS Platform</div>
+    <h1>Daily Operations Review</h1>
+    <div class="hero-sub">Triage alerts, review partner metrics, and track experiments.</div>
+    <div class="hero-meta">
+      <span>March 22, 2026</span>
+      <span>|</span>
+      <span>8 alerts</span>
+      <span>|</span>
+      <span>9 active experiments</span>
+      <span>|</span>
+      <span>Generated 08:15</span>
+    </div>
+  </header>
 
-  <!-- RED: Revenue impact -->
-  <div class="alert-card severity-action" data-alert-id="alert-1">
-    <label class="alert-checkbox">
-      <input type="checkbox" onchange="toggleDismiss('alert-1')">
-    </label>
-    <div class="alert-content">
-      <div class="alert-title">Partner &ldquo;CreditServe&rdquo; &mdash; EPL Down 34% Day-Over-Day</div>
-      EPL dropped from $42.80 to $28.20 yesterday. This partner accounts for 18% of total revenue. No corresponding decline in lead volume (2,840 leads sent vs. 2,910 avg). Possible causes: buyer-side cap hit, campaign paused, or quality filtering tightened.
-      <div class="alert-actions">
-        <span class="quick-action" data-action="Query CreditServe daily EPL, sell rate, and reject reasons for the last 14 days. Break down by traffic type. Flag any day where EPL dropped more than 15%." onclick="selectAction(this)">Query analytics</span>
-        <span class="quick-action" data-action="Draft a Slack message for #partnerships: 'Seeing a 34% EPL drop on CreditServe yesterday — want to flag before the weekly call. Investigating reject reasons now.'" onclick="selectAction(this)">Draft Slack message</span>
-        <span class="quick-action" data-action="Create a ticket: 'Investigate CreditServe EPL decline — 34% drop on 2026-03-19. Check reject reasons, cap status, buyer-side filtering.' Priority High." onclick="selectAction(this)">Create a ticket</span>
-      </div>
-      <div class="alert-note-toggle" onclick="toggleNote('alert-1')">+ Add note</div>
-      <div id="note-alert-1" style="display:none">
-        <textarea class="alert-note" data-id="alert-1" placeholder="Notes for Claude..."></textarea>
-      </div>
+  <!-- ============================================================
+       KPI CARDS
+       ============================================================ -->
+  <div class="kpi-row">
+    <div class="kpi-card kpi-card--green anim-scale" style="--i:1">
+      <div class="kpi-card__value">$287,430</div>
+      <div class="kpi-card__label">Yesterday Revenue</div>
+    </div>
+    <div class="kpi-card kpi-card--accent anim-scale" style="--i:2">
+      <div class="kpi-card__value">$1.42</div>
+      <div class="kpi-card__label">Blended RPC</div>
+    </div>
+    <div class="kpi-card kpi-card--green anim-scale" style="--i:3">
+      <div class="kpi-card__value">68.4%</div>
+      <div class="kpi-card__label">Conversion Rate</div>
+    </div>
+    <div class="kpi-card kpi-card--accent anim-scale" style="--i:4">
+      <div class="kpi-card__value">9</div>
+      <div class="kpi-card__label">Active Experiments</div>
     </div>
   </div>
 
-  <!-- BLUE: SMS volume anomaly -->
-  <div class="alert-card severity-anomaly" data-alert-id="alert-2">
-    <label class="alert-checkbox">
-      <input type="checkbox" onchange="toggleDismiss('alert-2')">
-    </label>
-    <div class="alert-content">
-      <div class="alert-title">SMS Traffic &mdash; Volume 2.4x Weekly Average</div>
-      SMS channel delivered 12,400 clicks yesterday vs. 5,200 weekly average. EPC held steady at $1.38 (within 3% of norm). Sell rate is 71.2% (above average). Likely cause: new SMS campaign &ldquo;SpringCash-03&rdquo; launched Monday by affiliate &ldquo;PulseMedia.&rdquo;
-      <div class="alert-actions">
-        <span class="quick-action" data-action="Expected — PulseMedia launched SpringCash-03 SMS campaign on Monday. Volume spike is intentional. Monitor EPC for 3 more days before adjusting." onclick="selectAction(this)">Expected (new campaign)</span>
-        <span class="quick-action" data-action="Query analytics: SMS traffic quality for the last 7 days — show duplicate rate, reject rate by reason, and app completion rate. Compare PulseMedia vs. other SMS affiliates." onclick="selectAction(this)">Check quality</span>
-        <span class="quick-action" data-action="Pull PulseMedia affiliate scorecard for March: total clicks, leads sold, EPC, duplicate rate, reject rate. Compare to their February performance." onclick="selectAction(this)">Review affiliate</span>
-      </div>
-      <div class="alert-note-toggle" onclick="toggleNote('alert-2')">+ Add note</div>
-      <div id="note-alert-2" style="display:none">
-        <textarea class="alert-note" data-id="alert-2" placeholder="Notes for Claude..."></textarea>
-      </div>
+  <!-- ============================================================
+       FILTER BAR + ALERTS
+       ============================================================ -->
+  <div class="anim-up" style="--i:5">
+    <div class="section-label">Alerts &amp; Recommendations</div>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterCards('all')">All</button>
+      <button class="filter-btn" onclick="filterCards('action')">Action</button>
+      <button class="filter-btn" onclick="filterCards('anomaly')">Anomaly</button>
+      <button class="filter-btn" onclick="filterCards('review')">Review</button>
+      <button class="filter-btn" onclick="filterCards('info')">Info</button>
+      <button class="filter-btn" onclick="filterCards('routine')">Routine</button>
+      <span class="filter-count" id="visible-count"></span>
     </div>
   </div>
 
-  <!-- BLUE: Funnel dropout -->
-  <div class="alert-card severity-anomaly" data-alert-id="alert-3">
-    <label class="alert-checkbox">
-      <input type="checkbox" onchange="toggleDismiss('alert-3')">
-    </label>
-    <div class="alert-content">
-      <div class="alert-title">Application Funnel Step 3&rarr;4 Conversion Down 11%</div>
-      Application completion (step 3 to step 4) dropped from 62% to 55.2% starting Tuesday. Affects all traffic types equally. No code deploys in that window. Possible causes: third-party lookup service latency, form field validation change, or mobile rendering issue.
-      <div class="alert-actions">
-        <span class="quick-action" data-action="Query the application lookup service response times for the last 7 days. Show p50 and p95 by provider. Flag any provider where p95 exceeded 3 seconds." onclick="selectAction(this)">Check lookup latency</span>
-        <span class="quick-action" data-action="Create a ticket on the Engineering board: 'Investigate application step 3→4 dropout — 11% decline since Tuesday, no corresponding deploy. Check lookup service latency and mobile rendering.' Priority High." onclick="selectAction(this)">Create a ticket</span>
-        <span class="quick-action" data-action="Query analytics: application funnel conversion by step, broken down by device type (mobile vs desktop), for the last 7 days. Did the drop happen on mobile only?" onclick="selectAction(this)">Check by device</span>
-      </div>
-      <div class="alert-note-toggle" onclick="toggleNote('alert-3')">+ Add note</div>
-      <div id="note-alert-3" style="display:none">
-        <textarea class="alert-note" data-id="alert-3" placeholder="Notes for Claude..."></textarea>
+  <div class="alerts-container" id="alerts-container">
+
+    <!-- RED: Revenue impact -->
+    <div class="alert-card severity-action anim-up" style="--i:6" data-alert-id="alert-1" data-severity="action">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-1')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Partner "CreditServe": RPT Down 34% Day-Over-Day</div>
+        <div class="alert-desc">RPT dropped from $42.80 to $28.20 yesterday. This partner accounts for 18% of total revenue. No corresponding decline in transaction volume (2,840 transactions sent vs. 2,910 avg). Possible causes: client-side cap hit, campaign paused, or quality filtering tightened.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Query CreditServe daily RPT, conversion rate, and reject reasons for the last 14 days. Break down by traffic type. Flag any day where RPT dropped more than 15%." onclick="selectAction(this)">Query analytics</span>
+          <span class="quick-action" data-action="Draft a Slack message for #partnerships: 'Seeing a 34% RPT drop on CreditServe yesterday, want to flag before the weekly call. Investigating reject reasons now.'" onclick="selectAction(this)">Draft Slack message</span>
+          <span class="quick-action" data-action="Create a ticket: 'Investigate CreditServe RPT decline, 34% drop on 2026-03-19. Check reject reasons, cap status, client-side filtering.' Priority High." onclick="selectAction(this)">Create a ticket</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-1')">+ Add note</div>
+        <div id="note-alert-1" style="display:none"><textarea class="alert-note" data-id="alert-1" placeholder="Notes for Claude..."></textarea></div>
       </div>
     </div>
-  </div>
 
-  <!-- AMBER: Experiment ready -->
-  <div class="alert-card severity-todo" data-alert-id="alert-4">
-    <label class="alert-checkbox">
-      <input type="checkbox" onchange="toggleDismiss('alert-4')">
-    </label>
-    <div class="alert-content">
-      <div class="alert-title">Experiment &ldquo;RLA-ReAsk-v2&rdquo; &mdash; Reached Statistical Significance</div>
-      Running 18 days with 24,000 leads per variant. Results: +8.2% EPL lift in treatment (p=0.003). Control EPL $31.40, treatment EPL $33.98. Scheduled for a 14-day minimum &mdash; ready for a ship/kill decision.
-      <div class="alert-actions">
-        <span class="quick-action" data-action="Draft a Slack message for #experimentation: 'RLA-ReAsk-v2 hit significance at +8.2% EPL lift (p=0.003, 18 days, 24K/variant). Recommending we ship to 100%. Objections by EOD Thursday?'" onclick="selectAction(this)">Ship it</span>
-        <span class="quick-action" data-action="Extending RLA-ReAsk-v2 for 7 more days to confirm stability. The 8.2% lift is promising but I want to see weekend traffic patterns before shipping." onclick="selectAction(this)">Extend 7 days</span>
-        <span class="quick-action" data-action="Run /experiment-report for RLA-ReAsk-v2. Include daily EPL by variant, cumulative lift chart, confidence interval, and segment breakdown (traffic type, partner)." onclick="selectAction(this)">Pull full report</span>
-      </div>
-      <div class="alert-note-toggle" onclick="toggleNote('alert-4')">+ Add note</div>
-      <div id="note-alert-4" style="display:none">
-        <textarea class="alert-note" data-id="alert-4" placeholder="Notes for Claude..."></textarea>
+    <!-- BLUE: SMS volume anomaly -->
+    <div class="alert-card severity-anomaly anim-up" style="--i:7" data-alert-id="alert-2" data-severity="anomaly">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-2')"></label>
+      <div class="alert-content">
+        <div class="alert-title">SMS Traffic: Volume 2.4x Weekly Average</div>
+        <div class="alert-desc">SMS channel delivered 12,400 clicks yesterday vs. 5,200 weekly average. RPC held steady at $1.38 (within 3% of norm). Conversion rate is 71.2% (above average). Likely cause: new SMS campaign "SpringCash-03" launched Monday by affiliate "PulseMedia."</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Expected, PulseMedia launched SpringCash-03 SMS campaign on Monday. Volume spike is intentional. Monitor RPC for 3 more days before adjusting." onclick="selectAction(this)">Expected (new campaign)</span>
+          <span class="quick-action" data-action="Query analytics: SMS traffic quality for the last 7 days. Show duplicate rate, reject rate by reason, and app completion rate. Compare PulseMedia vs. other SMS affiliates." onclick="selectAction(this)">Check quality</span>
+          <span class="quick-action" data-action="Pull PulseMedia affiliate scorecard for March: total clicks, transactions sold, RPC, duplicate rate, reject rate. Compare to their February performance." onclick="selectAction(this)">Review affiliate</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-2')">+ Add note</div>
+        <div id="note-alert-2" style="display:none"><textarea class="alert-note" data-id="alert-2" placeholder="Notes for Claude..."></textarea></div>
       </div>
     </div>
-  </div>
 
-  <!-- AMBER: Stale pipeline -->
-  <div class="alert-card severity-todo" data-alert-id="alert-5">
-    <label class="alert-checkbox">
-      <input type="checkbox" onchange="toggleDismiss('alert-5')">
-    </label>
-    <div class="alert-content">
-      <div class="alert-title">QuickSight &ldquo;Daily Partner Revenue&rdquo; &mdash; Data 4h Stale</div>
-      Dashboard last refreshed at 4:12 AM. Expected refresh cycle is hourly. The ETL job <code>partner_revenue_rollup</code> shows status &ldquo;running&rdquo; since 4:08 AM. All other QuickSight dashboards refreshed within the last 45 minutes.
-      <div class="alert-actions">
-        <span class="quick-action" data-action="Check the status of the partner_revenue_rollup ETL job. If stuck, restart the Athena query and trigger a manual QuickSight dataset refresh for Daily Partner Revenue." onclick="selectAction(this)">Restart ETL</span>
-        <span class="quick-action" data-action="Expected — the partner_revenue_rollup job sometimes hangs on large backfill days. It should self-recover within an hour. Monitor and escalate if still stale by 10 AM." onclick="selectAction(this)">Known issue</span>
-      </div>
-      <div class="alert-note-toggle" onclick="toggleNote('alert-5')">+ Add note</div>
-      <div id="note-alert-5" style="display:none">
-        <textarea class="alert-note" data-id="alert-5" placeholder="Notes for Claude..."></textarea>
+    <!-- BLUE: Funnel dropout -->
+    <div class="alert-card severity-anomaly anim-up" style="--i:8" data-alert-id="alert-3" data-severity="anomaly">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-3')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Application Funnel Step 3&rarr;4 Conversion Down 11%</div>
+        <div class="alert-desc">Application completion (step 3 to step 4) dropped from 62% to 55.2% starting Tuesday. Affects all traffic types equally. No code deploys in that window. Possible causes: third-party lookup service latency, form field validation change, or mobile rendering issue.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Query the application lookup service response times for the last 7 days. Show p50 and p95 by provider. Flag any provider where p95 exceeded 3 seconds." onclick="selectAction(this)">Check lookup latency</span>
+          <span class="quick-action" data-action="Create a ticket on the Engineering board: 'Investigate application step 3 to 4 dropout, 11% decline since Tuesday, no corresponding deploy. Check lookup service latency and mobile rendering.' Priority High." onclick="selectAction(this)">Create a ticket</span>
+          <span class="quick-action" data-action="Query analytics: application funnel conversion by step, broken down by device type (mobile vs desktop), for the last 7 days. Did the drop happen on mobile only?" onclick="selectAction(this)">Check by device</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-3')">+ Add note</div>
+        <div id="note-alert-3" style="display:none"><textarea class="alert-note" data-id="alert-3" placeholder="Notes for Claude..."></textarea></div>
       </div>
     </div>
-  </div>
 
-  <!-- GRAY: Contract renewals -->
-  <div class="alert-card severity-info" data-alert-id="alert-6">
-    <label class="alert-checkbox">
-      <input type="checkbox" onchange="toggleDismiss('alert-6')">
-    </label>
-    <div class="alert-content">
-      <div class="alert-title">3 Partner Contracts Up for Renewal This Month</div>
-      NorthBridge Financial (renews Mar 25, $84K/mo), QuickFund Direct (renews Mar 28, $52K/mo), and PeakLend Solutions (renews Mar 31, $31K/mo). Combined monthly revenue at risk: $167K. No renewal discussions logged in CRM for PeakLend.
-      <div class="alert-actions">
-        <span class="quick-action" data-action="Query analytics: monthly EPL, lead volume, and sell rate for NorthBridge Financial, QuickFund Direct, and PeakLend Solutions for the last 6 months. Format as a comparison table." onclick="selectAction(this)">Pull scorecards</span>
-        <span class="quick-action" data-action="Draft a Slack message for #client-relations: 'PeakLend Solutions contract renews March 31 — no renewal discussion logged in CRM yet. Can someone confirm status? They are $31K/mo.'" onclick="selectAction(this)">Flag PeakLend</span>
-        <span class="quick-action" data-action="For each of these 3 partners (NorthBridge, QuickFund, PeakLend), generate a 1-page renewal brief: trailing 6-month EPL trend, volume trend, contract terms, and recommended pricing action." onclick="selectAction(this)">Draft renewal prep</span>
-      </div>
-      <div class="alert-note-toggle" onclick="toggleNote('alert-6')">+ Add note</div>
-      <div id="note-alert-6" style="display:none">
-        <textarea class="alert-note" data-id="alert-6" placeholder="Notes for Claude..."></textarea>
+    <!-- AMBER: Experiment ready -->
+    <div class="alert-card severity-review anim-up" style="--i:9" data-alert-id="alert-4" data-severity="review">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-4')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Experiment "Pricing-ReAsk-v2": Reached Statistical Significance</div>
+        <div class="alert-desc">Running 18 days with 24,000 transactions per variant. Results: +8.2% RPT lift in treatment (p=0.003). Control RPT $31.40, treatment RPT $33.98. Scheduled for a 14-day minimum, ready for a ship/kill decision.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Draft a Slack message for #experimentation: 'Pricing-ReAsk-v2 hit significance at +8.2% RPT lift (p=0.003, 18 days, 24K/variant). Recommending we ship to 100%. Objections by EOD Thursday?'" onclick="selectAction(this)">Ship it</span>
+          <span class="quick-action" data-action="Extending Pricing-ReAsk-v2 for 7 more days to confirm stability. The 8.2% lift is promising but I want to see weekend traffic patterns before shipping." onclick="selectAction(this)">Extend 7 days</span>
+          <span class="quick-action" data-action="Run /experiment-report for Pricing-ReAsk-v2. Include daily RPT by variant, cumulative lift chart, confidence interval, and segment breakdown (traffic type, partner)." onclick="selectAction(this)">Pull full report</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-4')">+ Add note</div>
+        <div id="note-alert-4" style="display:none"><textarea class="alert-note" data-id="alert-4" placeholder="Notes for Claude..."></textarea></div>
       </div>
     </div>
-  </div>
 
-  <!-- GRAY: Weekly scorecard -->
-  <div class="alert-card severity-info" data-alert-id="alert-7">
-    <label class="alert-checkbox">
-      <input type="checkbox" onchange="toggleDismiss('alert-7')">
-    </label>
-    <div class="alert-content">
-      <div class="alert-title">Weekly Scorecard &mdash; Due by 11 AM Friday</div>
-      Covers Mon&ndash;Thu data. Traffic mix: 42% Internal Media Buy, 23% External Media Buy, 18% SMS, 9% Email, 8% Other. All data sources are fresh. Revenue tracking 4% above weekly forecast.
-      <div class="alert-actions">
-        <span class="quick-action" data-action="Run /weekly-scorecard for all traffic types, week of 2026-03-17. Include revenue, EPC, EPL, sell rate, and margin by traffic type. Highlight any metric that moved more than 10% week-over-week." onclick="selectAction(this)">Generate scorecard</span>
-        <span class="quick-action" data-action="Reviewed — revenue on pace, data fresh. Standard scorecard, no special callouts needed." onclick="selectAction(this)">Looks good</span>
-      </div>
-      <div class="alert-note-toggle" onclick="toggleNote('alert-7')">+ Add note</div>
-      <div id="note-alert-7" style="display:none">
-        <textarea class="alert-note" data-id="alert-7" placeholder="Notes for Claude..."></textarea>
+    <!-- AMBER: Stale pipeline -->
+    <div class="alert-card severity-review anim-up" style="--i:10" data-alert-id="alert-5" data-severity="review">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-5')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Dashboard "Daily Partner Revenue": Data 4h Stale</div>
+        <div class="alert-desc">Dashboard last refreshed at 4:12 AM. Expected refresh cycle is hourly. The ETL job <code>partner_revenue_rollup</code> shows status "running" since 4:08 AM. All other BI dashboards refreshed within the last 45 minutes.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Check the status of the partner_revenue_rollup ETL job. If stuck, restart the analytics query and trigger a manual BI dataset refresh for Daily Partner Revenue." onclick="selectAction(this)">Restart ETL</span>
+          <span class="quick-action" data-action="Expected. The partner_revenue_rollup job sometimes hangs on large backfill days. It should self-recover within an hour. Monitor and escalate if still stale by 10 AM." onclick="selectAction(this)">Known issue</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-5')">+ Add note</div>
+        <div id="note-alert-5" style="display:none"><textarea class="alert-note" data-id="alert-5" placeholder="Notes for Claude..."></textarea></div>
       </div>
     </div>
-  </div>
 
-  <!-- GREEN: All systems go -->
-  <div class="alert-card severity-ok" data-alert-id="alert-8">
-    <label class="alert-checkbox">
-      <input type="checkbox" onchange="toggleDismiss('alert-8')">
-    </label>
-    <div class="alert-content">
-      <div class="alert-title">All Ping Trees Active &mdash; Lead Flow Normal</div>
-      14 active ping trees, all responding within SLA. Total leads sold yesterday: 6,840. Average response time: 320ms (within 500ms target). No partner timeouts in the last 24 hours. Fund rate: 42.1% (within 2% of monthly average).
-      <div class="alert-actions">
-        <span class="quick-action" data-action="Looks good — all systems green, lead flow normal. Dismiss." onclick="selectAction(this)">Looks good</span>
-      </div>
-      <div class="alert-note-toggle" onclick="toggleNote('alert-8')">+ Add note</div>
-      <div id="note-alert-8" style="display:none">
-        <textarea class="alert-note" data-id="alert-8" placeholder="Notes for Claude..."></textarea>
+    <!-- GRAY: Contract renewals -->
+    <div class="alert-card severity-info anim-up" style="--i:11" data-alert-id="alert-6" data-severity="info">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-6')"></label>
+      <div class="alert-content">
+        <div class="alert-title">3 Partner Contracts Up for Renewal This Month</div>
+        <div class="alert-desc">NorthBridge Financial (renews Mar 25, $84K/mo), QuickFund Direct (renews Mar 28, $52K/mo), and PeakLend Solutions (renews Mar 31, $31K/mo). Combined monthly revenue at risk: $167K. No renewal discussions logged in CRM for PeakLend.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Query analytics: monthly RPT, transaction volume, and conversion rate for NorthBridge Financial, QuickFund Direct, and PeakLend Solutions for the last 6 months. Format as a comparison table." onclick="selectAction(this)">Pull scorecards</span>
+          <span class="quick-action" data-action="Draft a Slack message for #client-relations: 'PeakLend Solutions contract renews March 31, no renewal discussion logged in CRM yet. Can someone confirm status? They are $31K/mo.'" onclick="selectAction(this)">Flag PeakLend</span>
+          <span class="quick-action" data-action="For each of these 3 partners (NorthBridge, QuickFund, PeakLend), generate a 1-page renewal brief: trailing 6-month RPT trend, volume trend, contract terms, and recommended pricing action." onclick="selectAction(this)">Draft renewal prep</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-6')">+ Add note</div>
+        <div id="note-alert-6" style="display:none"><textarea class="alert-note" data-id="alert-6" placeholder="Notes for Claude..."></textarea></div>
       </div>
     </div>
+
+    <!-- GRAY: Weekly scorecard -->
+    <div class="alert-card severity-info anim-up" style="--i:12" data-alert-id="alert-7" data-severity="info">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-7')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Weekly Scorecard: Due by 11 AM Friday</div>
+        <div class="alert-desc">Covers Monday through Thursday data. Traffic mix: 42% Internal Media Buy, 23% External Media Buy, 18% SMS, 9% Email, 8% Other. All data sources are fresh. Revenue tracking 4% above weekly forecast.</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Run /weekly-scorecard for all traffic types, week of 2026-03-17. Include revenue, RPC, RPT, conversion rate, and margin by traffic type. Highlight any metric that moved more than 10% week-over-week." onclick="selectAction(this)">Generate scorecard</span>
+          <span class="quick-action" data-action="Reviewed: revenue on pace, data fresh. Standard scorecard, no special callouts needed." onclick="selectAction(this)">Looks good</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-7')">+ Add note</div>
+        <div id="note-alert-7" style="display:none"><textarea class="alert-note" data-id="alert-7" placeholder="Notes for Claude..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- GREEN: All systems go -->
+    <div class="alert-card severity-routine anim-up" style="--i:13" data-alert-id="alert-8" data-severity="routine">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('alert-8')"></label>
+      <div class="alert-content">
+        <div class="alert-title">All Routing Nodes Active, Transaction Flow Normal</div>
+        <div class="alert-desc">14 active routing nodes, all responding within SLA. Total transactions processed yesterday: 6,840. Average response time: 320ms (within 500ms target). No partner timeouts in the last 24 hours. Fulfillment rate: 42.1% (within 2% of monthly average).</div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Looks good, all systems green, transaction flow normal. Dismiss." onclick="selectAction(this)">Looks good</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('alert-8')">+ Add note</div>
+        <div id="note-alert-8" style="display:none"><textarea class="alert-note" data-id="alert-8" placeholder="Notes for Claude..."></textarea></div>
+      </div>
+    </div>
+
   </div>
 
-</div>
-
-<h2 class="section-header">Partner Performance</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Partner</th>
-      <th>Status</th>
-      <th>Leads Sold</th>
-      <th class="amt">EPL</th>
-      <th class="amt">Revenue</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr data-account="CreditServe">
-      <td>CreditServe</td>
-      <td><span class="badge badge-stale">DECLINING</span></td>
-      <td style="font-family: var(--font-mono);">2,840</td>
-      <td class="amt negative">$28.20</td>
-      <td class="amt negative">$80,088</td>
-    </tr>
-    <tr data-account="NorthBridge Financial">
-      <td>NorthBridge Financial</td>
-      <td><span class="badge badge-fresh">ACTIVE</span></td>
-      <td style="font-family: var(--font-mono);">1,420</td>
-      <td class="amt positive">$44.60</td>
-      <td class="amt positive">$63,332</td>
-    </tr>
-    <tr data-account="QuickFund Direct">
-      <td>QuickFund Direct</td>
-      <td><span class="badge badge-fresh">ACTIVE</span></td>
-      <td style="font-family: var(--font-mono);">1,180</td>
-      <td class="amt positive">$38.90</td>
-      <td class="amt positive">$45,902</td>
-    </tr>
-    <tr data-account="PeakLend Solutions">
-      <td>PeakLend Solutions</td>
-      <td><span class="badge badge-fresh">ACTIVE</span></td>
-      <td style="font-family: var(--font-mono);">890</td>
-      <td class="amt positive">$34.50</td>
-      <td class="amt positive">$30,705</td>
-    </tr>
-    <tr data-account="MeridianCap">
-      <td>MeridianCap</td>
-      <td><span class="badge badge-fresh">ACTIVE</span></td>
-      <td style="font-family: var(--font-mono);">510</td>
-      <td class="amt positive">$32.10</td>
-      <td class="amt positive">$16,371</td>
-    </tr>
-  </tbody>
-</table>
-
-<h2 class="section-header">Traffic Source Health</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Traffic Type</th>
-      <th>Source</th>
-      <th>Clicks</th>
-      <th class="amt">EPC</th>
-      <th class="amt">Margin %</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr data-account="Internal Media Buy">
-      <td>Internal Media Buy</td>
-      <td>&mdash;</td>
-      <td style="font-family: var(--font-mono);">84,200</td>
-      <td class="amt positive">$1.52</td>
-      <td class="amt positive">38.2%</td>
-    </tr>
-    <tr data-account="External Media Buy">
-      <td>External Media Buy</td>
-      <td>&mdash;</td>
-      <td style="font-family: var(--font-mono);">46,100</td>
-      <td class="amt positive">$1.34</td>
-      <td class="amt positive">31.7%</td>
-    </tr>
-    <tr data-account="SMS">
-      <td>SMS</td>
-      <td>PulseMedia</td>
-      <td style="font-family: var(--font-mono);">12,400</td>
-      <td class="amt positive">$1.38</td>
-      <td class="amt positive">44.1%</td>
-    </tr>
-    <tr data-account="Email">
-      <td>Email</td>
-      <td>&mdash;</td>
-      <td style="font-family: var(--font-mono);">18,600</td>
-      <td class="amt positive">$1.18</td>
-      <td class="amt positive">28.9%</td>
-    </tr>
-    <tr data-account="Push">
-      <td>Push</td>
-      <td>&mdash;</td>
-      <td style="font-family: var(--font-mono);">9,200</td>
-      <td class="amt">$0.94</td>
-      <td class="amt positive">22.4%</td>
-    </tr>
-    <tr data-account="Affiliate">
-      <td>Affiliate</td>
-      <td>TrafficMax</td>
-      <td style="font-family: var(--font-mono);">22,800</td>
-      <td class="amt positive">$1.61</td>
-      <td class="amt positive">41.3%</td>
-    </tr>
-    <tr data-account="Marketplace">
-      <td>Marketplace</td>
-      <td>&mdash;</td>
-      <td style="font-family: var(--font-mono);">8,900</td>
-      <td class="amt">$1.08</td>
-      <td class="amt positive">19.6%</td>
-    </tr>
-  </tbody>
-</table>
-
-<h2 class="section-header">Active Experiments</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Experiment</th>
-      <th>Area</th>
-      <th>Days Running</th>
-      <th>Sample Size</th>
-      <th class="amt">Result</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr data-account="RLA-ReAsk-v2">
-      <td>RLA-ReAsk-v2</td>
-      <td>Monetization</td>
-      <td style="font-family: var(--font-mono);">18</td>
-      <td style="font-family: var(--font-mono);">48,000</td>
-      <td class="amt positive">+8.2% EPL</td>
-    </tr>
-    <tr data-account="SoftTimeout-300ms">
-      <td>SoftTimeout-300ms</td>
-      <td>Monetization</td>
-      <td style="font-family: var(--font-mono);">12</td>
-      <td style="font-family: var(--font-mono);">31,200</td>
-      <td class="amt positive">+3.1% sell rate</td>
-    </tr>
-    <tr data-account="ProcessingScreen-v4">
-      <td>ProcessingScreen-v4</td>
-      <td>Application</td>
-      <td style="font-family: var(--font-mono);">9</td>
-      <td style="font-family: var(--font-mono);">18,400</td>
-      <td class="amt">0.0% (collecting)</td>
-    </tr>
-    <tr data-account="MobileForm-2Step">
-      <td>MobileForm-2Step</td>
-      <td>Application</td>
-      <td style="font-family: var(--font-mono);">6</td>
-      <td style="font-family: var(--font-mono);">12,800</td>
-      <td class="amt positive">+5.7% completion</td>
-    </tr>
-    <tr data-account="EngageTier-Rebalance">
-      <td>EngageTier-Rebalance</td>
-      <td>Router</td>
-      <td style="font-family: var(--font-mono);">21</td>
-      <td style="font-family: var(--font-mono);">62,000</td>
-      <td class="amt negative">-1.4% EPC</td>
-    </tr>
-    <tr data-account="EmailSubject-Urgency">
-      <td>EmailSubject-Urgency</td>
-      <td>Email</td>
-      <td style="font-family: var(--font-mono);">4</td>
-      <td style="font-family: var(--font-mono);">8,200</td>
-      <td class="amt">+1.2% (not sig)</td>
-    </tr>
-    <tr data-account="PushTiming-Evening">
-      <td>PushTiming-Evening</td>
-      <td>Push</td>
-      <td style="font-family: var(--font-mono);">7</td>
-      <td style="font-family: var(--font-mono);">6,400</td>
-      <td class="amt positive">+4.8% CTR</td>
-    </tr>
-    <tr data-account="AffiliateLP-Redesign">
-      <td>AffiliateLP-Redesign</td>
-      <td>Application</td>
-      <td style="font-family: var(--font-mono);">14</td>
-      <td style="font-family: var(--font-mono);">22,600</td>
-      <td class="amt positive">+6.3% app rate</td>
-    </tr>
-    <tr data-account="DynamicRLA-Caps">
-      <td>DynamicRLA-Caps</td>
-      <td>Monetization</td>
-      <td style="font-family: var(--font-mono);">3</td>
-      <td style="font-family: var(--font-mono);">4,800</td>
-      <td class="amt">collecting</td>
-    </tr>
-  </tbody>
-</table>
-
-<h2 class="section-header">Data Quality</h2>
-<div>
-  <div class="dq-item">
-    <span>Stale data pipelines</span>
-    <span class="dq-count warn">1</span>
-  </div>
-  <div class="dq-item">
-    <span>Leads processed this month</span>
-    <span class="dq-count ok">142,680</span>
-  </div>
-</div>
-
-<h2 class="section-header">System Health</h2>
-<details open>
-  <summary><span class="status-dot amber"></span>Data Pipeline Status</summary>
-  <div class="details-content">
-    <table>
+  <!-- ============================================================
+       PARTNER PERFORMANCE TABLE
+       ============================================================ -->
+  <div class="anim-up" style="--i:14">
+    <div class="section-label">Partner Performance</div>
+    <table class="data-table" data-table-id="partners">
       <thead>
-        <tr><th>Pipeline</th><th>Last Refresh</th><th>Status</th></tr>
+        <tr>
+          <th>Partner</th>
+          <th>Status</th>
+          <th class="num">Transactions</th>
+          <th class="num">RPT</th>
+          <th class="num">Revenue</th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>Lead Events</td><td>8 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
-        <tr><td>Funnel Metrics</td><td>15 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
-        <tr><td>Traffic Router Clicks</td><td>22 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
-        <tr><td>Partner Revenue Rollup</td><td class="stale">4 hours ago</td><td><span class="badge badge-stale">STALE</span></td></tr>
-        <tr><td>QuickSight Datasets</td><td>35 min ago</td><td><span class="badge badge-fresh">OK</span></td></tr>
+        <tr data-row-id="CreditServe">
+          <td>CreditServe</td>
+          <td><span class="badge badge--red">Declining</span></td>
+          <td class="num">2,840</td>
+          <td class="num negative">$28.20</td>
+          <td class="num negative">$80,088</td>
+        </tr>
+        <tr data-row-id="NorthBridge-Financial">
+          <td>NorthBridge Financial</td>
+          <td><span class="badge badge--green">Active</span></td>
+          <td class="num">1,420</td>
+          <td class="num positive">$44.60</td>
+          <td class="num positive">$63,332</td>
+        </tr>
+        <tr data-row-id="QuickFund-Direct">
+          <td>QuickFund Direct</td>
+          <td><span class="badge badge--green">Active</span></td>
+          <td class="num">1,180</td>
+          <td class="num positive">$38.90</td>
+          <td class="num positive">$45,902</td>
+        </tr>
+        <tr data-row-id="PeakLend-Solutions">
+          <td>PeakLend Solutions</td>
+          <td><span class="badge badge--green">Active</span></td>
+          <td class="num">890</td>
+          <td class="num positive">$34.50</td>
+          <td class="num positive">$30,705</td>
+        </tr>
+        <tr data-row-id="MeridianCap">
+          <td>MeridianCap</td>
+          <td><span class="badge badge--green">Active</span></td>
+          <td class="num">510</td>
+          <td class="num positive">$32.10</td>
+          <td class="num positive">$16,371</td>
+        </tr>
       </tbody>
     </table>
   </div>
-</details>
-<details>
-  <summary><span class="status-dot green"></span>Partner API Health</summary>
-  <div class="details-content">
-    <table>
-      <thead>
-        <tr><th>Partner</th><th>Last Ping</th><th>Response Time</th><th>Status</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>CreditServe</td><td>2 min ago</td><td style="font-family: var(--font-mono);">280ms</td><td><span class="badge badge-fresh">OK</span></td></tr>
-        <tr><td>NorthBridge Financial</td><td>5 min ago</td><td style="font-family: var(--font-mono);">310ms</td><td><span class="badge badge-fresh">OK</span></td></tr>
-        <tr><td>QuickFund Direct</td><td>3 min ago</td><td style="font-family: var(--font-mono);">245ms</td><td><span class="badge badge-fresh">OK</span></td></tr>
-        <tr><td>PeakLend Solutions</td><td>8 min ago</td><td style="font-family: var(--font-mono);">390ms</td><td><span class="badge badge-fresh">OK</span></td></tr>
-        <tr><td>MeridianCap</td><td>4 min ago</td><td style="font-family: var(--font-mono);">260ms</td><td><span class="badge badge-fresh">OK</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-</details>
-<details>
-  <summary><span class="status-dot green"></span>Experiment Infrastructure</summary>
-  <div class="details-content">
-    <table>
-      <thead>
-        <tr><th>Component</th><th>Status</th><th>Notes</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Assignment Service</td><td><span class="badge badge-fresh">OK</span></td><td>9 experiments active</td></tr>
-        <tr><td>Event Logging</td><td><span class="badge badge-fresh">OK</span></td><td>142K events/day</td></tr>
-        <tr><td>Stats Engine</td><td><span class="badge badge-fresh">OK</span></td><td>Last significance calc: 12 min ago</td></tr>
-        <tr><td>Sample Size Monitor</td><td><span class="badge badge-fresh">OK</span></td><td>2 experiments at target</td></tr>
-      </tbody>
-    </table>
-  </div>
-</details>
 
-<!-- Keyboard shortcuts hint -->
+  <!-- ============================================================
+       TRAFFIC SOURCE HEALTH TABLE
+       ============================================================ -->
+  <div class="anim-up" style="--i:15">
+    <div class="section-label">Traffic Source Health</div>
+    <table class="data-table" data-table-id="traffic">
+      <thead>
+        <tr>
+          <th>Traffic Type</th>
+          <th>Source</th>
+          <th class="num">Clicks</th>
+          <th class="num">RPC</th>
+          <th class="num">Margin %</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-row-id="Internal-Media-Buy">
+          <td>Internal Media Buy</td>
+          <td>--</td>
+          <td class="num">84,200</td>
+          <td class="num positive">$1.52</td>
+          <td class="num positive">38.2%</td>
+        </tr>
+        <tr data-row-id="External-Media-Buy">
+          <td>External Media Buy</td>
+          <td>--</td>
+          <td class="num">46,100</td>
+          <td class="num positive">$1.34</td>
+          <td class="num positive">31.7%</td>
+        </tr>
+        <tr data-row-id="SMS">
+          <td>SMS</td>
+          <td>PulseMedia</td>
+          <td class="num">12,400</td>
+          <td class="num positive">$1.38</td>
+          <td class="num positive">44.1%</td>
+        </tr>
+        <tr data-row-id="Email">
+          <td>Email</td>
+          <td>--</td>
+          <td class="num">18,600</td>
+          <td class="num positive">$1.18</td>
+          <td class="num positive">28.9%</td>
+        </tr>
+        <tr data-row-id="Push">
+          <td>Push</td>
+          <td>--</td>
+          <td class="num">9,200</td>
+          <td class="num">$0.94</td>
+          <td class="num positive">22.4%</td>
+        </tr>
+        <tr data-row-id="Affiliate">
+          <td>Affiliate</td>
+          <td>TrafficMax</td>
+          <td class="num">22,800</td>
+          <td class="num positive">$1.61</td>
+          <td class="num positive">41.3%</td>
+        </tr>
+        <tr data-row-id="Platform">
+          <td>Platform</td>
+          <td>--</td>
+          <td class="num">8,900</td>
+          <td class="num">$1.08</td>
+          <td class="num positive">19.6%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============================================================
+       ACTIVE EXPERIMENTS TABLE
+       ============================================================ -->
+  <div class="anim-up" style="--i:16">
+    <div class="section-label">Active Experiments</div>
+    <table class="data-table" data-table-id="experiments">
+      <thead>
+        <tr>
+          <th>Experiment</th>
+          <th>Area</th>
+          <th class="num">Days Running</th>
+          <th class="num">Sample Size</th>
+          <th class="num">Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-row-id="Pricing-ReAsk-v2">
+          <td>Pricing-ReAsk-v2</td>
+          <td>Monetization</td>
+          <td class="num">18</td>
+          <td class="num">48,000</td>
+          <td class="num positive">+8.2% RPT</td>
+        </tr>
+        <tr data-row-id="SoftTimeout-300ms">
+          <td>SoftTimeout-300ms</td>
+          <td>Monetization</td>
+          <td class="num">12</td>
+          <td class="num">31,200</td>
+          <td class="num positive">+3.1% conv rate</td>
+        </tr>
+        <tr data-row-id="ProcessingScreen-v4">
+          <td>ProcessingScreen-v4</td>
+          <td>Application</td>
+          <td class="num">9</td>
+          <td class="num">18,400</td>
+          <td class="num">0.0% (collecting)</td>
+        </tr>
+        <tr data-row-id="MobileForm-2Step">
+          <td>MobileForm-2Step</td>
+          <td>Application</td>
+          <td class="num">6</td>
+          <td class="num">12,800</td>
+          <td class="num positive">+5.7% completion</td>
+        </tr>
+        <tr data-row-id="EngageTier-Rebalance">
+          <td>EngageTier-Rebalance</td>
+          <td>Router</td>
+          <td class="num">21</td>
+          <td class="num">62,000</td>
+          <td class="num negative">-1.4% RPC</td>
+        </tr>
+        <tr data-row-id="EmailSubject-Urgency">
+          <td>EmailSubject-Urgency</td>
+          <td>Email</td>
+          <td class="num">4</td>
+          <td class="num">8,200</td>
+          <td class="num">+1.2% (not sig)</td>
+        </tr>
+        <tr data-row-id="PushTiming-Evening">
+          <td>PushTiming-Evening</td>
+          <td>Push</td>
+          <td class="num">7</td>
+          <td class="num">6,400</td>
+          <td class="num positive">+4.8% CTR</td>
+        </tr>
+        <tr data-row-id="AffiliateLP-Redesign">
+          <td>AffiliateLP-Redesign</td>
+          <td>Application</td>
+          <td class="num">14</td>
+          <td class="num">22,600</td>
+          <td class="num positive">+6.3% app rate</td>
+        </tr>
+        <tr data-row-id="DynamicPricing-Caps">
+          <td>DynamicPricing-Caps</td>
+          <td>Monetization</td>
+          <td class="num">3</td>
+          <td class="num">4,800</td>
+          <td class="num">collecting</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============================================================
+       DATA QUALITY
+       ============================================================ -->
+  <div class="anim-up" style="--i:17">
+    <div class="section-label">Data Quality</div>
+    <div class="dq-item">
+      <span>Stale data pipelines</span>
+      <span class="dq-count warn">1</span>
+    </div>
+    <div class="dq-item">
+      <span>Transactions processed this month</span>
+      <span class="dq-count ok">142,680</span>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SYSTEM HEALTH
+       ============================================================ -->
+  <div class="anim-up" style="--i:18">
+    <div class="section-label">System Health</div>
+
+    <details class="standalone" open>
+      <summary><span class="status-dot amber"></span>Data Pipeline Status</summary>
+      <div class="details-content">
+        <table class="data-table" data-table-id="pipelines">
+          <thead>
+            <tr><th>Pipeline</th><th>Last Refresh</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr data-row-id="transaction-events"><td>Transaction Events</td><td>8 min ago</td><td><span class="badge badge--green">OK</span></td></tr>
+            <tr data-row-id="funnel-metrics"><td>Funnel Metrics</td><td>15 min ago</td><td><span class="badge badge--green">OK</span></td></tr>
+            <tr data-row-id="traffic-router-clicks"><td>Traffic Router Clicks</td><td>22 min ago</td><td><span class="badge badge--green">OK</span></td></tr>
+            <tr data-row-id="partner-revenue-rollup"><td>Partner Revenue Rollup</td><td class="negative">4 hours ago</td><td><span class="badge badge--amber">Stale</span></td></tr>
+            <tr data-row-id="bi-datasets"><td>BI Datasets</td><td>35 min ago</td><td><span class="badge badge--green">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <details class="standalone">
+      <summary><span class="status-dot green"></span>Partner API Health</summary>
+      <div class="details-content">
+        <table class="data-table" data-table-id="partner-api">
+          <thead>
+            <tr><th>Partner</th><th>Last Ping</th><th class="num">Response Time</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr data-row-id="api-CreditServe"><td>CreditServe</td><td>2 min ago</td><td class="num">280ms</td><td><span class="badge badge--green">OK</span></td></tr>
+            <tr data-row-id="api-NorthBridge"><td>NorthBridge Financial</td><td>5 min ago</td><td class="num">310ms</td><td><span class="badge badge--green">OK</span></td></tr>
+            <tr data-row-id="api-QuickFund"><td>QuickFund Direct</td><td>3 min ago</td><td class="num">245ms</td><td><span class="badge badge--green">OK</span></td></tr>
+            <tr data-row-id="api-PeakLend"><td>PeakLend Solutions</td><td>8 min ago</td><td class="num">390ms</td><td><span class="badge badge--green">OK</span></td></tr>
+            <tr data-row-id="api-MeridianCap"><td>MeridianCap</td><td>4 min ago</td><td class="num">260ms</td><td><span class="badge badge--green">OK</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <details class="standalone">
+      <summary><span class="status-dot green"></span>Experiment Infrastructure</summary>
+      <div class="details-content">
+        <table class="data-table" data-table-id="experiment-infra">
+          <thead>
+            <tr><th>Component</th><th>Status</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr data-row-id="assignment-service"><td>Assignment Service</td><td><span class="badge badge--green">OK</span></td><td>9 experiments active</td></tr>
+            <tr data-row-id="event-logging"><td>Event Logging</td><td><span class="badge badge--green">OK</span></td><td>142K events/day</td></tr>
+            <tr data-row-id="stats-engine"><td>Stats Engine</td><td><span class="badge badge--green">OK</span></td><td>Last significance calc: 12 min ago</td></tr>
+            <tr data-row-id="sample-size-monitor"><td>Sample Size Monitor</td><td><span class="badge badge--green">OK</span></td><td>2 experiments at target</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <div class="footer anim-up" style="--i:99">
+    Generated by Claude Code on March 22, 2026.
+    <br>Keyboard shortcuts: press <kbd>?</kbd> for help.
+  </div>
+
+</div>
+
+<!-- Keyboard Hint -->
 <div class="kbd-hint" id="kbd-hint">
   <kbd>j</kbd><kbd>k</kbd> navigate &nbsp;
   <kbd>x</kbd> dismiss &nbsp;
-  <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> action &nbsp;
+  <kbd>1</kbd>-<kbd>5</kbd> action &nbsp;
   <kbd>n</kbd> note &nbsp;
+  <kbd>esc</kbd> exit note &nbsp;
   <kbd>c</kbd> copy &nbsp;
+  <kbd>s</kbd> share &nbsp;
   <kbd>?</kbd> help
 </div>
 
-<!-- Action bar (hidden until user interacts) -->
+<!-- Action Bar -->
 <div class="action-bar" id="action-bar">
   <span class="action-bar-stats" id="action-bar-stats"></span>
-  <button class="copy-btn" id="copy-btn" onclick="copySummary()">Copy Review Summary</button>
+  <div class="action-bar-buttons">
+    <button class="action-btn--danger action-btn" id="clear-btn" onclick="clearReview()" style="display:none">Clear Review</button>
+    <button class="action-btn--secondary action-btn" id="share-btn" onclick="shareState()">Share State</button>
+    <button class="action-btn" id="copy-btn" onclick="copySummary()">Copy Review Summary</button>
+  </div>
 </div>
 
 <script>
+/* ================================================================
+   INTERACTIVE REPORT ENGINE — JavaScript
+   Domain-agnostic interaction engine for the 3-layer feedback pattern.
+
+   FEATURES:
+   1. Dismiss alerts (checkbox toggle with animation)
+   2. Quick action selection (single or multi-select)
+   3. Inline notes on alert cards
+   4. Table row flagging with inline notes
+   5. Inline annotations on [data-annotatable] elements
+   6. Filter by severity
+   7. Keyboard navigation (j/k/x/1-5/n/c/s/?)
+   8. Copy Review Summary (structured markdown)
+   9. Share State (compressed JSON in URL hash)
+   10. localStorage persistence (auto-save/restore)
+
+   DATA ATTRIBUTES READ:
+   - body[data-report-title]  — heading for the summary markdown
+   - body[data-report-date]   — date for the summary (falls back to today)
+   - body[data-multiaction]   — if present, allow multi-select on action pills
+   - body[data-annotatable]   — if present, enable click-to-annotate on elements with data-annotation-id
+   - body[data-no-persist]    — if present, skip localStorage
+   - .alert-card[data-alert-id]    — unique alert identifier
+   - .alert-card[data-severity]    — severity type string
+   - .quick-action[data-action]    — literal Claude instruction
+   - .data-table[data-table-id]    — table identifier for row flagging
+   - tr[data-row-id]               — row identifier for flagging
+   - [data-annotation-id]                   — annotation target (requires body[data-annotatable])
+   ================================================================ */
 (function() {
+  'use strict';
+
+  // --- Feature detection ---
+  var body = document.body;
+  var MULTI_ACTION = body.hasAttribute('data-multiaction');
+  var ANNOTATABLE = body.hasAttribute('data-annotatable');
+  var NO_PERSIST = body.hasAttribute('data-no-persist');
+  var REPORT_TITLE = body.getAttribute('data-report-title') || 'Report';
+  var REPORT_DATE = body.getAttribute('data-report-date') || new Date().toISOString().slice(0, 10);
+
+  // --- Helpers ---
+  function escapeForMarkdown(str) {
+    return str.replace(/"/g, "'").replace(/\n/g, ' / ').replace(/\r/g, '');
+  }
+
+  // --- State ---
   var state = {
-    dismissed: new Set(),
-    notes: {},
-    actions: {},
-    flaggedAccounts: new Set(),
-    accountNotes: {}
+    dismissed: [],       // array of alert IDs
+    notes: {},           // alertId -> note text
+    actions: {},         // alertId -> action text (single) or array (multi)
+    flaggedRows: [],     // array of "tableId:rowId" keys
+    rowNotes: {},        // "tableId:rowId" -> note text
+    annotations: {}      // annotationId -> note text
   };
 
+  // --- Clipboard ---
   function copyToClipboard(text, onSuccess) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(onSuccess).catch(function() {
@@ -935,193 +864,347 @@
     var ok = false;
     try { ok = document.execCommand('copy'); } catch(e) { ok = false; }
     document.body.removeChild(ta);
-    if (ok) {
-      if (onSuccess) onSuccess();
-    } else {
-      window.prompt('Copy failed. Select the text below:', text);
-    }
+    if (ok && onSuccess) onSuccess();
+    else if (!ok) window.prompt('Copy failed. Select the text below:', text);
   }
 
-  function getReportDate() {
-    var el = document.querySelector('.generated-date');
-    if (!el) return new Date().toISOString().slice(0, 10);
-    var m = el.textContent.match(/\d{4}-\d{2}-\d{2}/);
-    return m ? m[0] : new Date().toISOString().slice(0, 10);
+  // --- State helpers ---
+  function hasItem(arr, item) {
+    return arr.indexOf(item) !== -1;
+  }
+  function addItem(arr, item) {
+    if (!hasItem(arr, item)) arr.push(item);
+  }
+  function removeItem(arr, item) {
+    var idx = arr.indexOf(item);
+    if (idx !== -1) arr.splice(idx, 1);
   }
 
+  // --- Dismiss ---
   window.toggleDismiss = function(id) {
     var card = document.querySelector('[data-alert-id="' + id + '"]');
     if (!card) return;
-    if (state.dismissed.has(id)) {
-      state.dismissed.delete(id);
+    if (hasItem(state.dismissed, id)) {
+      removeItem(state.dismissed, id);
       card.classList.remove('dismissed');
+      var cb = card.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = false;
     } else {
-      state.dismissed.add(id);
+      addItem(state.dismissed, id);
       card.classList.add('dismissed');
+      var cb2 = card.querySelector('input[type="checkbox"]');
+      if (cb2) cb2.checked = true;
     }
+    saveState();
     updateActionBar();
+    updateVisibleCount();
   };
 
+  // --- Quick Actions ---
   window.selectAction = function(el) {
     var action = el.getAttribute('data-action');
     var card = el.closest('.alert-card');
     var id = card.getAttribute('data-alert-id');
 
-    if (el.classList.contains('selected')) {
-      el.classList.remove('selected');
-      delete state.actions[id];
+    if (MULTI_ACTION) {
+      // Multi-select mode
+      if (el.classList.contains('selected')) {
+        el.classList.remove('selected');
+        if (Array.isArray(state.actions[id])) {
+          var idx = state.actions[id].indexOf(action);
+          if (idx !== -1) state.actions[id].splice(idx, 1);
+          if (state.actions[id].length === 0) delete state.actions[id];
+        }
+      } else {
+        el.classList.add('selected');
+        if (!Array.isArray(state.actions[id])) state.actions[id] = [];
+        state.actions[id].push(action);
+      }
     } else {
-      card.querySelectorAll('.quick-action.selected').forEach(function(s) { s.classList.remove('selected'); });
-      el.classList.add('selected');
-      state.actions[id] = action;
+      // Single-select mode
+      if (el.classList.contains('selected')) {
+        el.classList.remove('selected');
+        delete state.actions[id];
+      } else {
+        card.querySelectorAll('.quick-action.selected').forEach(function(s) { s.classList.remove('selected'); });
+        el.classList.add('selected');
+        state.actions[id] = action;
+      }
     }
-
     copyToClipboard(action);
+    saveState();
     updateActionBar();
   };
 
+  // --- Notes ---
   window.toggleNote = function(id) {
     var area = document.getElementById('note-' + id);
     if (!area) return;
     area.style.display = area.style.display === 'none' ? 'block' : 'none';
-    if (area.style.display === 'block') {
-      area.querySelector('textarea').focus();
-    }
+    if (area.style.display === 'block') area.querySelector('textarea').focus();
   };
 
   document.addEventListener('input', function(e) {
     if (e.target.classList.contains('alert-note')) {
       var id = e.target.getAttribute('data-id');
-      if (e.target.value.trim()) {
-        state.notes[id] = e.target.value.trim();
-      } else {
-        delete state.notes[id];
-      }
+      if (e.target.value.trim()) state.notes[id] = e.target.value.trim();
+      else delete state.notes[id];
+      saveState();
+      updateActionBar();
+    }
+    if (e.target.classList.contains('row-note-input')) {
+      var key = e.target.getAttribute('data-row-key');
+      if (e.target.value.trim()) state.rowNotes[key] = e.target.value.trim();
+      else delete state.rowNotes[key];
+      saveState();
+      updateActionBar();
+    }
+    if (e.target.classList.contains('annotation-input')) {
+      var annId = e.target.getAttribute('data-annotation-id');
+      if (e.target.value.trim()) state.annotations[annId] = e.target.value.trim();
+      else delete state.annotations[annId];
+      saveState();
       updateActionBar();
     }
   });
 
+  // --- Table Row Flagging ---
   document.addEventListener('click', function(e) {
-    if (e.target.closest('.account-note-row')) return;
-    if (e.target.classList.contains('account-note-input')) return;
+    if (e.target.closest('.row-note-row')) return;
+    if (e.target.classList.contains('row-note-input')) return;
 
-    var row = e.target.closest('tbody tr[data-account]');
+    var row = e.target.closest('.data-table tbody tr[data-row-id]');
     if (!row) return;
-    var name = row.getAttribute('data-account');
+    var rowId = row.getAttribute('data-row-id');
+    var table = row.closest('.data-table');
+    var tableId = table.getAttribute('data-table-id') || 'default';
+    var key = tableId + ':' + rowId;
+    var label = row.querySelector('td') ? row.querySelector('td').textContent.trim() : rowId;
     var noteRow = row.nextElementSibling;
-    var hasNoteRow = noteRow && noteRow.classList.contains('account-note-row');
+    var hasNoteRow = noteRow && noteRow.classList.contains('row-note-row');
 
-    if (state.flaggedAccounts.has(name)) {
-      state.flaggedAccounts.delete(name);
-      delete state.accountNotes[name];
+    if (hasItem(state.flaggedRows, key)) {
+      removeItem(state.flaggedRows, key);
+      delete state.rowNotes[key];
       row.classList.remove('flagged');
       if (hasNoteRow) noteRow.remove();
     } else {
-      state.flaggedAccounts.add(name);
+      addItem(state.flaggedRows, key);
       row.classList.add('flagged');
       var cols = row.querySelectorAll('td').length;
       var nr = document.createElement('tr');
-      nr.className = 'account-note-row';
-      nr.innerHTML = '<td colspan="' + cols + '"><input type="text" class="account-note-input" data-account="' + name.replace(/"/g, '&quot;') + '" placeholder="Why are you flagging ' + name.replace(/"/g, '&quot;') + '?"></td>';
+      nr.className = 'row-note-row';
+      nr.innerHTML = '<td colspan="' + cols + '"><input type="text" class="row-note-input" data-row-key="' + key + '" placeholder="Why are you flagging ' + label.replace(/"/g, '&quot;') + '?"></td>';
       row.after(nr);
       nr.querySelector('input').focus();
     }
+    saveState();
     updateActionBar();
   });
 
-  document.addEventListener('input', function(e) {
-    if (e.target.classList.contains('account-note-input')) {
-      var name = e.target.getAttribute('data-account');
-      if (e.target.value.trim()) {
-        state.accountNotes[name] = e.target.value.trim();
-      } else {
-        delete state.accountNotes[name];
-      }
-      updateActionBar();
+  // --- Inline Annotations ---
+  document.addEventListener('click', function(e) {
+    if (!ANNOTATABLE) return;
+    var target = e.target.closest('[data-annotation-id]');
+    if (!target) return;
+    if (e.target.classList.contains('annotation-input')) return;
+
+    var annId = target.getAttribute('data-annotation-id');
+    var existing = target.nextElementSibling;
+    if (existing && existing.classList.contains('annotation-input')) {
+      // Toggle off
+      existing.remove();
+      var badge = target.querySelector('.annotation-badge');
+      if (badge && !state.annotations[annId]) badge.remove();
+      return;
     }
+
+    var input = document.createElement('textarea');
+    input.className = 'annotation-input';
+    input.setAttribute('data-annotation-id', annId);
+    input.placeholder = 'Add annotation...';
+    if (state.annotations[annId]) input.value = state.annotations[annId];
+    target.after(input);
+    input.focus();
   });
 
+  // --- Filter ---
+  window.filterCards = function(severity) {
+    var btns = document.querySelectorAll('.filter-btn');
+    btns.forEach(function(b) {
+      var match = b.getAttribute('onclick');
+      b.classList.toggle('active', match && match.indexOf("'" + severity + "'") !== -1);
+    });
+
+    var cards = document.querySelectorAll('.alert-card[data-alert-id]');
+    cards.forEach(function(card) {
+      if (severity === 'all') {
+        card.style.display = '';
+      } else {
+        card.style.display = card.getAttribute('data-severity') === severity ? '' : 'none';
+      }
+    });
+    updateVisibleCount();
+  };
+
+  function updateVisibleCount() {
+    var all = document.querySelectorAll('.alert-card[data-alert-id]');
+    var visible = 0;
+    all.forEach(function(c) {
+      if (c.style.display !== 'none' && !c.classList.contains('dismissed')) visible++;
+    });
+    // Update filter button counts
+    var counts = {};
+    var totalActive = 0;
+    all.forEach(function(c) {
+      if (!c.classList.contains('dismissed')) {
+        var sev = c.getAttribute('data-severity');
+        counts[sev] = (counts[sev] || 0) + 1;
+        totalActive++;
+      }
+    });
+
+    var el = document.getElementById('visible-count');
+    if (el) el.textContent = 'Showing ' + visible + ' of ' + totalActive;
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+      var onclick = btn.getAttribute('onclick') || '';
+      var match = onclick.match(/filterCards\('([^']+)'\)/);
+      if (!match) return;
+      var sev = match[1];
+      var label = btn.textContent.replace(/\s*\(\d+\)/, '');
+      if (sev === 'all') {
+        btn.textContent = label + ' (' + totalActive + ')';
+      } else if (counts[sev] !== undefined) {
+        btn.textContent = label + ' (' + counts[sev] + ')';
+      } else {
+        btn.textContent = label + ' (0)';
+      }
+    });
+  }
+
+  // --- Action Bar ---
   function updateActionBar() {
-    var hasAlerts = document.querySelectorAll('.alert-card[data-alert-id]').length > 0;
-    var interactions = state.dismissed.size + Object.keys(state.notes).length + Object.keys(state.actions).length + state.flaggedAccounts.size;
+    var actionCount = Object.keys(state.actions).length;
+    var noteCount = Object.keys(state.notes).length;
+    var annCount = Object.keys(state.annotations).length;
+    var interactions = state.dismissed.length + noteCount + actionCount + state.flaggedRows.length + annCount;
+
+    var hasCards = document.querySelectorAll('.alert-card[data-alert-id]').length > 0;
     var bar = document.getElementById('action-bar');
-    if (hasAlerts || interactions > 0) {
+    if (hasCards || interactions > 0) {
       bar.classList.add('visible');
-      var parts = [];
-      if (state.dismissed.size) parts.push(state.dismissed.size + ' dismissed');
-      if (Object.keys(state.actions).length) parts.push(Object.keys(state.actions).length + ' action' + (Object.keys(state.actions).length > 1 ? 's' : ''));
-      if (Object.keys(state.notes).length) parts.push(Object.keys(state.notes).length + ' note' + (Object.keys(state.notes).length > 1 ? 's' : ''));
-      if (state.flaggedAccounts.size) parts.push(state.flaggedAccounts.size + ' flagged');
-      document.getElementById('action-bar-stats').textContent = parts.length ? parts.join(', ') : 'Review complete \u2014 copy summary';
     } else {
       bar.classList.remove('visible');
     }
+
+    var parts = [];
+    if (state.dismissed.length) parts.push(state.dismissed.length + ' dismissed');
+    if (actionCount) parts.push(actionCount + ' action' + (actionCount > 1 ? 's' : ''));
+    if (noteCount) parts.push(noteCount + ' note' + (noteCount > 1 ? 's' : ''));
+    if (state.flaggedRows.length) parts.push(state.flaggedRows.length + ' flagged');
+    if (annCount) parts.push(annCount + ' annotation' + (annCount > 1 ? 's' : ''));
+    document.getElementById('action-bar-stats').textContent = parts.length ? parts.join(', ') : 'Review items and copy summary when done';
+
     var btn = document.getElementById('copy-btn');
     btn.textContent = 'Copy Review Summary';
     btn.classList.remove('copied');
+
+    // Show clear button if there's persisted state
+    var clearBtn = document.getElementById('clear-btn');
+    if (clearBtn) clearBtn.style.display = interactions > 0 ? '' : 'none';
   }
 
-  updateActionBar();
-
+  // --- Copy Summary ---
   window.copySummary = function() {
-    var lines = ['## Action Dashboard Review \u2014 ' + getReportDate(), ''];
+    var lines = ['## ' + REPORT_TITLE + ' Review \u2014 ' + REPORT_DATE, ''];
     var allCards = document.querySelectorAll('.alert-card[data-alert-id]');
 
-    var actionEntries = Object.keys(state.actions);
-    if (actionEntries.length) {
-      lines.push('### Quick Actions');
-      actionEntries.forEach(function(id) {
+    // Actions Selected
+    var actionIds = Object.keys(state.actions);
+    if (actionIds.length) {
+      lines.push('### Actions Selected');
+      actionIds.forEach(function(id) {
         var card = document.querySelector('[data-alert-id="' + id + '"]');
-        var title = card ? card.querySelector('.alert-title').textContent.trim() : id;
-        lines.push('- ' + title + ': "' + state.actions[id] + '"');
+        var title = card ? escapeForMarkdown(card.querySelector('.alert-title').textContent.trim()) : id;
+        var actionVal = state.actions[id];
+        if (Array.isArray(actionVal)) {
+          actionVal.forEach(function(a) {
+            lines.push('- ' + title + ': "' + escapeForMarkdown(a) + '"');
+          });
+        } else {
+          lines.push('- ' + title + ': "' + escapeForMarkdown(actionVal) + '"');
+        }
       });
       lines.push('');
     }
 
+    // Dismissed
     var dismissedItems = [];
     var openItems = [];
     allCards.forEach(function(card) {
       var id = card.getAttribute('data-alert-id');
       var title = card.querySelector('.alert-title');
       if (!title) return;
-      var text = title.textContent.trim();
-      if (state.dismissed.has(id)) {
-        dismissedItems.push('- [x] ' + text);
+      var text = escapeForMarkdown(title.textContent.trim());
+      var severity = card.getAttribute('data-severity');
+      if (hasItem(state.dismissed, id)) {
+        var note = state.notes[id] ? ' \u2014 ' + escapeForMarkdown(state.notes[id]) : '';
+        dismissedItems.push('- [x] ' + text + ' (' + severity + ')' + note);
       } else {
-        openItems.push('- [ ] ' + text);
+        openItems.push('- [ ] ' + text + ' (' + severity + ')');
       }
     });
 
     if (dismissedItems.length) {
-      lines.push('### Dismissed');
+      lines.push('### Dismissed (Reviewed)');
       lines = lines.concat(dismissedItems);
       lines.push('');
     }
 
-    var noteEntries = Object.keys(state.notes);
-    if (noteEntries.length) {
+    // Notes (non-dismissed only)
+    var noteIds = Object.keys(state.notes).filter(function(id) { return !hasItem(state.dismissed, id); });
+    if (noteIds.length) {
       lines.push('### Notes');
-      noteEntries.forEach(function(id) {
+      noteIds.forEach(function(id) {
         var card = document.querySelector('[data-alert-id="' + id + '"]');
-        var title = card ? card.querySelector('.alert-title').textContent.trim() : id;
-        lines.push('- ' + title + ': "' + state.notes[id] + '"');
+        var title = card ? escapeForMarkdown(card.querySelector('.alert-title').textContent.trim()) : id;
+        lines.push('- ' + title + ': "' + escapeForMarkdown(state.notes[id]) + '"');
       });
       lines.push('');
     }
 
-    if (state.flaggedAccounts.size) {
+    // Flagged Rows
+    if (state.flaggedRows.length) {
       lines.push('### Flagged Items');
-      state.flaggedAccounts.forEach(function(name) {
-        var note = state.accountNotes[name];
+      state.flaggedRows.forEach(function(key) {
+        var parts = key.split(':');
+        var tableId = parts[0];
+        var rowId = parts.slice(1).join(':');
+        var row = document.querySelector('.data-table[data-table-id="' + tableId + '"] tr[data-row-id="' + rowId + '"]');
+        var label = row ? escapeForMarkdown(row.querySelector('td').textContent.trim()) : rowId;
+        var note = state.rowNotes[key];
         if (note) {
-          lines.push('- ' + name + ': "' + note + '"');
+          lines.push('- ' + label + ' (' + rowId + '): "' + escapeForMarkdown(note) + '"');
         } else {
-          lines.push('- ' + name);
+          lines.push('- ' + label + ' (' + rowId + ')');
         }
       });
       lines.push('');
     }
 
+    // Annotations
+    var annIds = Object.keys(state.annotations);
+    if (annIds.length) {
+      lines.push('### Annotations');
+      annIds.forEach(function(annId) {
+        var el = document.querySelector('[data-annotation-id="' + annId + '"]');
+        var context = el ? el.textContent.replace(/\s+/g, ' ').trim().slice(0, 80) : annId;
+        lines.push('- [' + annId + '] "' + escapeForMarkdown(context) + '": "' + escapeForMarkdown(state.annotations[annId]) + '"');
+      });
+      lines.push('');
+    }
+
+    // Still Open
     if (openItems.length) {
       lines.push('### Still Open');
       lines = lines.concat(openItems);
@@ -1140,12 +1223,178 @@
     });
   };
 
-  // === Keyboard navigation ===
+  // --- Share State (URL hash) ---
+  window.shareState = function() {
+    try {
+      var json = JSON.stringify(state);
+      var encoded = btoa(unescape(encodeURIComponent(json)));
+      var url = window.location.href.split('#')[0] + '#state=' + encoded;
+      copyToClipboard(url, function() {
+        var btn = document.getElementById('share-btn');
+        btn.textContent = 'URL Copied!';
+        setTimeout(function() { btn.textContent = 'Share State'; }, 2000);
+      });
+    } catch(e) {
+      console.error('Share state failed:', e);
+    }
+  };
+
+  // --- Clear Review ---
+  window.clearReview = function() {
+    if (!confirm('Clear all review progress? This cannot be undone.')) return;
+    state.dismissed = [];
+    state.notes = {};
+    state.actions = {};
+    state.flaggedRows = [];
+    state.rowNotes = {};
+    state.annotations = {};
+
+    // Reset DOM
+    document.querySelectorAll('.alert-card.dismissed').forEach(function(c) { c.classList.remove('dismissed'); });
+    document.querySelectorAll('input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
+    document.querySelectorAll('.quick-action.selected').forEach(function(a) { a.classList.remove('selected'); });
+    document.querySelectorAll('.alert-note').forEach(function(ta) { ta.value = ''; });
+    document.querySelectorAll('[id^="note-"]').forEach(function(n) { n.style.display = 'none'; });
+    document.querySelectorAll('.flagged').forEach(function(r) { r.classList.remove('flagged'); });
+    document.querySelectorAll('.row-note-row').forEach(function(r) { r.remove(); });
+    document.querySelectorAll('.annotation-input').forEach(function(a) { a.remove(); });
+    document.querySelectorAll('.annotation-badge').forEach(function(b) { b.remove(); });
+
+    clearStorage();
+    if (window.location.hash) {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+    updateActionBar();
+    updateVisibleCount();
+  };
+
+  // --- localStorage Persistence ---
+  function getStorageKey() {
+    return 'ire:' + window.location.pathname;
+  }
+
+  function saveState() {
+    if (NO_PERSIST) return;
+    try {
+      localStorage.setItem(getStorageKey(), JSON.stringify(state));
+    } catch(e) { /* quota exceeded or private browsing */ }
+  }
+
+  function clearStorage() {
+    try { localStorage.removeItem(getStorageKey()); } catch(e) {}
+  }
+
+  function restoreFromStorage() {
+    if (NO_PERSIST) return false;
+    try {
+      var saved = localStorage.getItem(getStorageKey());
+      if (!saved) return false;
+      var parsed = JSON.parse(saved);
+      return applyState(parsed);
+    } catch(e) { return false; }
+  }
+
+  // --- Restore from URL hash ---
+  function restoreFromHash() {
+    var hash = window.location.hash;
+    if (!hash || hash.indexOf('#state=') !== 0) return false;
+    try {
+      var encoded = hash.slice(7);
+      var json = decodeURIComponent(escape(atob(encoded)));
+      var parsed = JSON.parse(json);
+      var ok = applyState(parsed);
+      if (ok) {
+        // Consume the hash so reloads use localStorage instead of stale hash
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+        saveState();
+      }
+      return ok;
+    } catch(e) { return false; }
+  }
+
+  // --- Apply state to DOM ---
+  function applyState(s) {
+    if (!s) return false;
+
+    // Merge into state
+    state.dismissed = s.dismissed || [];
+    state.notes = s.notes || {};
+    state.actions = s.actions || {};
+    state.flaggedRows = s.flaggedRows || [];
+    state.rowNotes = s.rowNotes || {};
+    state.annotations = s.annotations || {};
+
+    // Apply dismissed
+    state.dismissed.forEach(function(id) {
+      var card = document.querySelector('[data-alert-id="' + id + '"]');
+      if (!card) return;
+      card.classList.add('dismissed');
+      var cb = card.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = true;
+    });
+
+    // Apply notes
+    Object.keys(state.notes).forEach(function(id) {
+      var area = document.querySelector('.alert-note[data-id="' + id + '"]');
+      if (area) {
+        area.value = state.notes[id];
+        var wrapper = document.getElementById('note-' + id);
+        if (wrapper) wrapper.style.display = 'block';
+      }
+    });
+
+    // Apply actions
+    Object.keys(state.actions).forEach(function(id) {
+      var card = document.querySelector('[data-alert-id="' + id + '"]');
+      if (!card) return;
+      var vals = Array.isArray(state.actions[id]) ? state.actions[id] : [state.actions[id]];
+      card.querySelectorAll('.quick-action').forEach(function(pill) {
+        if (vals.indexOf(pill.getAttribute('data-action')) !== -1) {
+          pill.classList.add('selected');
+        }
+      });
+    });
+
+    // Apply flagged rows
+    state.flaggedRows.forEach(function(key) {
+      var parts = key.split(':');
+      var tableId = parts[0];
+      var rowId = parts.slice(1).join(':');
+      var row = document.querySelector('.data-table[data-table-id="' + tableId + '"] tr[data-row-id="' + rowId + '"]');
+      if (!row) return;
+      row.classList.add('flagged');
+      var cols = row.querySelectorAll('td').length;
+      var label = row.querySelector('td') ? row.querySelector('td').textContent.trim() : rowId;
+      var nr = document.createElement('tr');
+      nr.className = 'row-note-row';
+      nr.innerHTML = '<td colspan="' + cols + '"><input type="text" class="row-note-input" data-row-key="' + key + '" placeholder="Why are you flagging ' + label.replace(/"/g, '&quot;') + '?" value="' + (state.rowNotes[key] || '').replace(/"/g, '&quot;') + '"></td>';
+      row.after(nr);
+    });
+
+    // Apply annotations (only when feature is enabled)
+    if (ANNOTATABLE) {
+      Object.keys(state.annotations).forEach(function(annId) {
+        var el = document.querySelector('[data-annotation-id="' + annId + '"]');
+        if (!el) return;
+        if (!el.querySelector('.annotation-badge')) {
+          var badge = document.createElement('span');
+          badge.className = 'annotation-badge';
+          el.appendChild(badge);
+        }
+      });
+    }
+
+    return true;
+  }
+
+  // --- Keyboard Navigation ---
   var focusedIndex = -1;
   var hintTimeout;
 
   function getVisibleCards() {
-    return Array.from(document.querySelectorAll('.alert-card[data-alert-id]:not(.dismissed)'));
+    return Array.from(document.querySelectorAll('.alert-card[data-alert-id]:not(.dismissed)')).filter(function(c) {
+      return c.style.display !== 'none';
+    });
   }
 
   function focusCard(index) {
@@ -1173,7 +1422,13 @@
 
   document.addEventListener('keydown', function(e) {
     var tag = (e.target.tagName || '').toLowerCase();
-    if (tag === 'input' || tag === 'textarea') return;
+    if (tag === 'input' || tag === 'textarea') {
+      if (e.key === 'Escape') {
+        e.target.blur();
+        e.preventDefault();
+      }
+      return;
+    }
 
     var cards = getVisibleCards();
     var card, id, cb;
@@ -1183,27 +1438,20 @@
         e.preventDefault();
         focusCard(Math.min(focusedIndex + 1, cards.length - 1));
         break;
-
       case 'k':
         e.preventDefault();
         focusCard(Math.max(focusedIndex - 1, 0));
         break;
-
       case 'x':
         card = getFocusedCard();
         if (!card) break;
         e.preventDefault();
         id = card.getAttribute('data-alert-id');
-        cb = card.querySelector('input[type="checkbox"]');
-        if (cb) cb.checked = !cb.checked;
         toggleDismiss(id);
-        if (focusedIndex >= getVisibleCards().length) {
-          focusedIndex = getVisibleCards().length - 1;
-        }
+        if (focusedIndex >= getVisibleCards().length) focusedIndex = getVisibleCards().length - 1;
         if (focusedIndex >= 0) focusCard(focusedIndex);
         break;
-
-      case '1': case '2': case '3':
+      case '1': case '2': case '3': case '4': case '5':
         card = getFocusedCard();
         if (!card) break;
         e.preventDefault();
@@ -1211,7 +1459,6 @@
         var idx = parseInt(e.key) - 1;
         if (actions[idx]) selectAction(actions[idx]);
         break;
-
       case 'n':
         card = getFocusedCard();
         if (!card) break;
@@ -1219,12 +1466,14 @@
         id = card.getAttribute('data-alert-id');
         toggleNote(id);
         break;
-
       case 'c':
         e.preventDefault();
         copySummary();
         break;
-
+      case 's':
+        e.preventDefault();
+        shareState();
+        break;
       case '?':
         e.preventDefault();
         var hint = document.getElementById('kbd-hint');
@@ -1235,7 +1484,6 @@
           showHint();
         }
         break;
-
       case 'Escape':
         document.querySelectorAll('.alert-card.focused').forEach(function(c) { c.classList.remove('focused'); });
         focusedIndex = -1;
@@ -1243,6 +1491,14 @@
         break;
     }
   });
+
+  // --- Init ---
+  // Priority: URL hash > localStorage
+  if (!restoreFromHash()) {
+    restoreFromStorage();
+  }
+  updateActionBar();
+  updateVisibleCount();
 })();
 </script>
 
