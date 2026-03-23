@@ -301,18 +301,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 .diff-del { background: var(--red-dim); text-decoration: line-through; opacity: 0.6; }
 .diff-same { opacity: 0.5; }
 
-/* Pattern 4: Data Flow Diagram */
-.dag-container { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding: 1.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin: 1rem 0; }
-.dag-row { display: flex; gap: 1rem; align-items: center; justify-content: center; flex-wrap: wrap; }
-.dag-node { padding: 0.5rem 1rem; border-radius: 8px; font-family: var(--font-mono); font-size: 0.8rem; text-align: center; min-width: 120px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border); background: var(--blue-dim); color: var(--text); }
-.dag-node:hover { border-color: var(--accent); }
-.dag-node.cte { background: var(--amber-dim); }
-.dag-node.output { background: var(--green-dim); }
-.dag-arrow { color: var(--text-dim); font-size: 1rem; }
-.dag-edge-label { font-size: 0.7rem; color: var(--text-dim); font-family: var(--font-mono); }
-@media (max-width: 768px) { .dag-row { flex-direction: column; } }
-
-/* Pattern 5: Sample Data Tables (cell highlighting) */
+/* Pattern 4: Sample Data Tables (cell highlighting) */
 .cell-match { background: var(--green-dim); font-weight: 600; }
 .cell-miss { background: var(--red-dim); color: var(--red); font-weight: 500; }
 .cell-neutral { color: var(--text-dim); }
@@ -362,54 +351,18 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   </div>
 
   <!-- ============================================================
-       DATA MODEL — Data Flow Diagram
-       ============================================================ -->
-  <div class="anim-up" style="--i:5">
-    <div class="section-label">Data Model</div>
-  </div>
-
-  <div class="dag-container anim-up" style="--i:6">
-    <div class="dag-row">
-      <div class="dag-node" onclick="document.getElementById('section-campaign-roles').scrollIntoView({behavior:'smooth'})" title="Click to jump to Campaign Roles">applications</div>
-      <div class="dag-node" onclick="document.getElementById('section-example-app').scrollIntoView({behavior:'smooth'})" title="Click to jump to Example Application">attempts</div>
-      <div class="dag-node" onclick="document.getElementById('section-conversion').scrollIntoView({behavior:'smooth'})" title="Click to jump to The Conversion">conversions</div>
-      <div class="dag-node" onclick="document.getElementById('section-campaign-roles').scrollIntoView({behavior:'smooth'})" title="Click to jump to Campaign Roles">tier_campaign_buffer</div>
-    </div>
-    <div class="dag-row">
-      <div class="dag-edge-label">application_id</div>
-      <div class="dag-edge-label">campaign_id</div>
-      <div class="dag-edge-label">parent_campaign_id</div>
-    </div>
-    <div class="dag-row">
-      <div class="dag-arrow">&darr;</div>
-    </div>
-    <div class="dag-row">
-      <div class="dag-node cte" onclick="document.getElementById('section-join-strategies').scrollIntoView({behavior:'smooth'})" title="Click to jump to Join Strategies">attempt_revenue</div>
-    </div>
-    <div class="dag-row">
-      <div class="dag-edge-label">GROUP BY parent_campaign_id</div>
-    </div>
-    <div class="dag-row">
-      <div class="dag-arrow">&darr;</div>
-    </div>
-    <div class="dag-row">
-      <div class="dag-node output" data-annotation-id="dag-partner-revenue">partner_revenue_summary</div>
-    </div>
-  </div>
-
-  <div class="callout callout--blue anim-up" style="--i:7">
-    <strong>Key question:</strong> How should attempt_revenue join conversions to attempts? The join strategy determines whether revenue is attributed precisely or spread across all campaigns that touched an application.
-  </div>
-
-  <!-- ============================================================
        THE DATA MODEL — Literate SQL Sections
        ============================================================ -->
-  <div class="anim-up" style="--i:8">
+  <div class="anim-up" style="--i:5">
     <div class="section-label">The Data Model</div>
   </div>
 
+  <div class="callout callout--blue anim-up" style="--i:6">
+    <strong>Four tables are involved:</strong> <code>applications</code>, <code>attempts</code>, <code>conversions</code>, and <code>tier_campaign_buffer</code>. The key question is how to join conversions to attempts so that revenue is attributed to the correct campaign.
+  </div>
+
   <!-- Section 1: Campaign Roles -->
-  <div class="lit-section anim-up" style="--i:9" id="section-campaign-roles">
+  <div class="lit-section anim-up" style="--i:7" id="section-campaign-roles">
     <div class="lit-prose">
       <p><span class="step-num">1</span> <strong>Campaign Roles in Price Reject Setups</strong></p>
       <p>One application generates multiple attempts, one per campaign pinged. Some campaigns participate in price reject setups where a top-tier campaign places a bid, and a negotiable "catcher" campaign fulfills it.</p>
@@ -437,7 +390,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   </div>
 
   <!-- Section 2: Example Application #1000 -->
-  <div class="lit-section anim-up" style="--i:10" id="section-example-app">
+  <div class="lit-section anim-up" style="--i:8" id="section-example-app">
     <div class="lit-prose">
       <p><span class="step-num">2</span> <strong>Example Application #1000</strong></p>
       <p>An application enters the ping tree and gets pinged to approximately 75 campaigns. Three of them are relevant to this scenario.</p>
@@ -473,7 +426,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   </div>
 
   <!-- Section 3: The Conversion -->
-  <div class="lit-section anim-up" style="--i:11" id="section-conversion">
+  <div class="lit-section anim-up" style="--i:9" id="section-conversion">
     <div class="lit-prose">
       <p><span class="step-num">3</span> <strong>The Conversion</strong></p>
       <p>The conversion records which campaign actually completed the sale. Because the negotiable campaign C_150 accepted the bid, the conversion's <code>campaign_id</code> is C_150, not C_100.</p>
@@ -496,18 +449,18 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     </div>
   </div>
 
-  <div class="callout anim-up" style="--i:12">
+  <div class="callout anim-up" style="--i:10">
     <strong>Notice:</strong> The conversion's <code>campaign_id</code> is C_150 (the negotiable that accepted), not C_100 (the top-tier that placed the bid). The <span data-annotation-id="conversion-campaign-mismatch"><code>ON</code> clause must account for this mismatch</span> to attribute revenue correctly.
   </div>
 
   <!-- ============================================================
        QUERY COMPARISON — Decision Group
        ============================================================ -->
-  <div class="anim-up" style="--i:13" id="section-join-strategies">
+  <div class="anim-up" style="--i:11" id="section-join-strategies">
     <div class="section-label">Join Strategies</div>
   </div>
 
-  <div class="decision-group anim-up" style="--i:14">
+  <div class="decision-group anim-up" style="--i:12">
     <div class="decision-header">
       <div class="decision-question">How should attempt_revenue join conversions?</div>
       <div class="decision-context">Three join strategies produce different revenue attribution. Review each option and select the correct approach for DRLA training data.</div>
@@ -696,7 +649,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   </div>
 
   <!-- Stage 2 Aggregation Comparison -->
-  <div class="lit-section anim-up" style="--i:15">
+  <div class="lit-section anim-up" style="--i:13">
     <div class="lit-prose">
       <p><span class="step-num">S2</span> <strong>Stage 2: Aggregation by parent_campaign_id</strong></p>
       <p>Stage 2 groups attempts by <code>(partner_id, parent_campaign_id, affiliate, state, presented_rla)</code>. The join strategy from Stage 1 determines which attempts carry revenue into this grouping.</p>
@@ -726,11 +679,11 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   <!-- ============================================================
        DIRECT BUYS — Verification
        ============================================================ -->
-  <div class="anim-up" style="--i:16">
+  <div class="anim-up" style="--i:14">
     <div class="section-label">Direct Buys</div>
   </div>
 
-  <div class="lit-section anim-up" style="--i:17">
+  <div class="lit-section anim-up" style="--i:15">
     <div class="lit-prose">
       <p><span class="step-num">4</span> <strong>Direct Buys Work with Option B</strong></p>
       <p>When a top-tier campaign buys directly without placing a bid, its campaign_id appears on both the attempt and the conversion. Option B's join on <code>(application_id, campaign_id)</code> matches correctly because <span data-annotation-id="direct-buy-match"><code>attempt.campaign_id (C_100) = conversion.campaign_id (C_100)</code></span>.</p>
@@ -767,7 +720,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   </div>
 
   <!-- Summary Callout -->
-  <div class="callout callout--blue anim-up" style="--i:18">
+  <div class="callout callout--blue anim-up" style="--i:16">
     <strong>Recommendation: Option B.</strong> Join conversions on <code>(application_id, campaign_id)</code> instead of <code>(application_id, parent_campaign_id)</code>.
     <ul style="margin: 0.5rem 0 0 1.25rem; font-size: 0.85rem; line-height: 1.7;">
       <li><strong>Direct buys:</strong> campaign_id matches on both sides. Revenue is attributed correctly.</li>
