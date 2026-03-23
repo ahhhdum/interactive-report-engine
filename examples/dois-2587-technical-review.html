@@ -3,22 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><!-- REPORT_TITLE: Replace with your report title --></title>
+<title>DOIS-2587 Technical Review — Experiment Load Balancing</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ================================================================
    INTERACTIVE REPORT ENGINE — CSS
-   Domain-agnostic styles for the 3-layer feedback pattern.
-   Extracted from CCPA Compliance Review + Action Dashboard.
-
-   USAGE: Copy this file. Replace placeholder comments in HTML
-   zone with your domain data. CSS and JS work unchanged.
-
-   FEATURES (toggle via data-* attributes on <body>):
-     data-multiaction     — allow multiple action pills per card
-     data-annotatable     — enable inline annotations on elements
-     data-no-persist      — disable localStorage state persistence
-   (localStorage enabled by default; shareable URL always available)
    ================================================================ */
 
 :root {
@@ -103,7 +92,6 @@ body {
 .hero h1 { font-family: var(--font-display); font-size: clamp(36px, 5vw, 52px); font-weight: 400; color: var(--text-bright); line-height: 1.1; margin-bottom: 12px; }
 .hero-sub { font-size: 16px; color: var(--text-dim); font-style: italic; margin-bottom: 8px; }
 .hero-meta { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
-.hero-meta span { margin: 0 8px; }
 
 /* --- KPI Cards --- */
 .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 32px; }
@@ -118,7 +106,7 @@ body {
 /* --- Pipeline --- */
 .pipeline-section { margin-bottom: 32px; }
 .pipeline { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 4px 0 8px; }
-.pipe-step { flex: 1; min-width: 80px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 8px; text-align: center; position: relative; }
+.pipe-step { flex: 1; min-width: 80px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 8px; text-align: center; }
 .pipe-step--done { border-color: var(--green); background: var(--green-dim); }
 .pipe-step--active { border-color: var(--accent); background: var(--accent-dim); }
 .pipe-step--pending { border-color: var(--border); opacity: 0.5; }
@@ -132,31 +120,58 @@ body {
 .section-label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 .section-label::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 
-/* --- Decision Groups ---
-   Use when items are alternatives to each other (e.g., Option A vs B).
-   Options inside are standard alert cards wrapped in a .decision-options
-   container. They use the same state system (dismiss, notes, actions).
-   Filter bar does NOT apply to decision group cards.
-*/
-.decision-group { background: var(--bg-subtle); border: 1px solid var(--border-bright); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
-.decision-header { margin-bottom: 16px; }
-.decision-question { font-family: var(--font-display); font-size: 22px; color: var(--text-bright); line-height: 1.3; margin-bottom: 6px; }
-.decision-context { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
-.decision-options { display: flex; flex-direction: column; gap: 10px; }
-.decision-group .alert-card { background: var(--surface-elevated); }
-.decision-group .alert-card details { background: var(--bg); }
-.decision-divider { display: flex; align-items: center; gap: 12px; padding: 2px 0; }
-.decision-divider::before, .decision-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-bright); }
-.decision-divider span { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
-
-/* --- Comparison Table (non-interactive, inside decision groups) --- */
-.comparison-table { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.5; }
-.comparison-table th { font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border-bright); }
-.comparison-table td { padding: 6px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
-.comparison-table td.positive { color: var(--green); }
-.comparison-table td.negative { color: var(--red); }
-.comparison-table td.neutral { color: var(--text-dim); }
-.comparison-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+/* --- Decision Groups --- */
+.decision-group {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-bright);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.decision-header {
+  margin-bottom: 16px;
+}
+.decision-question {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--text-bright);
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+.decision-context {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.decision-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.decision-group .alert-card {
+  background: var(--surface-elevated);
+}
+.decision-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 0;
+}
+.decision-divider::before,
+.decision-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-bright);
+}
+.decision-divider span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
 
 /* --- Filter Bar --- */
 .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
@@ -180,7 +195,6 @@ body {
   transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease 0.1s, margin 0.3s ease;
 }
 
-/* Severity colors — add your own as needed */
 .alert-card.severity-action   { border-left-color: var(--red); }
 .alert-card.severity-escalate { border-left-color: var(--red); }
 .alert-card.severity-review   { border-left-color: var(--amber); }
@@ -235,7 +249,7 @@ body {
 .alert-note { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: var(--font-body); font-size: 12px; padding: 8px; margin-top: 6px; resize: vertical; min-height: 48px; }
 .alert-note:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
 
-/* --- Inline Annotations (feature: data-annotatable on body) --- */
+/* --- Inline Annotations --- */
 body[data-annotatable] [data-annotation-id] { cursor: pointer; position: relative; border-bottom: 1px dashed var(--border-bright); }
 body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--accent); }
 .annotation-input { width: 100%; background: var(--bg); border: 1px solid var(--accent); border-radius: 4px; color: var(--text); font-family: var(--font-body); font-size: 12px; padding: 6px 8px; margin-top: 4px; resize: none; min-height: 32px; }
@@ -247,6 +261,37 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 .alert-card details summary { padding: 10px 14px; cursor: pointer; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text); list-style: none; user-select: none; }
 .alert-card details summary::before { content: '\25B6'; display: inline-block; margin-right: 8px; font-size: 10px; color: var(--text-dim); transition: transform 0.15s; }
 .alert-card details[open] summary::before { transform: rotate(90deg); }
+/* Details inside decision groups need different nesting bg */
+.decision-group .alert-card details { background: var(--bg); }
+
+/* --- Comparison Table (inside decision group) --- */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 12px;
+}
+.comparison-table th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-bright);
+}
+.comparison-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.comparison-table td.positive { color: var(--green); }
+.comparison-table td.negative { color: var(--red); }
+.comparison-table td.neutral { color: var(--text-dim); }
+.comparison-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
 
 /* --- Data Tables --- */
 .data-table { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.4; }
@@ -301,209 +346,354 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 </style>
 </head>
 
-<!--
-  BODY ATTRIBUTES (feature flags):
-    data-multiaction  — allow selecting multiple action pills per card
-    data-annotatable  — enable click-to-annotate on [data-annotatable] elements
-    data-no-persist   — disable localStorage state saving
-    data-report-title — title used in the Copy Review Summary heading
-    data-report-date  — date used in the summary heading (YYYY-MM-DD)
--->
-<body data-report-title="Report" data-report-date="">
+<body data-multiaction data-annotatable data-report-title="Decision" data-report-date="2026-03-22">
 
 <div class="container">
 
-  <!-- ============================================================
-       HERO SECTION
-       Replace eyebrow, h1, subtitle, and meta with your content.
-       ============================================================ -->
+  <!-- HERO -->
   <header class="hero anim-up" style="--i:0">
-    <div class="hero-eyebrow"><!-- HERO_EYEBROW: e.g. "Compliance Review Tool" --></div>
-    <h1><!-- HERO_TITLE: e.g. "CCPA Compliance Review" --></h1>
-    <div class="hero-sub"><!-- HERO_SUBTITLE: e.g. "Review, classify, and act on pending requests." --></div>
-    <div class="hero-meta"><!-- HERO_META: e.g. "March 20, 2026 | 13 requests | Interactive" --></div>
+    <div class="hero-eyebrow">Technical Review Tool</div>
+    <h1>DOIS-2587 Technical Review</h1>
+    <div class="hero-sub">Evaluate delivery approach for experiment load balancing in the Boost Sequential Processor.</div>
+    <div class="hero-meta">March 22, 2026 | 1 decision, 4 concerns | Interactive</div>
   </header>
 
-  <!-- ============================================================
-       KPI CARDS
-       Use kpi-card--accent, --green, --amber, --red for coloring.
-       Duplicate or remove cards as needed.
-       ============================================================ -->
+  <!-- KPI CARDS -->
   <div class="kpi-row">
-    <div class="kpi-card anim-scale" style="--i:1">
-      <div class="kpi-card__value"><!-- KPI_1_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_1_LABEL --></div>
+    <div class="kpi-card kpi-card--accent anim-scale" style="--i:1">
+      <div class="kpi-card__value" data-annotatable data-annotation-id="kpi-files">6</div>
+      <div class="kpi-card__label">Files to Modify</div>
     </div>
     <div class="kpi-card kpi-card--green anim-scale" style="--i:2">
-      <div class="kpi-card__value"><!-- KPI_2_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_2_LABEL --></div>
+      <div class="kpi-card__value" data-annotatable data-annotation-id="kpi-options">2</div>
+      <div class="kpi-card__label">Delivery Options</div>
     </div>
     <div class="kpi-card kpi-card--amber anim-scale" style="--i:3">
-      <div class="kpi-card__value"><!-- KPI_3_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_3_LABEL --></div>
+      <div class="kpi-card__value" data-annotatable data-annotation-id="kpi-risks">3</div>
+      <div class="kpi-card__label">Risk Areas</div>
     </div>
     <div class="kpi-card kpi-card--red anim-scale" style="--i:4">
-      <div class="kpi-card__value"><!-- KPI_4_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_4_LABEL --></div>
+      <div class="kpi-card__value" data-annotatable data-annotation-id="kpi-decisions">1</div>
+      <div class="kpi-card__label">Open Decision</div>
     </div>
   </div>
 
-  <!-- ============================================================
-       PIPELINE (optional)
-       Shows workflow steps. Remove this section if not needed.
-       Use pipe-step--done, --active, --pending for state.
-       ============================================================ -->
+  <!-- PIPELINE -->
   <div class="pipeline-section anim-up" style="--i:5">
-    <div class="section-label"><!-- PIPELINE_LABEL: e.g. "Processing Pipeline" --></div>
+    <div class="section-label">Ticket Progress</div>
     <div class="pipeline">
-      <!-- PIPELINE_STEPS: Repeat this pattern for each step:
       <div class="pipe-step pipe-step--done">
         <div class="pipe-step__num">01</div>
-        <div class="pipe-step__name">Step Name</div>
+        <div class="pipe-step__name">Created</div>
       </div>
       <div class="pipe-arrow">&rarr;</div>
-      -->
+      <div class="pipe-step pipe-step--active">
+        <div class="pipe-step__num">02</div>
+        <div class="pipe-step__name">Tech Review</div>
+      </div>
+      <div class="pipe-arrow">&rarr;</div>
+      <div class="pipe-step pipe-step--pending">
+        <div class="pipe-step__num">03</div>
+        <div class="pipe-step__name">Implement</div>
+      </div>
+      <div class="pipe-arrow">&rarr;</div>
+      <div class="pipe-step pipe-step--pending">
+        <div class="pipe-step__num">04</div>
+        <div class="pipe-step__name">Validate</div>
+      </div>
+      <div class="pipe-arrow">&rarr;</div>
+      <div class="pipe-step pipe-step--pending">
+        <div class="pipe-step__num">05</div>
+        <div class="pipe-step__name">Ship</div>
+      </div>
     </div>
   </div>
 
   <!-- ============================================================
-       DECISION GROUPS (optional)
-       Use when items are alternatives to each other (e.g., Option A
-       vs Option B for a delivery approach). Options inside are
-       standard alert cards wrapped in a .decision-options container.
-       They use the same state system (dismiss, notes, actions).
-       The filter bar does NOT apply to cards inside decision groups.
-
-       Remove this section if your report has only independent items.
+       DECISION SECTION
+       Connected options grouped under the question they answer.
        ============================================================ -->
-  <!-- DECISION_GROUPS: Repeat this pattern for each decision:
-
   <div class="anim-up" style="--i:6">
     <div class="section-label">Decision</div>
   </div>
 
   <div class="decision-group anim-up" style="--i:7">
     <div class="decision-header">
-      <div class="decision-question">What is the question being decided?</div>
-      <div class="decision-context">Instructions for the reviewer.</div>
-    </div>
-    <div class="decision-options">
-
-      OPTION CARDS: Standard alert cards. Use severity to signal status:
-        routine (green)  = recommended option
-        anomaly (blue)   = viable alternative
-        review  (amber)  = option with concerns
-      Add badge--green "Recommended" badge ONLY when there is a clear rec.
-
-      <div class="alert-card severity-routine" data-alert-id="opt-a" data-severity="routine">
-        ... standard alert card structure ...
+      <div class="decision-question">How should DOIS-2587 be delivered?</div>
+      <div class="decision-context">
+        Choose one delivery approach. Select actions on your preferred option. Dismiss the rejected option with a note explaining why.
       </div>
+    </div>
+
+    <div class="decision-options" id="alerts-container-decision">
+
+      <!-- OPTION A: Phased Delivery (Recommended) -->
+      <div class="alert-card severity-routine" data-alert-id="dois-opt-phased" data-severity="routine">
+        <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('dois-opt-phased')"></label>
+        <div class="alert-content">
+          <div class="alert-title">Option A: Phased Delivery</div>
+          <div class="alert-meta">
+            <span class="badge badge--green">Recommended</span>
+            <span class="badge badge--muted">2 PRs</span>
+          </div>
+          <div class="alert-desc">
+            Ship flags persistence first (PR 1), then weighted splitting with schema migration (PR 2).
+            The Innovation team already needs flags for the DP soft timeout expansion test. The current workaround
+            is a manual PingTree ID mapping in SQL that breaks whenever trees are reassigned.
+            PR 1 is a 4-file change. PR 2 adds <code>config_experiments</code> parsing,
+            <code>weighted_choice()</code> integration, validation logic, and the schema migration.
+          </div>
+          <div class="alert-actions">
+            <span class="quick-action" data-action="Approve phased delivery: ship flags persistence as PR 1, weighted splitting as PR 2" onclick="selectAction(this)">Approve Phased</span>
+            <span class="quick-action" data-action="Draft scope document listing the 4 files and exact changes for flags-only PR 1" onclick="selectAction(this)">Draft PR 1 Scope</span>
+            <span class="quick-action" data-action="Create Jira sub-task under DOIS-2587 for flags-only PR" onclick="selectAction(this)">Create Sub-task</span>
+          </div>
+          <div class="alert-note-toggle" onclick="toggleNote('dois-opt-phased')">+ Add note</div>
+          <div id="note-dois-opt-phased" style="display:none"><textarea class="alert-note" data-id="dois-opt-phased" placeholder="Notes..."></textarea></div>
+
+          <details>
+            <summary>PR 1 File Scope (4 files)</summary>
+            <div style="overflow-x:auto; padding: 0 0 8px;">
+              <table class="comparison-table">
+                <thead><tr><th>File</th><th>Change</th></tr></thead>
+                <tbody>
+                  <tr><td><code>ApplicationFlagsPingTreeProcessorDocument</code></td><td>Add experiment property</td></tr>
+                  <tr><td><code>BoostSequentialVersionV120.php</code></td><td>Add getter for selected experiment</td></tr>
+                  <tr><td><code>ProcessorParser.php</code></td><td>Update <code>updateApplicationFlags()</code> signature</td></tr>
+                  <tr><td>Call sites (lines 97, 158)</td><td>Pass experiment value to updated signature</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      </div>
+
       <div class="decision-divider"><span>or</span></div>
-      <div class="alert-card severity-anomaly" data-alert-id="opt-b" data-severity="anomaly">
-        ... standard alert card structure ...
+
+      <!-- OPTION B: Monolithic Delivery -->
+      <div class="alert-card severity-anomaly" data-alert-id="dois-opt-mono" data-severity="anomaly">
+        <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('dois-opt-mono')"></label>
+        <div class="alert-content">
+          <div class="alert-title">Option B: Monolithic Delivery</div>
+          <div class="alert-meta">
+            <span class="badge badge--muted">1 PR</span>
+          </div>
+          <div class="alert-desc">
+            Ship everything in a single PR: flags persistence, <code>config_experiments</code> weighted splitting,
+            validation, and schema migration. One review cycle, no intermediate state, simpler release coordination.
+            The trade-off is a larger blast radius, longer review, and delayed delivery of the flags value that
+            the Innovation team needs now. If the weighted splitting design needs revision during review, the flags
+            work is blocked alongside it.
+          </div>
+          <div class="alert-actions">
+            <span class="quick-action" data-action="Approve monolithic delivery: single PR with all changes including flags, splitting, and schema migration" onclick="selectAction(this)">Approve Monolithic</span>
+            <span class="quick-action" data-action="Draft combined PR checklist with acceptance criteria from DOIS-2587" onclick="selectAction(this)">Draft PR Checklist</span>
+          </div>
+          <div class="alert-note-toggle" onclick="toggleNote('dois-opt-mono')">+ Add note</div>
+          <div id="note-dois-opt-mono" style="display:none"><textarea class="alert-note" data-id="dois-opt-mono" placeholder="Notes..."></textarea></div>
+        </div>
       </div>
 
     </div>
 
-    OPTIONAL: Side-by-side comparison table (non-interactive).
-    Use .comparison-table class (no row flagging). Use .positive,
-    .negative, .neutral classes on <td> for color coding.
-
+    <!-- Side-by-side comparison -->
+    <details style="background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-top:14px;">
+      <summary style="padding:10px 14px;cursor:pointer;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text);list-style:none;user-select:none;">
+        <span style="display:inline-block;margin-right:8px;font-size:10px;color:var(--text-dim);">&#9654;</span>Side-by-Side Comparison
+      </summary>
+      <div style="overflow-x:auto; padding: 0 0 8px;">
+        <table class="comparison-table">
+          <thead>
+            <tr><th>Factor</th><th>Phased (2 PRs)</th><th>Monolithic (1 PR)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Time to flags value</td><td class="positive">Fast (PR 1 ships independently)</td><td class="negative">Blocked until full review</td></tr>
+            <tr><td>Review complexity</td><td class="positive">Smaller, focused reviews</td><td class="negative">Large, cross-cutting review</td></tr>
+            <tr><td>Release coordination</td><td class="neutral">Two deploys required</td><td class="positive">Single deploy</td></tr>
+            <tr><td>Intermediate state risk</td><td class="neutral">Flags live without splitting</td><td class="positive">No intermediate state</td></tr>
+            <tr><td>Blast radius if rollback</td><td class="positive">Roll back only the broken half</td><td class="negative">Roll back everything</td></tr>
+            <tr><td>Innovation team unblocked</td><td class="positive">After PR 1 ships</td><td class="negative">After full ship</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
   </div>
 
-  -->
-
   <!-- ============================================================
-       FILTER BAR
-       Add filter buttons matching your severity types.
-       The filter bar applies only to the flat alerts-container
-       below, not to decision group cards above.
+       INDEPENDENT CONCERNS
+       These are not alternatives to each other.
        ============================================================ -->
-  <div class="anim-up" style="--i:6">
-    <div class="section-label"><!-- SECTION_LABEL: e.g. "Alerts" --></div>
+  <div class="anim-up" style="--i:10">
+    <div class="section-label">Technical Concerns</div>
     <div class="filter-bar">
       <button class="filter-btn active" onclick="filterCards('all')">All</button>
-      <!-- FILTER_BUTTONS: Add one per severity type:
-      <button class="filter-btn" onclick="filterCards('action')">Action</button>
-      <button class="filter-btn" onclick="filterCards('review')">Review</button>
-      <button class="filter-btn" onclick="filterCards('routine')">Routine</button>
-      -->
+      <button class="filter-btn" onclick="filterCards('review')">Needs Review</button>
+      <button class="filter-btn" onclick="filterCards('info')">Context</button>
       <span class="filter-count" id="visible-count"></span>
     </div>
   </div>
 
-  <!-- ============================================================
-       ALERT CARDS
-       Each card needs:
-         data-alert-id="unique-id"
-         data-severity="action|review|anomaly|routine|ok|info|..."
-
-       Quick action pills need:
-         data-action="The literal instruction for Claude"
-
-       For collapsible tables inside cards, use <details> with
-       a .data-table inside. Table rows need data-row-id="unique".
-       ============================================================ -->
   <div class="alerts-container" id="alerts-container">
 
-    <!-- ALERT_CARDS: Repeat this pattern for each alert:
-
-    <div class="alert-card severity-ACTION_TYPE anim-up" style="--i:N" data-alert-id="UNIQUE_ID" data-severity="TYPE">
-      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('UNIQUE_ID')"></label>
+    <!-- CONCERN: Schema Migration -->
+    <div class="alert-card severity-review anim-up" style="--i:11" data-alert-id="dois-schema" data-severity="review">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('dois-schema')"></label>
       <div class="alert-content">
-        <div class="alert-title">Alert Title</div>
+        <div class="alert-title">Schema Migration: CHAR(10) to VARCHAR(30)</div>
         <div class="alert-meta">
-          <span class="badge badge--green">Badge Text</span>
+          <span class="badge badge--amber">Needs Review</span>
+          <span class="badge badge--muted">Production Table</span>
         </div>
-        <div class="alert-desc">Description with <code>inline code</code>.</div>
+        <div class="alert-desc">
+          The <code>experiment</code> column on <code>ft_innovation_ping_tree_processor_campaign_config</code>
+          needs to expand from <code>CHAR(10)</code> to <code>VARCHAR(30)</code>. Current experiment names like
+          <code>scs_and_dp</code> already hit the 10-character limit. The migration file is
+          <code>Version20251126010021.php</code>. In a phased approach, this migration goes in PR 2 since flags
+          persistence does not require longer names. Confirm whether this ALTER can run online without locking the
+          table at current row volume.
+        </div>
         <div class="alert-actions">
-          <span class="quick-action" data-action="Literal instruction for Claude" onclick="selectAction(this)">Button Label</span>
+          <span class="quick-action" data-action="Query row count on ft_innovation_ping_tree_processor_campaign_config to assess migration lock risk" onclick="selectAction(this)">Check Row Count</span>
+          <span class="quick-action" data-action="Confirm CHAR to VARCHAR ALTER runs online without table lock on MySQL at current volume" onclick="selectAction(this)">Verify Online DDL</span>
+          <span class="quick-action" data-action="Draft rollback plan for schema migration in case VARCHAR(30) causes index issues" onclick="selectAction(this)">Draft Rollback Plan</span>
         </div>
-        <div class="alert-note-toggle" onclick="toggleNote('UNIQUE_ID')">+ Add note</div>
-        <div id="note-UNIQUE_ID" style="display:none"><textarea class="alert-note" data-id="UNIQUE_ID" placeholder="Notes..."></textarea></div>
-
-        OPTIONAL: Collapsible detail table
-        <details>
-          <summary>Detail Label (N items)</summary>
-          <div style="overflow-x:auto; padding: 0 0 8px;">
-            <table class="data-table" data-table-id="TABLE_ID">
-              <thead><tr><th>Col 1</th><th class="num">Col 2</th></tr></thead>
-              <tbody>
-                <tr data-row-id="ROW_ID"><td>Value</td><td class="num">123</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </details>
+        <div class="alert-note-toggle" onclick="toggleNote('dois-schema')">+ Add note</div>
+        <div id="note-dois-schema" style="display:none"><textarea class="alert-note" data-id="dois-schema" placeholder="Notes..."></textarea></div>
       </div>
     </div>
 
-    -->
+    <!-- CONCERN: Validation Tolerance -->
+    <div class="alert-card severity-review anim-up" style="--i:12" data-alert-id="dois-validation" data-severity="review">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('dois-validation')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Validation Design: Weight Sum Tolerance</div>
+        <div class="alert-meta">
+          <span class="badge badge--amber">Needs Review</span>
+          <span class="badge badge--muted">Design Decision</span>
+        </div>
+        <div class="alert-desc">
+          The ticket description contains two different validation rules. The acceptance criteria state "weights
+          sum to 100" while the description body says "99-100" and also references "+/-1%". These are three
+          different tolerances. The existing <code>weighted_choice()</code> in <code>helpers/functions.php</code>
+          may handle sub-100 sums by assigning leftover weight to the last entry, or it may not. This needs to be
+          clarified before implementation to avoid a validation rule that rejects valid configs or accepts invalid ones.
+        </div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Read weighted_choice() in helpers/functions.php to determine behavior when weights sum to less than 100" onclick="selectAction(this)">Check weighted_choice()</span>
+          <span class="quick-action" data-action="Clarify validation rule: propose strict sum-to-100 with clear error message on mismatch" onclick="selectAction(this)">Propose Strict Rule</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('dois-validation')">+ Add note</div>
+        <div id="note-dois-validation" style="display:none"><textarea class="alert-note" data-id="dois-validation" placeholder="Notes..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- CONCERN: Backward Compatibility -->
+    <div class="alert-card severity-review anim-up" style="--i:13" data-alert-id="dois-backcompat" data-severity="review">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('dois-backcompat')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Backward Compatibility: config_experiment Singular</div>
+        <div class="alert-meta">
+          <span class="badge badge--amber">Needs Review</span>
+          <span class="badge badge--muted">Regression Risk</span>
+        </div>
+        <div class="alert-desc">
+          The existing <code>config_experiment</code> (singular) option must continue working unchanged.
+          It is read in <code>BoostSequentialVersionV120.php</code> at <code>doProcess()</code> line 334.
+          The new <code>config_experiments</code> (plural) option adds a parallel code path. The acceptance
+          criteria require backward compatibility, but there is no test plan in the ticket. A regression in the
+          singular path would silently route all traffic to the default experiment config.
+        </div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Add backward compatibility test requirement: verify config_experiment singular routes correctly after config_experiments is deployed" onclick="selectAction(this)">Require Compat Test</span>
+          <span class="quick-action" data-action="Review BoostSequentialVersionV120.php doProcess() line 334 to confirm singular path is isolated from plural changes" onclick="selectAction(this)">Review Singular Path</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('dois-backcompat')">+ Add note</div>
+        <div id="note-dois-backcompat" style="display:none"><textarea class="alert-note" data-id="dois-backcompat" placeholder="Notes..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- CONTEXT: Innovation Team Comment -->
+    <div class="alert-card severity-info anim-up" style="--i:14" data-alert-id="dois-innovation" data-severity="info">
+      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('dois-innovation')"></label>
+      <div class="alert-content">
+        <div class="alert-title">Innovation Team: Flags Persistence Has Independent Value</div>
+        <div class="alert-meta">
+          <span class="badge badge--muted">Context</span>
+          <span class="badge badge--muted">Comment from Adam S.</span>
+        </div>
+        <div class="alert-desc">
+          The Innovation team is running the DP soft timeout expansion test (<code>scs_and_dp</code> vs
+          <code>default</code> arms). The only way to identify which arm a lead was in is a manual PingTree ID
+          mapping in SQL. This mapping breaks whenever trees are reassigned and makes handoff to analysts fragile.
+          Flags persistence solves this independent of whether weighted splitting ships. The comment explicitly
+          notes "no urgency" but calls out "immediate ROI" for the flags half of the ticket.
+        </div>
+        <div class="alert-actions">
+          <span class="quick-action" data-action="Verify the 4-file scope matches Innovation team's comment: ApplicationFlagsPingTreeProcessorDocument, version getter, ProcessorParser.updateApplicationFlags, both call sites" onclick="selectAction(this)">Verify Scope Match</span>
+        </div>
+        <div class="alert-note-toggle" onclick="toggleNote('dois-innovation')">+ Add note</div>
+        <div id="note-dois-innovation" style="display:none"><textarea class="alert-note" data-id="dois-innovation" placeholder="Notes..."></textarea></div>
+      </div>
+    </div>
 
   </div>
 
-  <!-- ============================================================
-       STANDALONE TABLES (optional)
-       For tables outside of alert cards. Same flagging behavior.
-       ============================================================ -->
-  <!-- STANDALONE_TABLES: Use section-label + data-table pattern:
-
-  <div class="anim-up" style="--i:N">
-    <div class="section-label">Table Section Title</div>
-    <table class="data-table" data-table-id="TABLE_ID">
-      <thead><tr><th>Col</th><th class="num">Value</th></tr></thead>
+  <!-- STANDALONE TABLE: Code Change Matrix -->
+  <div class="anim-up" style="--i:15">
+    <div class="section-label">Code Change Matrix</div>
+    <table class="data-table" data-table-id="code-matrix">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Change Description</th>
+          <th>PR 1 (Flags)</th>
+          <th>PR 2 (Splitting)</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr data-row-id="ROW_ID"><td>Name</td><td class="num">123</td></tr>
+        <tr data-row-id="file-appflags">
+          <td><code>ApplicationFlagsPingTreeProcessorDocument</code></td>
+          <td>Add experiment property</td>
+          <td class="positive">Yes</td>
+          <td>--</td>
+        </tr>
+        <tr data-row-id="file-v120">
+          <td><code>BoostSequentialVersionV120.php</code></td>
+          <td>Getter + validateOptions + config_experiments</td>
+          <td class="positive">Getter only</td>
+          <td class="positive">Validation + parsing</td>
+        </tr>
+        <tr data-row-id="file-parser">
+          <td><code>ProcessorParser.php</code></td>
+          <td>updateApplicationFlags sig + parseVersionByOptions</td>
+          <td class="positive">Flags sig</td>
+          <td class="positive">config_experiments</td>
+        </tr>
+        <tr data-row-id="file-callsites">
+          <td>Call sites (lines 97, 158)</td>
+          <td>Pass experiment value to updateApplicationFlags</td>
+          <td class="positive">Yes</td>
+          <td>--</td>
+        </tr>
+        <tr data-row-id="file-helpers">
+          <td><code>helpers/functions.php</code></td>
+          <td>Reuse weighted_choice() as-is</td>
+          <td>--</td>
+          <td>No change</td>
+        </tr>
+        <tr data-row-id="file-migration">
+          <td><code>Version20251126010021.php</code></td>
+          <td>CHAR(10) to VARCHAR(30) migration</td>
+          <td>--</td>
+          <td class="positive">Yes</td>
+        </tr>
       </tbody>
     </table>
   </div>
 
-  -->
-
-  <!-- ============================================================
-       FOOTER
-       ============================================================ -->
+  <!-- FOOTER -->
   <div class="footer anim-up" style="--i:99">
-    <!-- FOOTER_TEXT: e.g. "Generated by Claude Code on March 20, 2026." -->
+    Generated by Claude Code on March 22, 2026. Source: <a href="https://vipepc.atlassian.net/browse/DOIS-2587" style="color:var(--accent);">DOIS-2587</a>
     <br>Keyboard shortcuts: press <kbd>?</kbd> for help.
   </div>
 
@@ -534,37 +724,13 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 <script>
 /* ================================================================
    INTERACTIVE REPORT ENGINE — JavaScript
-   Domain-agnostic interaction engine for the 3-layer feedback pattern.
-
-   FEATURES:
-   1. Dismiss alerts (checkbox toggle with animation)
-   2. Quick action selection (single or multi-select)
-   3. Inline notes on alert cards
-   4. Table row flagging with inline notes
-   5. Inline annotations on [data-annotatable] elements
-   6. Filter by severity
-   7. Keyboard navigation (j/k/x/1-5/n/c/s/?)
-   8. Copy Review Summary (structured markdown)
-   9. Share State (compressed JSON in URL hash)
-   10. localStorage persistence (auto-save/restore)
-
-   DATA ATTRIBUTES READ:
-   - body[data-report-title]  — heading for the summary markdown
-   - body[data-report-date]   — date for the summary (falls back to today)
-   - body[data-multiaction]   — if present, allow multi-select on action pills
-   - body[data-annotatable]   — if present, enable click-to-annotate on elements with data-annotation-id
-   - body[data-no-persist]    — if present, skip localStorage
-   - .alert-card[data-alert-id]    — unique alert identifier
-   - .alert-card[data-severity]    — severity type string
-   - .quick-action[data-action]    — literal Claude instruction
-   - .data-table[data-table-id]    — table identifier for row flagging
-   - tr[data-row-id]               — row identifier for flagging
-   - [data-annotation-id]                   — annotation target (requires body[data-annotatable])
+   Extended to support decision groups alongside flat alert cards.
+   Cards inside .decision-options are included in the same state
+   system as cards inside .alerts-container.
    ================================================================ */
 (function() {
   'use strict';
 
-  // --- Feature detection ---
   var body = document.body;
   var MULTI_ACTION = body.hasAttribute('data-multiaction');
   var ANNOTATABLE = body.hasAttribute('data-annotatable');
@@ -572,27 +738,22 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   var REPORT_TITLE = body.getAttribute('data-report-title') || 'Report';
   var REPORT_DATE = body.getAttribute('data-report-date') || new Date().toISOString().slice(0, 10);
 
-  // --- Helpers ---
   function escapeForMarkdown(str) {
     return str.replace(/"/g, "'").replace(/\n/g, ' / ').replace(/\r/g, '');
   }
 
-  // --- State ---
   var state = {
-    dismissed: [],       // array of alert IDs
-    notes: {},           // alertId -> note text
-    actions: {},         // alertId -> action text (single) or array (multi)
-    flaggedRows: [],     // array of "tableId:rowId" keys
-    rowNotes: {},        // "tableId:rowId" -> note text
-    annotations: {}      // annotationId -> note text
+    dismissed: [],
+    notes: {},
+    actions: {},
+    flaggedRows: [],
+    rowNotes: {},
+    annotations: {}
   };
 
-  // --- Clipboard ---
   function copyToClipboard(text, onSuccess) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(onSuccess).catch(function() {
-        fallbackCopy(text, onSuccess);
-      });
+      navigator.clipboard.writeText(text).then(onSuccess).catch(function() { fallbackCopy(text, onSuccess); });
     } else {
       fallbackCopy(text, onSuccess);
     }
@@ -611,19 +772,15 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     else if (!ok) window.prompt('Copy failed. Select the text below:', text);
   }
 
-  // --- State helpers ---
-  function hasItem(arr, item) {
-    return arr.indexOf(item) !== -1;
-  }
-  function addItem(arr, item) {
-    if (!hasItem(arr, item)) arr.push(item);
-  }
-  function removeItem(arr, item) {
-    var idx = arr.indexOf(item);
-    if (idx !== -1) arr.splice(idx, 1);
+  function hasItem(arr, item) { return arr.indexOf(item) !== -1; }
+  function addItem(arr, item) { if (!hasItem(arr, item)) arr.push(item); }
+  function removeItem(arr, item) { var idx = arr.indexOf(item); if (idx !== -1) arr.splice(idx, 1); }
+
+  // All alert cards (both in decision groups and flat lists)
+  function getAllCards() {
+    return document.querySelectorAll('.alert-card[data-alert-id]');
   }
 
-  // --- Dismiss ---
   window.toggleDismiss = function(id) {
     var card = document.querySelector('[data-alert-id="' + id + '"]');
     if (!card) return;
@@ -643,14 +800,12 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     updateVisibleCount();
   };
 
-  // --- Quick Actions ---
   window.selectAction = function(el) {
     var action = el.getAttribute('data-action');
     var card = el.closest('.alert-card');
     var id = card.getAttribute('data-alert-id');
 
     if (MULTI_ACTION) {
-      // Multi-select mode
       if (el.classList.contains('selected')) {
         el.classList.remove('selected');
         if (Array.isArray(state.actions[id])) {
@@ -664,7 +819,6 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
         state.actions[id].push(action);
       }
     } else {
-      // Single-select mode
       if (el.classList.contains('selected')) {
         el.classList.remove('selected');
         delete state.actions[id];
@@ -679,7 +833,6 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     updateActionBar();
   };
 
-  // --- Notes ---
   window.toggleNote = function(id) {
     var area = document.getElementById('note-' + id);
     if (!area) return;
@@ -692,30 +845,25 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       var id = e.target.getAttribute('data-id');
       if (e.target.value.trim()) state.notes[id] = e.target.value.trim();
       else delete state.notes[id];
-      saveState();
-      updateActionBar();
+      saveState(); updateActionBar();
     }
     if (e.target.classList.contains('row-note-input')) {
       var key = e.target.getAttribute('data-row-key');
       if (e.target.value.trim()) state.rowNotes[key] = e.target.value.trim();
       else delete state.rowNotes[key];
-      saveState();
-      updateActionBar();
+      saveState(); updateActionBar();
     }
     if (e.target.classList.contains('annotation-input')) {
       var annId = e.target.getAttribute('data-annotation-id');
       if (e.target.value.trim()) state.annotations[annId] = e.target.value.trim();
       else delete state.annotations[annId];
-      saveState();
-      updateActionBar();
+      saveState(); updateActionBar();
     }
   });
 
-  // --- Table Row Flagging ---
   document.addEventListener('click', function(e) {
     if (e.target.closest('.row-note-row')) return;
     if (e.target.classList.contains('row-note-input')) return;
-
     var row = e.target.closest('.data-table tbody tr[data-row-id]');
     if (!row) return;
     var rowId = row.getAttribute('data-row-id');
@@ -741,27 +889,22 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       row.after(nr);
       nr.querySelector('input').focus();
     }
-    saveState();
-    updateActionBar();
+    saveState(); updateActionBar();
   });
 
-  // --- Inline Annotations ---
   document.addEventListener('click', function(e) {
     if (!ANNOTATABLE) return;
     var target = e.target.closest('[data-annotation-id]');
     if (!target) return;
     if (e.target.classList.contains('annotation-input')) return;
-
     var annId = target.getAttribute('data-annotation-id');
     var existing = target.nextElementSibling;
     if (existing && existing.classList.contains('annotation-input')) {
-      // Toggle off
       existing.remove();
       var badge = target.querySelector('.annotation-badge');
       if (badge && !state.annotations[annId]) badge.remove();
       return;
     }
-
     var input = document.createElement('textarea');
     input.className = 'annotation-input';
     input.setAttribute('data-annotation-id', annId);
@@ -771,15 +914,15 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     input.focus();
   });
 
-  // --- Filter ---
+  // Filter only applies to the flat concerns list, not decision group
   window.filterCards = function(severity) {
     var btns = document.querySelectorAll('.filter-btn');
     btns.forEach(function(b) {
       var match = b.getAttribute('onclick');
       b.classList.toggle('active', match && match.indexOf("'" + severity + "'") !== -1);
     });
-
-    var cards = document.querySelectorAll('.alert-card[data-alert-id]');
+    // Only filter cards in the flat alerts-container, not decision group
+    var cards = document.querySelectorAll('#alerts-container .alert-card[data-alert-id]');
     cards.forEach(function(card) {
       if (severity === 'all') {
         card.style.display = '';
@@ -791,15 +934,15 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   };
 
   function updateVisibleCount() {
-    var all = document.querySelectorAll('.alert-card[data-alert-id]');
+    // Count only flat concern cards for filter display
+    var flatCards = document.querySelectorAll('#alerts-container .alert-card[data-alert-id]');
     var visible = 0;
-    all.forEach(function(c) {
+    flatCards.forEach(function(c) {
       if (c.style.display !== 'none' && !c.classList.contains('dismissed')) visible++;
     });
-    // Update filter button counts
     var counts = {};
     var totalActive = 0;
-    all.forEach(function(c) {
+    flatCards.forEach(function(c) {
       if (!c.classList.contains('dismissed')) {
         var sev = c.getAttribute('data-severity');
         counts[sev] = (counts[sev] || 0) + 1;
@@ -825,20 +968,16 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     });
   }
 
-  // --- Action Bar ---
   function updateActionBar() {
     var actionCount = Object.keys(state.actions).length;
     var noteCount = Object.keys(state.notes).length;
     var annCount = Object.keys(state.annotations).length;
     var interactions = state.dismissed.length + noteCount + actionCount + state.flaggedRows.length + annCount;
 
-    var hasCards = document.querySelectorAll('.alert-card[data-alert-id]').length > 0;
+    var hasCards = getAllCards().length > 0;
     var bar = document.getElementById('action-bar');
-    if (hasCards || interactions > 0) {
-      bar.classList.add('visible');
-    } else {
-      bar.classList.remove('visible');
-    }
+    if (hasCards || interactions > 0) { bar.classList.add('visible'); }
+    else { bar.classList.remove('visible'); }
 
     var parts = [];
     if (state.dismissed.length) parts.push(state.dismissed.length + ' dismissed');
@@ -852,17 +991,14 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     btn.textContent = 'Copy Review Summary';
     btn.classList.remove('copied');
 
-    // Show clear button if there's persisted state
     var clearBtn = document.getElementById('clear-btn');
     if (clearBtn) clearBtn.style.display = interactions > 0 ? '' : 'none';
   }
 
-  // --- Copy Summary ---
   window.copySummary = function() {
     var lines = ['## ' + REPORT_TITLE + ' Review \u2014 ' + REPORT_DATE, ''];
-    var allCards = document.querySelectorAll('.alert-card[data-alert-id]');
+    var allCards = getAllCards();
 
-    // Actions Selected
     var actionIds = Object.keys(state.actions);
     if (actionIds.length) {
       lines.push('### Actions Selected');
@@ -871,9 +1007,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
         var title = card ? escapeForMarkdown(card.querySelector('.alert-title').textContent.trim()) : id;
         var actionVal = state.actions[id];
         if (Array.isArray(actionVal)) {
-          actionVal.forEach(function(a) {
-            lines.push('- ' + title + ': "' + escapeForMarkdown(a) + '"');
-          });
+          actionVal.forEach(function(a) { lines.push('- ' + title + ': "' + escapeForMarkdown(a) + '"'); });
         } else {
           lines.push('- ' + title + ': "' + escapeForMarkdown(actionVal) + '"');
         }
@@ -881,7 +1015,6 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       lines.push('');
     }
 
-    // Dismissed
     var dismissedItems = [];
     var openItems = [];
     allCards.forEach(function(card) {
@@ -904,7 +1037,6 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       lines.push('');
     }
 
-    // Notes (non-dismissed only)
     var noteIds = Object.keys(state.notes).filter(function(id) { return !hasItem(state.dismissed, id); });
     if (noteIds.length) {
       lines.push('### Notes');
@@ -916,7 +1048,6 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       lines.push('');
     }
 
-    // Flagged Rows
     if (state.flaggedRows.length) {
       lines.push('### Flagged Items');
       state.flaggedRows.forEach(function(key) {
@@ -926,16 +1057,12 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
         var row = document.querySelector('.data-table[data-table-id="' + tableId + '"] tr[data-row-id="' + rowId + '"]');
         var label = row ? escapeForMarkdown(row.querySelector('td').textContent.trim()) : rowId;
         var note = state.rowNotes[key];
-        if (note) {
-          lines.push('- ' + label + ' (' + rowId + '): "' + escapeForMarkdown(note) + '"');
-        } else {
-          lines.push('- ' + label + ' (' + rowId + ')');
-        }
+        if (note) { lines.push('- ' + label + ' (' + rowId + '): "' + escapeForMarkdown(note) + '"'); }
+        else { lines.push('- ' + label + ' (' + rowId + ')'); }
       });
       lines.push('');
     }
 
-    // Annotations
     var annIds = Object.keys(state.annotations);
     if (annIds.length) {
       lines.push('### Annotations');
@@ -947,7 +1074,6 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       lines.push('');
     }
 
-    // Still Open
     if (openItems.length) {
       lines.push('### Still Open');
       lines = lines.concat(openItems);
@@ -959,14 +1085,10 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       var btn = document.getElementById('copy-btn');
       btn.textContent = 'Copied!';
       btn.classList.add('copied');
-      setTimeout(function() {
-        btn.textContent = 'Copy Review Summary';
-        btn.classList.remove('copied');
-      }, 2000);
+      setTimeout(function() { btn.textContent = 'Copy Review Summary'; btn.classList.remove('copied'); }, 2000);
     });
   };
 
-  // --- Share State (URL hash) ---
   window.shareState = function() {
     try {
       var json = JSON.stringify(state);
@@ -977,22 +1099,13 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
         btn.textContent = 'URL Copied!';
         setTimeout(function() { btn.textContent = 'Share State'; }, 2000);
       });
-    } catch(e) {
-      console.error('Share state failed:', e);
-    }
+    } catch(e) { console.error('Share state failed:', e); }
   };
 
-  // --- Clear Review ---
   window.clearReview = function() {
     if (!confirm('Clear all review progress? This cannot be undone.')) return;
-    state.dismissed = [];
-    state.notes = {};
-    state.actions = {};
-    state.flaggedRows = [];
-    state.rowNotes = {};
-    state.annotations = {};
-
-    // Reset DOM
+    state.dismissed = []; state.notes = {}; state.actions = {};
+    state.flaggedRows = []; state.rowNotes = {}; state.annotations = {};
     document.querySelectorAll('.alert-card.dismissed').forEach(function(c) { c.classList.remove('dismissed'); });
     document.querySelectorAll('input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
     document.querySelectorAll('.quick-action.selected').forEach(function(a) { a.classList.remove('selected'); });
@@ -1002,72 +1115,39 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     document.querySelectorAll('.row-note-row').forEach(function(r) { r.remove(); });
     document.querySelectorAll('.annotation-input').forEach(function(a) { a.remove(); });
     document.querySelectorAll('.annotation-badge').forEach(function(b) { b.remove(); });
-
     clearStorage();
-    if (window.location.hash) {
-      history.replaceState(null, '', window.location.pathname + window.location.search);
-    }
-    updateActionBar();
-    updateVisibleCount();
+    if (window.location.hash) { history.replaceState(null, '', window.location.pathname + window.location.search); }
+    updateActionBar(); updateVisibleCount();
   };
 
-  // --- localStorage Persistence ---
-  function getStorageKey() {
-    return 'ire:' + window.location.pathname;
-  }
-
-  function saveState() {
-    if (NO_PERSIST) return;
-    try {
-      localStorage.setItem(getStorageKey(), JSON.stringify(state));
-    } catch(e) { /* quota exceeded or private browsing */ }
-  }
-
-  function clearStorage() {
-    try { localStorage.removeItem(getStorageKey()); } catch(e) {}
-  }
+  function getStorageKey() { return 'ire:' + window.location.pathname; }
+  function saveState() { if (NO_PERSIST) return; try { localStorage.setItem(getStorageKey(), JSON.stringify(state)); } catch(e) {} }
+  function clearStorage() { try { localStorage.removeItem(getStorageKey()); } catch(e) {} }
 
   function restoreFromStorage() {
     if (NO_PERSIST) return false;
-    try {
-      var saved = localStorage.getItem(getStorageKey());
-      if (!saved) return false;
-      var parsed = JSON.parse(saved);
-      return applyState(parsed);
-    } catch(e) { return false; }
+    try { var saved = localStorage.getItem(getStorageKey()); if (!saved) return false; return applyState(JSON.parse(saved)); }
+    catch(e) { return false; }
   }
 
-  // --- Restore from URL hash ---
   function restoreFromHash() {
     var hash = window.location.hash;
     if (!hash || hash.indexOf('#state=') !== 0) return false;
     try {
       var encoded = hash.slice(7);
       var json = decodeURIComponent(escape(atob(encoded)));
-      var parsed = JSON.parse(json);
-      var ok = applyState(parsed);
-      if (ok) {
-        // Consume the hash so reloads use localStorage instead of stale hash
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-        saveState();
-      }
+      var ok = applyState(JSON.parse(json));
+      if (ok) { history.replaceState(null, '', window.location.pathname + window.location.search); saveState(); }
       return ok;
     } catch(e) { return false; }
   }
 
-  // --- Apply state to DOM ---
   function applyState(s) {
     if (!s) return false;
+    state.dismissed = s.dismissed || []; state.notes = s.notes || {};
+    state.actions = s.actions || {}; state.flaggedRows = s.flaggedRows || [];
+    state.rowNotes = s.rowNotes || {}; state.annotations = s.annotations || {};
 
-    // Merge into state
-    state.dismissed = s.dismissed || [];
-    state.notes = s.notes || {};
-    state.actions = s.actions || {};
-    state.flaggedRows = s.flaggedRows || [];
-    state.rowNotes = s.rowNotes || {};
-    state.annotations = s.annotations || {};
-
-    // Apply dismissed
     state.dismissed.forEach(function(id) {
       var card = document.querySelector('[data-alert-id="' + id + '"]');
       if (!card) return;
@@ -1076,67 +1156,52 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
       if (cb) cb.checked = true;
     });
 
-    // Apply notes
     Object.keys(state.notes).forEach(function(id) {
       var area = document.querySelector('.alert-note[data-id="' + id + '"]');
-      if (area) {
-        area.value = state.notes[id];
-        var wrapper = document.getElementById('note-' + id);
-        if (wrapper) wrapper.style.display = 'block';
-      }
+      if (area) { area.value = state.notes[id]; var wrapper = document.getElementById('note-' + id); if (wrapper) wrapper.style.display = 'block'; }
     });
 
-    // Apply actions
     Object.keys(state.actions).forEach(function(id) {
       var card = document.querySelector('[data-alert-id="' + id + '"]');
       if (!card) return;
       var vals = Array.isArray(state.actions[id]) ? state.actions[id] : [state.actions[id]];
       card.querySelectorAll('.quick-action').forEach(function(pill) {
-        if (vals.indexOf(pill.getAttribute('data-action')) !== -1) {
-          pill.classList.add('selected');
-        }
+        if (vals.indexOf(pill.getAttribute('data-action')) !== -1) pill.classList.add('selected');
       });
     });
 
-    // Apply flagged rows
     state.flaggedRows.forEach(function(key) {
       var parts = key.split(':');
-      var tableId = parts[0];
-      var rowId = parts.slice(1).join(':');
+      var tableId = parts[0]; var rowId = parts.slice(1).join(':');
       var row = document.querySelector('.data-table[data-table-id="' + tableId + '"] tr[data-row-id="' + rowId + '"]');
       if (!row) return;
       row.classList.add('flagged');
       var cols = row.querySelectorAll('td').length;
       var label = row.querySelector('td') ? row.querySelector('td').textContent.trim() : rowId;
-      var nr = document.createElement('tr');
-      nr.className = 'row-note-row';
+      var nr = document.createElement('tr'); nr.className = 'row-note-row';
       nr.innerHTML = '<td colspan="' + cols + '"><input type="text" class="row-note-input" data-row-key="' + key + '" placeholder="Why are you flagging ' + label.replace(/"/g, '&quot;') + '?" value="' + (state.rowNotes[key] || '').replace(/"/g, '&quot;') + '"></td>';
       row.after(nr);
     });
 
-    // Apply annotations (only when feature is enabled)
     if (ANNOTATABLE) {
       Object.keys(state.annotations).forEach(function(annId) {
         var el = document.querySelector('[data-annotation-id="' + annId + '"]');
         if (!el) return;
         if (!el.querySelector('.annotation-badge')) {
-          var badge = document.createElement('span');
-          badge.className = 'annotation-badge';
-          el.appendChild(badge);
+          var badge = document.createElement('span'); badge.className = 'annotation-badge'; el.appendChild(badge);
         }
       });
     }
-
     return true;
   }
 
-  // --- Keyboard Navigation ---
+  // Keyboard nav works across both decision group and flat cards
   var focusedIndex = -1;
   var hintTimeout;
 
   function getVisibleCards() {
-    return Array.from(document.querySelectorAll('.alert-card[data-alert-id]:not(.dismissed)')).filter(function(c) {
-      return c.style.display !== 'none';
+    return Array.from(getAllCards()).filter(function(c) {
+      return c.style.display !== 'none' && !c.classList.contains('dismissed');
     });
   }
 
@@ -1166,80 +1231,43 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   document.addEventListener('keydown', function(e) {
     var tag = (e.target.tagName || '').toLowerCase();
     if (tag === 'input' || tag === 'textarea') {
-      if (e.key === 'Escape') {
-        e.target.blur();
-        e.preventDefault();
-      }
+      if (e.key === 'Escape') { e.target.blur(); e.preventDefault(); }
       return;
     }
-
     var cards = getVisibleCards();
-    var card, id, cb;
-
+    var card, id;
     switch (e.key) {
-      case 'j':
-        e.preventDefault();
-        focusCard(Math.min(focusedIndex + 1, cards.length - 1));
-        break;
-      case 'k':
-        e.preventDefault();
-        focusCard(Math.max(focusedIndex - 1, 0));
-        break;
+      case 'j': e.preventDefault(); focusCard(Math.min(focusedIndex + 1, cards.length - 1)); break;
+      case 'k': e.preventDefault(); focusCard(Math.max(focusedIndex - 1, 0)); break;
       case 'x':
-        card = getFocusedCard();
-        if (!card) break;
-        e.preventDefault();
-        id = card.getAttribute('data-alert-id');
-        toggleDismiss(id);
+        card = getFocusedCard(); if (!card) break; e.preventDefault();
+        id = card.getAttribute('data-alert-id'); toggleDismiss(id);
         if (focusedIndex >= getVisibleCards().length) focusedIndex = getVisibleCards().length - 1;
         if (focusedIndex >= 0) focusCard(focusedIndex);
         break;
       case '1': case '2': case '3': case '4': case '5':
-        card = getFocusedCard();
-        if (!card) break;
-        e.preventDefault();
+        card = getFocusedCard(); if (!card) break; e.preventDefault();
         var actions = card.querySelectorAll('.quick-action');
         var idx = parseInt(e.key) - 1;
         if (actions[idx]) selectAction(actions[idx]);
         break;
-      case 'n':
-        card = getFocusedCard();
-        if (!card) break;
-        e.preventDefault();
-        id = card.getAttribute('data-alert-id');
-        toggleNote(id);
-        break;
-      case 'c':
-        e.preventDefault();
-        copySummary();
-        break;
-      case 's':
-        e.preventDefault();
-        shareState();
-        break;
-      case '?':
-        e.preventDefault();
+      case 'n': card = getFocusedCard(); if (!card) break; e.preventDefault();
+        toggleNote(card.getAttribute('data-alert-id')); break;
+      case 'c': e.preventDefault(); copySummary(); break;
+      case 's': e.preventDefault(); shareState(); break;
+      case '?': e.preventDefault();
         var hint = document.getElementById('kbd-hint');
-        if (hint.classList.contains('visible')) {
-          hint.classList.remove('visible');
-          clearTimeout(hintTimeout);
-        } else {
-          showHint();
-        }
+        if (hint.classList.contains('visible')) { hint.classList.remove('visible'); clearTimeout(hintTimeout); }
+        else { showHint(); }
         break;
       case 'Escape':
         document.querySelectorAll('.alert-card.focused').forEach(function(c) { c.classList.remove('focused'); });
-        focusedIndex = -1;
-        document.getElementById('kbd-hint').classList.remove('visible');
+        focusedIndex = -1; document.getElementById('kbd-hint').classList.remove('visible');
         break;
     }
   });
 
-  // --- Init ---
-  // Priority: URL hash > localStorage
-  if (!restoreFromHash()) {
-    restoreFromStorage();
-  }
+  if (!restoreFromHash()) { restoreFromStorage(); }
   updateActionBar();
   updateVisibleCount();
 })();

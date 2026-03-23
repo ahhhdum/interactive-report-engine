@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WT Tab Color Picker — Config Chooser Example</title>
+<!--
+  CONFIG CHOOSER EXAMPLE
+  ======================
+  This is a standalone variant of the 3-layer feedback pattern.
+  It does NOT use the interactive-report-engine.html template.
+
+  The 3 layers:
+    1. Prompt (config-chooser-prompt.md) — tells Claude when and how
+       to generate a config chooser HTML file.
+    2. This HTML file — a visual picker with live preview that the
+       human interacts with in a browser.
+    3. Feedback — the "Copy" button emits structured code (not markdown)
+       that the human pastes back into Claude for direct application.
+
+  WHY STANDALONE:
+  The engine template's alert-card / severity / dismiss model is built
+  for triage workflows where you evaluate N independent items. A config
+  chooser is fundamentally different: you pick one value from a visual
+  option space, preview it in context, and return structured data.
+  Forcing this into alert cards would be conceptually wrong.
+
+  The 3-layer pattern is bigger than the engine template. This example
+  proves that the pattern works for configuration choices, not just
+  triage and planning workflows.
+-->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #1e1e2e;
+    --surface: #282839;
+    --surface-raised: #313145;
+    --border: #3a3a50;
+    --text: #cdd6f4;
+    --text-dim: #7f849c;
+    --text-bright: #f0f0f8;
+    --accent: #89b4fa;
+    --green: #a6e3a1;
+    --red: #f38ba8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-bright);
+    margin-bottom: 0.25rem;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 2rem;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    max-width: 1100px;
+  }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  /* --- Palette section --- */
+  .palette-section h2 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .palette-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .palette-group-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .swatches {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s ease;
+    position: relative;
+  }
+
+  .swatch:hover {
+    transform: scale(1.12);
+    border-color: rgba(255,255,255,0.3);
+  }
+
+  .swatch.selected {
+    border-color: var(--text-bright);
+    box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--text-bright);
+  }
+
+  .swatch .hex {
+    display: none;
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .swatch:hover .hex,
+  .swatch.selected .hex {
+    display: block;
+  }
+
+  /* --- Custom hex input --- */
+  .hex-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .hex-input-row label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+
+  .hex-input {
+    width: 90px;
+    padding: 4px 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  .hex-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .hex-input-preview {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  /* --- WT mockup --- */
+  .preview-section h2 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .wt-window {
+    background: #0c0c0c;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    border: 1px solid #333;
+  }
+
+  .wt-titlebar {
+    background: #2d2d2d;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .wt-titlebar-text {
+    font-size: 0.7rem;
+    color: #999;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    flex: 1;
+  }
+
+  .wt-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .wt-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #555;
+  }
+
+  .wt-tabs {
+    display: flex;
+    background: #1a1a1a;
+    height: 36px;
+    align-items: flex-end;
+    padding: 0 4px;
+    gap: 1px;
+  }
+
+  .wt-tab {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-size: 0.72rem;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #888;
+    background: #252525;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    gap: 7px;
+    cursor: default;
+  }
+
+  .wt-tab.active {
+    background: #0c0c0c;
+    color: #ddd;
+  }
+
+  .wt-tab-color-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .wt-tab-icon {
+    font-size: 0.65rem;
+    opacity: 0.7;
+  }
+
+  .wt-terminal {
+    padding: 16px;
+    font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    min-height: 160px;
+    color: #cccccc;
+  }
+
+  .wt-terminal .prompt { color: #6a9fb5; }
+  .wt-terminal .path { color: #f0c674; }
+  .wt-terminal .cmd { color: #cccccc; }
+  .wt-terminal .output { color: #888; }
+
+  /* --- Before/After comparison --- */
+  .comparison {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .comparison-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+
+  .comparison-card h4 {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .comparison-colors {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .comparison-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .comparison-chip .chip {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .comparison-chip .chip-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--text-dim);
+  }
+
+  /* --- Selected colors display --- */
+  .selected-colors {
+    margin-top: 1.5rem;
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--border);
+  }
+
+  .selected-colors h3 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+  }
+
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .color-row:last-child { margin-bottom: 0; }
+
+  .color-chip {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .color-label {
+    font-size: 0.8rem;
+    color: var(--text);
+    min-width: 50px;
+  }
+
+  .color-hex {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+
+  /* --- Copy button --- */
+  .copy-btn {
+    display: block;
+    width: 100%;
+    padding: 0.65rem;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-bright);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: center;
+  }
+
+  .copy-btn:hover {
+    background: #3d3d55;
+    border-color: var(--accent);
+  }
+
+  .copy-btn.copied {
+    background: rgba(166, 227, 161, 0.15);
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .code-output {
+    display: none;
+    margin-top: 0.75rem;
+    background: #0c0c0c;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: #b4befe;
+    word-break: break-all;
+    border: 1px solid #333;
+  }
+
+  /* --- Footer --- */
+  .footer {
+    margin-top: 2rem;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<h1>WT Tab Colors</h1>
+<p class="subtitle">Pick subtle colors for Claude and Codex session tabs. Click a swatch or enter a custom hex value.</p>
+
+<div class="layout">
+  <div class="palette-section">
+    <h2>Claude (warm)</h2>
+
+    <div class="palette-group">
+      <div class="palette-group-label">coral / salmon</div>
+      <div class="swatches" data-source="claude">
+        <div class="swatch" style="background:#e8725c" data-color="#e8725c"><span class="hex">#e8725c</span></div>
+        <div class="swatch" style="background:#d4896b" data-color="#d4896b"><span class="hex">#d4896b</span></div>
+        <div class="swatch" style="background:#c4704b" data-color="#c4704b"><span class="hex">#c4704b</span></div>
+        <div class="swatch" style="background:#e09080" data-color="#e09080"><span class="hex">#e09080</span></div>
+        <div class="swatch" style="background:#cc6655" data-color="#cc6655"><span class="hex">#cc6655</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group">
+      <div class="palette-group-label">burnt sienna / rust</div>
+      <div class="swatches" data-source="claude">
+        <div class="swatch" style="background:#a0522d" data-color="#a0522d"><span class="hex">#a0522d</span></div>
+        <div class="swatch" style="background:#8b4513" data-color="#8b4513"><span class="hex">#8b4513</span></div>
+        <div class="swatch" style="background:#b5651d" data-color="#b5651d"><span class="hex">#b5651d</span></div>
+        <div class="swatch" style="background:#985e40" data-color="#985e40"><span class="hex">#985e40</span></div>
+        <div class="swatch" style="background:#c27038" data-color="#c27038"><span class="hex">#c27038</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group">
+      <div class="palette-group-label">warm gold / amber</div>
+      <div class="swatches" data-source="claude">
+        <div class="swatch" style="background:#d4a040" data-color="#d4a040"><span class="hex">#d4a040</span></div>
+        <div class="swatch" style="background:#c49050" data-color="#c49050"><span class="hex">#c49050</span></div>
+        <div class="swatch" style="background:#b8860b" data-color="#b8860b"><span class="hex">#b8860b</span></div>
+        <div class="swatch" style="background:#daa520" data-color="#daa520"><span class="hex">#daa520</span></div>
+        <div class="swatch" style="background:#cd950c" data-color="#cd950c"><span class="hex">#cd950c</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group">
+      <div class="palette-group-label">dusty rose / mauve</div>
+      <div class="swatches" data-source="claude">
+        <div class="swatch" style="background:#b07080" data-color="#b07080"><span class="hex">#b07080</span></div>
+        <div class="swatch" style="background:#c08090" data-color="#c08090"><span class="hex">#c08090</span></div>
+        <div class="swatch" style="background:#a06878" data-color="#a06878"><span class="hex">#a06878</span></div>
+        <div class="swatch" style="background:#9a6070" data-color="#9a6070"><span class="hex">#9a6070</span></div>
+        <div class="swatch" style="background:#d0909a" data-color="#d0909a"><span class="hex">#d0909a</span></div>
+      </div>
+    </div>
+
+    <div class="hex-input-row">
+      <label>Custom:</label>
+      <div class="hex-input-preview" id="custom-claude-preview" style="background:#c4704b"></div>
+      <input type="text" class="hex-input" id="custom-claude" placeholder="#c4704b" maxlength="7" data-source="claude">
+    </div>
+
+    <h2 style="margin-top:2rem">Codex (cool)</h2>
+
+    <div class="palette-group">
+      <div class="palette-group-label">steel blue</div>
+      <div class="swatches" data-source="codex">
+        <div class="swatch" style="background:#5b7fa6" data-color="#5b7fa6"><span class="hex">#5b7fa6</span></div>
+        <div class="swatch" style="background:#4a78b0" data-color="#4a78b0"><span class="hex">#4a78b0</span></div>
+        <div class="swatch" style="background:#3a6ea0" data-color="#3a6ea0"><span class="hex">#3a6ea0</span></div>
+        <div class="swatch" style="background:#6090c0" data-color="#6090c0"><span class="hex">#6090c0</span></div>
+        <div class="swatch" style="background:#4682b4" data-color="#4682b4"><span class="hex">#4682b4</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group">
+      <div class="palette-group-label">teal / ocean</div>
+      <div class="swatches" data-source="codex">
+        <div class="swatch" style="background:#2e8b8b" data-color="#2e8b8b"><span class="hex">#2e8b8b</span></div>
+        <div class="swatch" style="background:#4a9898" data-color="#4a9898"><span class="hex">#4a9898</span></div>
+        <div class="swatch" style="background:#3aa0a0" data-color="#3aa0a0"><span class="hex">#3aa0a0</span></div>
+        <div class="swatch" style="background:#58b0a8" data-color="#58b0a8"><span class="hex">#58b0a8</span></div>
+        <div class="swatch" style="background:#408080" data-color="#408080"><span class="hex">#408080</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group">
+      <div class="palette-group-label">lavender / muted purple</div>
+      <div class="swatches" data-source="codex">
+        <div class="swatch" style="background:#7068a0" data-color="#7068a0"><span class="hex">#7068a0</span></div>
+        <div class="swatch" style="background:#8878b0" data-color="#8878b0"><span class="hex">#8878b0</span></div>
+        <div class="swatch" style="background:#6060a0" data-color="#6060a0"><span class="hex">#6060a0</span></div>
+        <div class="swatch" style="background:#9888b8" data-color="#9888b8"><span class="hex">#9888b8</span></div>
+        <div class="swatch" style="background:#7b70a8" data-color="#7b70a8"><span class="hex">#7b70a8</span></div>
+      </div>
+    </div>
+
+    <div class="palette-group">
+      <div class="palette-group-label">forest / sage</div>
+      <div class="swatches" data-source="codex">
+        <div class="swatch" style="background:#5a8a6a" data-color="#5a8a6a"><span class="hex">#5a8a6a</span></div>
+        <div class="swatch" style="background:#4a7860" data-color="#4a7860"><span class="hex">#4a7860</span></div>
+        <div class="swatch" style="background:#6a9878" data-color="#6a9878"><span class="hex">#6a9878</span></div>
+        <div class="swatch" style="background:#3a6850" data-color="#3a6850"><span class="hex">#3a6850</span></div>
+        <div class="swatch" style="background:#78a888" data-color="#78a888"><span class="hex">#78a888</span></div>
+      </div>
+    </div>
+
+    <div class="hex-input-row">
+      <label>Custom:</label>
+      <div class="hex-input-preview" id="custom-codex-preview" style="background:#5b7fa6"></div>
+      <input type="text" class="hex-input" id="custom-codex" placeholder="#5b7fa6" maxlength="7" data-source="codex">
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <h2>Live Preview</h2>
+    <div class="wt-window">
+      <div class="wt-titlebar">
+        <div class="wt-titlebar-text">dynamic-rla-v7-3aa886</div>
+        <div class="wt-dots">
+          <div class="wt-dot"></div>
+          <div class="wt-dot"></div>
+          <div class="wt-dot"></div>
+        </div>
+      </div>
+      <div class="wt-tabs">
+        <div class="wt-tab active" id="tab-claude">
+          <div class="wt-tab-color-bar" id="bar-claude" style="background:#c4704b"></div>
+          <span class="wt-tab-icon" style="color:#c4704b">&#9679;</span>
+          <span>dynamic-rla-v7 &middot; Claude</span>
+        </div>
+        <div class="wt-tab" id="tab-codex">
+          <div class="wt-tab-color-bar" id="bar-codex" style="background:#5b7fa6"></div>
+          <span class="wt-tab-icon" style="color:#5b7fa6">&#9679;</span>
+          <span>dynamic-rla-v7 &middot; Codex</span>
+        </div>
+        <div class="wt-tab" id="tab-claude2">
+          <div class="wt-tab-color-bar" id="bar-claude2" style="background:#c4704b"></div>
+          <span class="wt-tab-icon" style="color:#c4704b">&#9679;</span>
+          <span>rd-tax-credit &middot; Claude</span>
+        </div>
+      </div>
+      <div class="wt-terminal">
+        <div><span class="prompt">adams@wsl</span>:<span class="path">~/repos-epcvip/projects/dynamic-rla-v7</span>$</div>
+        <div class="cmd">ccs claude --resume 7a53ad81-4be1-4cd2-8a44</div>
+        <div class="output" style="margin-top:8px">Resuming session 7a53ad81...</div>
+        <div class="output">Context: Dynamic RLA V7 Stage 1 investigation</div>
+        <div class="output" style="margin-top:8px; color:#6a9fb5">&#9484;&#9472; Claude Code &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</div>
+        <div class="output" style="color:#6a9fb5">&#9474; Ready. 212 tests passing, 0 failed.       &#9474;</div>
+        <div class="output" style="color:#6a9fb5">&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</div>
+        <div style="margin-top:8px"><span class="prompt">&gt;</span> <span class="cmd" style="opacity:0.4">_</span></div>
+      </div>
+    </div>
+
+    <!-- Before / After comparison -->
+    <div class="comparison">
+      <div class="comparison-card">
+        <h4>Before (defaults)</h4>
+        <div class="comparison-colors">
+          <div class="comparison-chip">
+            <div class="chip" style="background:#e8915a"></div>
+            <span class="chip-label">Claude</span>
+          </div>
+          <div class="comparison-chip">
+            <div class="chip" style="background:#4a90d9"></div>
+            <span class="chip-label">Codex</span>
+          </div>
+        </div>
+      </div>
+      <div class="comparison-card">
+        <h4>After (selected)</h4>
+        <div class="comparison-colors">
+          <div class="comparison-chip">
+            <div class="chip" id="after-claude" style="background:#c4704b"></div>
+            <span class="chip-label">Claude</span>
+          </div>
+          <div class="comparison-chip">
+            <div class="chip" id="after-codex" style="background:#5b7fa6"></div>
+            <span class="chip-label">Codex</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current selection -->
+    <div class="selected-colors">
+      <h3>Current Selection</h3>
+      <div class="color-row">
+        <div class="color-chip" id="chip-claude" style="background:#c4704b"></div>
+        <span class="color-label">Claude</span>
+        <span class="color-hex" id="hex-claude">#c4704b</span>
+      </div>
+      <div class="color-row">
+        <div class="color-chip" id="chip-codex" style="background:#5b7fa6"></div>
+        <span class="color-label">Codex</span>
+        <span class="color-hex" id="hex-codex">#5b7fa6</span>
+      </div>
+    </div>
+
+    <!-- Copy button: the feedback mechanism (Layer 3).
+         Emits code in the exact format the codebase expects.
+         For this example, that's a Python dict for recovery.py. -->
+    <button class="copy-btn" id="copy-code" style="margin-top:1.5rem">Copy for recovery.py</button>
+    <div class="code-output" id="code-output"></div>
+  </div>
+</div>
+
+<div class="footer">
+  Generated by Claude Code. Config chooser example for the interactive report engine.
+</div>
+
+<script>
+/*
+  CONFIG CHOOSER — JavaScript
+  ============================
+  Layer 3 of the 3-layer pattern: interaction + structured feedback.
+
+  Unlike the report engine (which produces markdown), this chooser
+  produces structured code (Python dict or JSON) that Claude can
+  paste directly into the codebase.
+
+  The pattern:
+    1. User clicks swatches or types custom hex values
+    2. Live preview updates instantly (no "apply" button)
+    3. User clicks "Copy" to get code in the format the codebase expects
+    4. User pastes into Claude, Claude applies the change
+*/
+
+var selected = { claude: '#c4704b', codex: '#5b7fa6' };
+
+// --- Swatch selection ---
+document.querySelectorAll('.swatch').forEach(function(swatch) {
+  swatch.addEventListener('click', function() {
+    var color = swatch.dataset.color;
+    var source = swatch.closest('.swatches').dataset.source;
+    applyColor(source, color);
+
+    // Update swatch selection state
+    swatch.closest('.palette-section')
+      .querySelectorAll('.swatches[data-source="' + source + '"] .swatch')
+      .forEach(function(s) { s.classList.remove('selected'); });
+    swatch.classList.add('selected');
+
+    // Sync custom input
+    document.getElementById('custom-' + source).value = color;
+    document.getElementById('custom-' + source + '-preview').style.background = color;
+  });
+});
+
+// --- Custom hex input ---
+document.querySelectorAll('.hex-input').forEach(function(input) {
+  input.addEventListener('input', function() {
+    var val = input.value.trim();
+    var source = input.dataset.source;
+    if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+      applyColor(source, val);
+      document.getElementById('custom-' + source + '-preview').style.background = val;
+      // Deselect all swatches for this source
+      document.querySelectorAll('.swatches[data-source="' + source + '"] .swatch')
+        .forEach(function(s) { s.classList.remove('selected'); });
+    }
+  });
+});
+
+function applyColor(source, color) {
+  selected[source] = color;
+
+  if (source === 'claude') {
+    document.getElementById('bar-claude').style.background = color;
+    document.getElementById('bar-claude2').style.background = color;
+    document.getElementById('chip-claude').style.background = color;
+    document.getElementById('hex-claude').textContent = color;
+    document.getElementById('after-claude').style.background = color;
+    document.getElementById('tab-claude').querySelector('.wt-tab-icon').style.color = color;
+    document.getElementById('tab-claude2').querySelector('.wt-tab-icon').style.color = color;
+  } else {
+    document.getElementById('bar-codex').style.background = color;
+    document.getElementById('chip-codex').style.background = color;
+    document.getElementById('hex-codex').textContent = color;
+    document.getElementById('after-codex').style.background = color;
+    document.getElementById('tab-codex').querySelector('.wt-tab-icon').style.color = color;
+  }
+}
+
+// --- Copy buttons (Layer 3: structured feedback) ---
+document.getElementById('copy-code').addEventListener('click', function() {
+  var text = '_SOURCE_TAB_COLORS: dict[str, str] = {\n' +
+    '    "claude": "' + selected.claude + '",\n' +
+    '    "codex": "' + selected.codex + '",\n' +
+    '}';
+  copyAndShow(text, 'copy-code');
+});
+
+function copyAndShow(text, btnId) {
+  var out = document.getElementById('code-output');
+  out.textContent = text;
+  out.style.display = 'block';
+
+  var btn = document.getElementById(btnId);
+  function onCopied() {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(function() {
+      btn.textContent = 'Copy for recovery.py';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onCopied).catch(function() {
+      fallbackCopy(text, onCopied);
+    });
+  } else {
+    fallbackCopy(text, onCopied);
+  }
+}
+
+function fallbackCopy(text, cb) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    if (cb) cb();
+  } catch (e) {
+    window.prompt('Copy this text:', text);
+  }
+  document.body.removeChild(ta);
+}
+
+// Select swatches matching default state
+document.querySelector('.swatches[data-source="claude"] .swatch[data-color="' + selected.claude + '"]').classList.add('selected');
+document.querySelector('.swatches[data-source="codex"] .swatch[data-color="' + selected.codex + '"]').classList.add('selected');
+</script>
+
+</body>
+</html>
