@@ -729,21 +729,43 @@ function copyAndShow(text, btnId) {
   out.style.display = 'block';
 
   var btn = document.getElementById(btnId);
+  function onCopied() {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(function() {
+      btn.textContent = 'Copy for recovery.py';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(function() {
-      btn.textContent = 'Copied!';
-      btn.classList.add('copied');
-      setTimeout(function() {
-        btn.textContent = 'Copy for recovery.py';
-        btn.classList.remove('copied');
-      }, 2000);
+    navigator.clipboard.writeText(text).then(onCopied).catch(function() {
+      fallbackCopy(text, onCopied);
     });
+  } else {
+    fallbackCopy(text, onCopied);
   }
 }
 
-// Select first swatches by default
-document.querySelector('.swatches[data-source="claude"] .swatch').classList.add('selected');
-document.querySelector('.swatches[data-source="codex"] .swatch').classList.add('selected');
+function fallbackCopy(text, cb) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    if (cb) cb();
+  } catch (e) {
+    window.prompt('Copy this text:', text);
+  }
+  document.body.removeChild(ta);
+}
+
+// Select swatches matching default state
+document.querySelector('.swatches[data-source="claude"] .swatch[data-color="' + selected.claude + '"]').classList.add('selected');
+document.querySelector('.swatches[data-source="codex"] .swatch[data-color="' + selected.codex + '"]').classList.add('selected');
 </script>
 
 </body>
