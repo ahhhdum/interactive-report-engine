@@ -382,15 +382,10 @@
     color: var(--accent);
   }
 
-  /* --- Copy buttons --- */
-  .copy-buttons {
-    display: flex;
-    gap: 8px;
-    margin-top: 1.5rem;
-  }
-
+  /* --- Copy button --- */
   .copy-btn {
-    flex: 1;
+    display: block;
+    width: 100%;
     padding: 0.65rem;
     background: var(--surface-raised);
     border: 1px solid var(--border);
@@ -634,11 +629,10 @@
       </div>
     </div>
 
-    <!-- Copy buttons: the feedback mechanism (Layer 3) -->
-    <div class="copy-buttons">
-      <button class="copy-btn" id="copy-python">Copy Python dict</button>
-      <button class="copy-btn" id="copy-json">Copy JSON</button>
-    </div>
+    <!-- Copy button: the feedback mechanism (Layer 3).
+         Emits code in the exact format the codebase expects.
+         For this example, that's a Python dict for recovery.py. -->
+    <button class="copy-btn" id="copy-code" style="margin-top:1.5rem">Copy for recovery.py</button>
     <div class="code-output" id="code-output"></div>
   </div>
 </div>
@@ -721,17 +715,12 @@ function applyColor(source, color) {
 }
 
 // --- Copy buttons (Layer 3: structured feedback) ---
-document.getElementById('copy-python').addEventListener('click', function() {
+document.getElementById('copy-code').addEventListener('click', function() {
   var text = '_SOURCE_TAB_COLORS: dict[str, str] = {\n' +
     '    "claude": "' + selected.claude + '",\n' +
     '    "codex": "' + selected.codex + '",\n' +
     '}';
-  copyAndShow(text, 'copy-python');
-});
-
-document.getElementById('copy-json').addEventListener('click', function() {
-  var text = JSON.stringify({ claude: selected.claude, codex: selected.codex }, null, 2);
-  copyAndShow(text, 'copy-json');
+  copyAndShow(text, 'copy-code');
 });
 
 function copyAndShow(text, btnId) {
@@ -745,7 +734,7 @@ function copyAndShow(text, btnId) {
       btn.textContent = 'Copied!';
       btn.classList.add('copied');
       setTimeout(function() {
-        btn.textContent = btnId === 'copy-python' ? 'Copy Python dict' : 'Copy JSON';
+        btn.textContent = 'Copy for recovery.py';
         btn.classList.remove('copied');
       }, 2000);
     });

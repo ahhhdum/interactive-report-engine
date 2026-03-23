@@ -27,9 +27,7 @@ All four conditions must be true:
 
 The copy button replaces the report engine's "Copy Review Summary" button. Instead of markdown, it emits code.
 
-The output must be in the exact format the codebase expects so Claude can paste and apply without transformation. If the target is a Python dict, emit a Python dict. If the target is a JSON config file, emit JSON. If the target is CSS custom properties, emit CSS.
-
-When there are multiple plausible output formats, provide multiple copy buttons (e.g., "Copy Python dict" and "Copy JSON").
+The output must be in the exact format the codebase expects so Claude can paste and apply without transformation. If the target is a Python dict, emit a Python dict. If the target is a JSON config file, emit JSON. If the target is CSS custom properties, emit CSS. One copy button, one format. Claude Code can work with any structured format equally well, so multiple format buttons add no value.
 
 ## What Not to Prescribe
 
