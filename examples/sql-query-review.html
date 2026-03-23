@@ -402,6 +402,105 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   </div>
 
   <!-- ============================================================
+       THE DATA MODEL — Literate SQL Sections
+       ============================================================ -->
+  <div class="anim-up" style="--i:8">
+    <div class="section-label">The Data Model</div>
+  </div>
+
+  <!-- Section 1: Campaign Roles -->
+  <div class="lit-section anim-up" style="--i:9" id="section-campaign-roles">
+    <div class="lit-prose">
+      <p><span class="step-num">1</span> <strong>Campaign Roles in Price Reject Setups</strong></p>
+      <p>One application generates multiple attempts, one per campaign pinged. Some campaigns participate in price reject setups where a top-tier campaign places a bid, and a negotiable "catcher" campaign fulfills it.</p>
+      <p>The <code>tier_campaign_buffer</code> table links negotiable campaigns to their top-tier parent via <code>parent_campaign_id</code>.</p>
+    </div>
+    <div class="lit-code">
+      <table class="data-table" data-table-id="campaign-roles">
+        <thead>
+          <tr><th>Role</th><th>negotiable</th><th>parent_campaign_id</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="role-top-tier">
+            <td>Top-Tier</td>
+            <td>false</td>
+            <td class="cell-match">= campaign_id (self)</td>
+          </tr>
+          <tr data-row-id="role-negotiable">
+            <td>Negotiable</td>
+            <td>true</td>
+            <td class="cell-match">= top-tier's campaign_id</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 2: Example Application #1000 -->
+  <div class="lit-section anim-up" style="--i:10" id="section-example-app">
+    <div class="lit-prose">
+      <p><span class="step-num">2</span> <strong>Example Application #1000</strong></p>
+      <p>An application enters the ping tree and gets pinged to approximately 75 campaigns. Three of them are relevant to this scenario.</p>
+      <p>Attempt att_501 is the top-tier campaign C_100, which places a bid at $60. Attempt att_502 is an unrelated top-tier campaign C_200, which does not buy. Attempt att_503 is the negotiable campaign C_150, which catches C_100's bid and accepts it.</p>
+    </div>
+    <div class="lit-code">
+      <table class="data-table" data-table-id="attempts">
+        <thead>
+          <tr><th>Attempt</th><th>campaign_id</th><th>parent_campaign_id</th><th>approved</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="att-501">
+            <td>att_501</td>
+            <td>C_100</td>
+            <td>C_100</td>
+            <td>false (bid $60)</td>
+          </tr>
+          <tr data-row-id="att-502">
+            <td>att_502</td>
+            <td>C_200</td>
+            <td>C_200</td>
+            <td>false</td>
+          </tr>
+          <tr data-row-id="att-503">
+            <td>att_503</td>
+            <td>C_150</td>
+            <td>C_100</td>
+            <td class="cell-match">true (accepted)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 3: The Conversion -->
+  <div class="lit-section anim-up" style="--i:11" id="section-conversion">
+    <div class="lit-prose">
+      <p><span class="step-num">3</span> <strong>The Conversion</strong></p>
+      <p>The conversion records which campaign actually completed the sale. Because the negotiable campaign C_150 accepted the bid, the conversion's <code>campaign_id</code> is C_150, not C_100.</p>
+      <p>This mismatch between the conversion's campaign_id and the top-tier's campaign_id is the root cause of the join problem.</p>
+    </div>
+    <div class="lit-code">
+      <table class="data-table" data-table-id="conversion">
+        <thead>
+          <tr><th>conversion_id</th><th>application_id</th><th>campaign_id</th><th>price</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="conv-999">
+            <td>conv_999</td>
+            <td>1000</td>
+            <td class="cell-match">C_150</td>
+            <td>$8.50</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="callout anim-up" style="--i:12">
+    <strong>Notice:</strong> The conversion's <code>campaign_id</code> is C_150 (the negotiable that accepted), not C_100 (the top-tier that placed the bid). The <span data-annotation-id="conversion-campaign-mismatch"><code>ON</code> clause must account for this mismatch</span> to attribute revenue correctly.
+  </div>
+
+  <!-- ============================================================
        FOOTER
        ============================================================ -->
   <div class="footer anim-up" style="--i:99">
