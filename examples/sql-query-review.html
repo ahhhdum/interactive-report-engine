@@ -362,6 +362,46 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   </div>
 
   <!-- ============================================================
+       DATA MODEL — Data Flow Diagram
+       ============================================================ -->
+  <div class="anim-up" style="--i:5">
+    <div class="section-label">Data Model</div>
+  </div>
+
+  <div class="dag-container anim-up" style="--i:6">
+    <div class="dag-row">
+      <div class="dag-node" data-annotation-id="dag-applications" onclick="document.getElementById('section-campaign-roles').scrollIntoView({behavior:'smooth'})">applications</div>
+      <div class="dag-node" data-annotation-id="dag-attempts" onclick="document.getElementById('section-example-app').scrollIntoView({behavior:'smooth'})">attempts</div>
+      <div class="dag-node" data-annotation-id="dag-conversions" onclick="document.getElementById('section-conversion').scrollIntoView({behavior:'smooth'})">conversions</div>
+      <div class="dag-node" data-annotation-id="dag-tier-campaign-buffer" onclick="document.getElementById('section-campaign-roles').scrollIntoView({behavior:'smooth'})">tier_campaign_buffer</div>
+    </div>
+    <div class="dag-row">
+      <div class="dag-edge-label">application_id</div>
+      <div class="dag-edge-label">campaign_id</div>
+      <div class="dag-edge-label">parent_campaign_id</div>
+    </div>
+    <div class="dag-row">
+      <div class="dag-arrow">&darr;</div>
+    </div>
+    <div class="dag-row">
+      <div class="dag-node cte" data-annotation-id="dag-attempt-revenue" onclick="document.getElementById('section-join-strategies').scrollIntoView({behavior:'smooth'})">attempt_revenue</div>
+    </div>
+    <div class="dag-row">
+      <div class="dag-edge-label">GROUP BY parent_campaign_id</div>
+    </div>
+    <div class="dag-row">
+      <div class="dag-arrow">&darr;</div>
+    </div>
+    <div class="dag-row">
+      <div class="dag-node output" data-annotation-id="dag-partner-revenue">partner_revenue_summary</div>
+    </div>
+  </div>
+
+  <div class="callout callout--blue anim-up" style="--i:7">
+    <strong>Key question:</strong> How should attempt_revenue join conversions to attempts? The join strategy determines whether revenue is attributed precisely or spread across all campaigns that touched an application.
+  </div>
+
+  <!-- ============================================================
        FOOTER
        ============================================================ -->
   <div class="footer anim-up" style="--i:99">
