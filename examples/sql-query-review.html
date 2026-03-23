@@ -724,6 +724,60 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   </div>
 
   <!-- ============================================================
+       DIRECT BUYS — Verification
+       ============================================================ -->
+  <div class="anim-up" style="--i:16">
+    <div class="section-label">Direct Buys</div>
+  </div>
+
+  <div class="lit-section anim-up" style="--i:17">
+    <div class="lit-prose">
+      <p><span class="step-num">4</span> <strong>Direct Buys Work with Option B</strong></p>
+      <p>When a top-tier campaign buys directly without placing a bid, its campaign_id appears on both the attempt and the conversion. Option B's join on <code>(application_id, campaign_id)</code> matches correctly because <span data-annotation-id="direct-buy-match"><code>attempt.campaign_id (C_100) = conversion.campaign_id (C_100)</code></span>.</p>
+      <p>No revenue is lost and no revenue is double-counted. Direct buys and price reject setups both produce correct attribution under Option B.</p>
+    </div>
+    <div class="lit-code">
+      <table class="data-table" data-table-id="direct-buy-attempts">
+        <thead>
+          <tr><th>Attempt</th><th>campaign_id</th><th>parent_campaign_id</th><th>approved</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="direct-att-601">
+            <td>att_601</td>
+            <td class="cell-match">C_100</td>
+            <td>C_100</td>
+            <td>true (direct buy)</td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="data-table" data-table-id="direct-buy-conversion" style="margin-top: 0.75rem;">
+        <thead>
+          <tr><th>conversion_id</th><th>application_id</th><th>campaign_id</th><th>price</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="direct-conv-888">
+            <td>conv_888</td>
+            <td>2000</td>
+            <td class="cell-match">C_100</td>
+            <td>$12.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Summary Callout -->
+  <div class="callout callout--blue anim-up" style="--i:18">
+    <strong>Recommendation: Option B.</strong> Join conversions on <code>(application_id, campaign_id)</code> instead of <code>(application_id, parent_campaign_id)</code>.
+    <ul style="margin: 0.5rem 0 0 1.25rem; font-size: 0.85rem; line-height: 1.7;">
+      <li><strong>Direct buys:</strong> campaign_id matches on both sides. Revenue is attributed correctly.</li>
+      <li><strong>Price reject:</strong> Only the negotiable attempt's campaign_id matches the conversion. Revenue flows to the correct parent_campaign_id group via Stage 2 aggregation.</li>
+      <li><strong>Unrelated campaigns:</strong> C_200 never matches C_150's conversion and correctly gets $0.</li>
+      <li><strong>Production ETL uses Option A</strong> because the overcount was acceptable for its use case. For the Dynamic RLA algorithm, precise attribution matters more.</li>
+    </ul>
+  </div>
+
+  <!-- ============================================================
        FOOTER
        ============================================================ -->
   <div class="footer anim-up" style="--i:99">
