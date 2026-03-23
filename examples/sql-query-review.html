@@ -351,18 +351,13 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   </div>
 
   <!-- ============================================================
-       THE DATA MODEL — Literate SQL Sections
+       CONTEXT — The Data Model
        ============================================================ -->
   <div class="anim-up" style="--i:5">
-    <div class="section-label">The Data Model</div>
+    <div class="section-label">Context</div>
   </div>
 
-  <div class="callout callout--blue anim-up" style="--i:6">
-    <strong>Four tables are involved:</strong> <code>applications</code>, <code>attempts</code>, <code>conversions</code>, and <code>tier_campaign_buffer</code>. The key question is how to join conversions to attempts so that revenue is attributed to the correct campaign.
-  </div>
-
-  <!-- Section 1: Campaign Roles -->
-  <div class="lit-section anim-up" style="--i:7" id="section-campaign-roles">
+  <div class="lit-section anim-up" style="--i:6" id="section-campaign-roles">
     <div class="lit-prose">
       <p><span class="step-num">1</span> <strong>Campaign Roles in Price Reject Setups</strong></p>
       <p>One application generates multiple attempts, one per campaign pinged. Some campaigns participate in price reject setups where a top-tier campaign places a bid, and a negotiable "catcher" campaign fulfills it.</p>
@@ -389,12 +384,10 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     </div>
   </div>
 
-  <!-- Section 2: Example Application #1000 -->
-  <div class="lit-section anim-up" style="--i:8" id="section-example-app">
+  <div class="lit-section anim-up" style="--i:7" id="section-example-app">
     <div class="lit-prose">
-      <p><span class="step-num">2</span> <strong>Example Application #1000</strong></p>
-      <p>An application enters the ping tree and gets pinged to approximately 75 campaigns. Three of them are relevant to this scenario.</p>
-      <p>Attempt att_501 is the top-tier campaign C_100, which places a bid at $60. Attempt att_502 is an unrelated top-tier campaign C_200, which does not buy. Attempt att_503 is the negotiable campaign C_150, which catches C_100's bid and accepts it.</p>
+      <p><span class="step-num">2</span> <strong>Example: Application #1000</strong></p>
+      <p>An application enters the ping tree and gets pinged to approximately 75 campaigns. Three are relevant: a top-tier (C_100) that bids, an unrelated top-tier (C_200) that does not buy, and a negotiable (C_150) that catches C_100's bid.</p>
     </div>
     <div class="lit-code">
       <table class="data-table" data-table-id="attempts">
@@ -425,12 +418,10 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     </div>
   </div>
 
-  <!-- Section 3: The Conversion -->
-  <div class="lit-section anim-up" style="--i:9" id="section-conversion">
+  <div class="lit-section anim-up" style="--i:8" id="section-conversion">
     <div class="lit-prose">
       <p><span class="step-num">3</span> <strong>The Conversion</strong></p>
-      <p>The conversion records which campaign actually completed the sale. Because the negotiable campaign C_150 accepted the bid, the conversion's <code>campaign_id</code> is C_150, not C_100.</p>
-      <p>This mismatch between the conversion's campaign_id and the top-tier's campaign_id is the root cause of the join problem.</p>
+      <p>The conversion records <code>campaign_id = C_150</code> (the negotiable), not C_100 (the top-tier that bid). This mismatch is the root cause of the join problem.</p>
     </div>
     <div class="lit-code">
       <table class="data-table" data-table-id="conversion">
@@ -449,144 +440,70 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     </div>
   </div>
 
-  <div class="callout anim-up" style="--i:10">
-    <strong>Notice:</strong> The conversion's <code>campaign_id</code> is C_150 (the negotiable that accepted), not C_100 (the top-tier that placed the bid). The <span data-annotation-id="conversion-campaign-mismatch"><code>ON</code> clause must account for this mismatch</span> to attribute revenue correctly.
+  <!-- ============================================================
+       THE PROBLEM — Current Broken Join
+       ============================================================ -->
+  <div class="anim-up" style="--i:9">
+    <div class="section-label">The Problem</div>
+  </div>
+
+  <div class="lit-section anim-up" style="--i:10">
+    <div class="lit-prose">
+      <p><span class="step-num">4</span> <strong>The Current Join is Broken</strong></p>
+      <p>The existing query joins on <code>parent_campaign_id</code>, which is C_100 for both the top-tier and the negotiable. The conversion's campaign_id is C_150. The condition <span data-annotation-id="broken-join-clause"><code>parent_campaign_id = conversion.campaign_id</code></span> never matches for price reject setups, producing zero revenue for all attempts.</p>
+    </div>
+    <div class="lit-code">
+      <div class="sql-block">
+        <span class="sql-clause"><span class="sql-kw">LEFT JOIN</span> conversion_cte</span>
+        <span class="sql-clause">&nbsp;&nbsp;<span class="sql-kw">ON</span> attempt.application_id = conversion.application_id</span>
+        <span class="sql-clause">&nbsp;&nbsp;<span class="sql-kw">AND</span> attempt.parent_campaign_id = conversion.campaign_id</span>
+      </div>
+      <table class="data-table" data-table-id="broken-results" style="margin-top: 0.75rem;">
+        <thead>
+          <tr><th>Attempt</th><th>parent_campaign_id</th><th>conv campaign_id</th><th>Match?</th><th>Revenue</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="broken-att-501">
+            <td>att_501</td>
+            <td>C_100</td>
+            <td>C_150</td>
+            <td class="cell-miss">C_100 != C_150</td>
+            <td class="cell-miss">$0</td>
+          </tr>
+          <tr data-row-id="broken-att-502">
+            <td>att_502</td>
+            <td>C_200</td>
+            <td>C_150</td>
+            <td class="cell-miss">C_200 != C_150</td>
+            <td class="cell-miss">$0</td>
+          </tr>
+          <tr data-row-id="broken-att-503">
+            <td>att_503</td>
+            <td>C_100</td>
+            <td>C_150</td>
+            <td class="cell-miss">C_100 != C_150</td>
+            <td class="cell-miss">$0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- ============================================================
-       QUERY COMPARISON — Decision Group
+       THE DECISION — Which Join Strategy?
        ============================================================ -->
   <div class="anim-up" style="--i:11" id="section-join-strategies">
-    <div class="section-label">Join Strategies</div>
+    <div class="section-label">The Decision</div>
   </div>
 
   <div class="decision-group anim-up" style="--i:12">
     <div class="decision-header">
-      <div class="decision-question">How should attempt_revenue join conversions?</div>
-      <div class="decision-context">Three join strategies produce different revenue attribution. Review each option and select the correct approach for DRLA training data.</div>
+      <div class="decision-question">Which join strategy should replace the broken one?</div>
+      <div class="decision-context">Two viable alternatives. Select an approach and dismiss the other with a note.</div>
     </div>
     <div class="decision-options">
 
-      <!-- Card 1: BROKEN (current join) -->
-      <div class="alert-card severity-action" data-alert-id="join-broken" data-severity="action">
-        <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('join-broken')"></label>
-        <div class="alert-content">
-          <div class="alert-title">Current: Join on parent_campaign_id</div>
-          <div class="alert-meta">
-            <span class="badge badge--red">BROKEN</span>
-          </div>
-          <div class="alert-desc">The current query joins on <code>attempt.parent_campaign_id = conversion.campaign_id</code>. Because the conversion records the negotiable's campaign_id (C_150), and the top-tier's parent_campaign_id is its own campaign_id (C_100), this condition never matches for price reject setups.</div>
-          <div class="sql-block">
-            <span class="sql-clause"><span class="sql-kw">LEFT JOIN</span> conversion_cte</span>
-            <span class="sql-clause">&nbsp;&nbsp;<span class="sql-kw">ON</span> attempt.application_id = conversion.application_id</span>
-            <span class="sql-clause" data-annotation-id="broken-join-clause">&nbsp;&nbsp;<span class="sql-kw">AND</span> attempt.parent_campaign_id = conversion.campaign_id</span>
-          </div>
-          <details>
-            <summary>Sample results (3 rows)</summary>
-            <div style="overflow-x:auto; padding: 0 0 8px;">
-              <table class="data-table" data-table-id="broken-results">
-                <thead>
-                  <tr><th>Attempt</th><th>campaign_id</th><th>parent_campaign_id</th><th>conv campaign_id</th><th>Match?</th><th>Revenue</th></tr>
-                </thead>
-                <tbody>
-                  <tr data-row-id="broken-att-501">
-                    <td>att_501</td>
-                    <td>C_100</td>
-                    <td>C_100</td>
-                    <td>C_150</td>
-                    <td class="cell-miss">C_100 != C_150</td>
-                    <td class="cell-miss">$0</td>
-                  </tr>
-                  <tr data-row-id="broken-att-502">
-                    <td>att_502</td>
-                    <td>C_200</td>
-                    <td>C_200</td>
-                    <td>C_150</td>
-                    <td class="cell-miss">C_200 != C_150</td>
-                    <td class="cell-miss">$0</td>
-                  </tr>
-                  <tr data-row-id="broken-att-503">
-                    <td>att_503</td>
-                    <td>C_150</td>
-                    <td>C_100</td>
-                    <td>C_150</td>
-                    <td class="cell-miss">C_100 != C_150</td>
-                    <td class="cell-miss">$0</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </details>
-          <div class="alert-actions">
-            <span class="quick-action" data-action="Reject: parent_campaign_id never matches negotiable conversion" onclick="selectAction(this)">Reject: parent_campaign_id never matches</span>
-          </div>
-          <div class="alert-note-toggle" onclick="toggleNote('join-broken')">+ Add note</div>
-          <div id="note-join-broken" style="display:none"><textarea class="alert-note" data-id="join-broken" placeholder="Notes..."></textarea></div>
-        </div>
-      </div>
-
-      <div class="decision-divider"><span>or</span></div>
-
-      <!-- Card 2: Option A (application_id only) -->
-      <div class="alert-card severity-review" data-alert-id="join-option-a" data-severity="review">
-        <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('join-option-a')"></label>
-        <div class="alert-content">
-          <div class="alert-title">Option A: Join on application_id only</div>
-          <div class="alert-meta">
-            <span class="badge badge--amber">OVERCOUNTS</span>
-            <span class="badge badge--green">PRODUCTION ETL</span>
-          </div>
-          <div class="alert-desc">Joining only on <code>application_id</code> means every attempt for the same application gets the conversion's revenue. This spreads revenue to campaigns that had nothing to do with the sale. The production ETL uses this approach because the overcount was acceptable for its use case.</div>
-          <div class="sql-block">
-            <span class="sql-clause"><span class="sql-kw">LEFT JOIN</span> conversion_cte</span>
-            <span class="sql-clause">&nbsp;&nbsp;<span class="sql-kw">ON</span> attempt.application_id = conversion.application_id</span>
-            <span class="sql-clause diff-del">&nbsp;&nbsp;<span class="sql-comment">-- missing: AND attempt.campaign_id = conversion.campaign_id</span></span>
-          </div>
-          <details>
-            <summary>Sample results (3 rows)</summary>
-            <div style="overflow-x:auto; padding: 0 0 8px;">
-              <table class="data-table" data-table-id="option-a-results">
-                <thead>
-                  <tr><th>Attempt</th><th>campaign_id</th><th>parent_campaign_id</th><th>Match?</th><th>Revenue</th></tr>
-                </thead>
-                <tbody>
-                  <tr data-row-id="opt-a-att-501">
-                    <td>att_501</td>
-                    <td>C_100</td>
-                    <td>C_100</td>
-                    <td class="cell-match">app_id match</td>
-                    <td>$8.50</td>
-                  </tr>
-                  <tr data-row-id="opt-a-att-502">
-                    <td>att_502</td>
-                    <td>C_200</td>
-                    <td>C_200</td>
-                    <td class="cell-match">app_id match</td>
-                    <td class="cell-miss">$8.50</td>
-                  </tr>
-                  <tr data-row-id="opt-a-att-503">
-                    <td>att_503</td>
-                    <td>C_150</td>
-                    <td>C_100</td>
-                    <td class="cell-match">app_id match</td>
-                    <td>$8.50</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </details>
-          <div class="alert-actions">
-            <span class="quick-action" data-action="Accept Option A: application_id join is simpler, overcount acceptable" onclick="selectAction(this)">Accept: simpler, overcount acceptable</span>
-            <span class="quick-action" data-action="Reject Option A: overcount is not acceptable for DRLA precision" onclick="selectAction(this)">Reject: overcount not acceptable for DRLA</span>
-          </div>
-          <div class="alert-note-toggle" onclick="toggleNote('join-option-a')">+ Add note</div>
-          <div id="note-join-option-a" style="display:none"><textarea class="alert-note" data-id="join-option-a" placeholder="Notes..."></textarea></div>
-        </div>
-      </div>
-
-      <div class="decision-divider"><span>or</span></div>
-
-      <!-- Card 3: Option B (application_id + campaign_id) -->
+      <!-- Option B: Recommended (first) -->
       <div class="alert-card severity-routine" data-alert-id="join-option-b" data-severity="routine">
         <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('join-option-b')"></label>
         <div class="alert-content">
@@ -595,7 +512,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
             <span class="badge badge--green">Recommended</span>
             <span class="badge badge--green">PRECISE</span>
           </div>
-          <div class="alert-desc">Adding <code>attempt.campaign_id = conversion.campaign_id</code> restricts the join to only the attempt whose campaign actually completed the conversion. Only the negotiable attempt (C_150) matches, and its parent_campaign_id (C_100) correctly receives the revenue in Stage 2 aggregation.</div>
+          <div class="alert-desc">Adding <code>attempt.campaign_id = conversion.campaign_id</code> restricts the join to only the attempt whose campaign completed the conversion. Only the negotiable (C_150) matches, and its parent_campaign_id (C_100) correctly receives the revenue in Stage 2 aggregation.</div>
           <div class="sql-block">
             <span class="sql-clause"><span class="sql-kw">LEFT JOIN</span> conversion_cte</span>
             <span class="sql-clause">&nbsp;&nbsp;<span class="sql-kw">ON</span> attempt.application_id = conversion.application_id</span>
@@ -606,12 +523,11 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
             <div style="overflow-x:auto; padding: 0 0 8px;">
               <table class="data-table" data-table-id="option-b-results">
                 <thead>
-                  <tr><th>Attempt</th><th>campaign_id</th><th>parent_campaign_id</th><th>conv campaign_id</th><th>Match?</th><th>Revenue</th></tr>
+                  <tr><th>Attempt</th><th>campaign_id</th><th>conv campaign_id</th><th>Match?</th><th>Revenue</th></tr>
                 </thead>
                 <tbody>
                   <tr data-row-id="opt-b-att-501">
                     <td>att_501</td>
-                    <td>C_100</td>
                     <td>C_100</td>
                     <td>C_150</td>
                     <td class="cell-neutral">C_100 != C_150</td>
@@ -620,7 +536,6 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
                   <tr data-row-id="opt-b-att-502">
                     <td>att_502</td>
                     <td>C_200</td>
-                    <td>C_200</td>
                     <td>C_150</td>
                     <td class="cell-neutral">C_200 != C_150</td>
                     <td>$0</td>
@@ -628,7 +543,6 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
                   <tr data-row-id="opt-b-att-503">
                     <td>att_503</td>
                     <td>C_150</td>
-                    <td>C_100</td>
                     <td>C_150</td>
                     <td class="cell-match">C_150 = C_150</td>
                     <td class="cell-match">$8.50</td>
@@ -638,32 +552,93 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
             </div>
           </details>
           <div class="alert-actions">
-            <span class="quick-action" data-action="Approve Option B: precise attribution via campaign_id match" onclick="selectAction(this)">Approve: precise attribution via campaign_id</span>
+            <span class="quick-action" data-action="Approve Option B: precise attribution via campaign_id match" onclick="selectAction(this)">Approve: precise attribution</span>
           </div>
           <div class="alert-note-toggle" onclick="toggleNote('join-option-b')">+ Add note</div>
           <div id="note-join-option-b" style="display:none"><textarea class="alert-note" data-id="join-option-b" placeholder="Notes..."></textarea></div>
         </div>
       </div>
 
+      <div class="decision-divider"><span>or</span></div>
+
+      <!-- Option A: Simpler but overcounts -->
+      <div class="alert-card severity-review" data-alert-id="join-option-a" data-severity="review">
+        <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('join-option-a')"></label>
+        <div class="alert-content">
+          <div class="alert-title">Option A: Join on application_id only</div>
+          <div class="alert-meta">
+            <span class="badge badge--amber">OVERCOUNTS</span>
+            <span class="badge badge--muted">PRODUCTION ETL</span>
+          </div>
+          <div class="alert-desc">Joining only on <code>application_id</code> matches every attempt for the same application. Revenue spreads to campaigns that had nothing to do with the sale. The production ETL uses this approach because the overcount was acceptable for its reporting use case.</div>
+          <div class="sql-block">
+            <span class="sql-clause"><span class="sql-kw">LEFT JOIN</span> conversion_cte</span>
+            <span class="sql-clause">&nbsp;&nbsp;<span class="sql-kw">ON</span> attempt.application_id = conversion.application_id</span>
+            <span class="sql-clause diff-del">&nbsp;&nbsp;<span class="sql-comment">-- missing: AND attempt.campaign_id = conversion.campaign_id</span></span>
+          </div>
+          <details>
+            <summary>Sample results (3 rows)</summary>
+            <div style="overflow-x:auto; padding: 0 0 8px;">
+              <table class="data-table" data-table-id="option-a-results">
+                <thead>
+                  <tr><th>Attempt</th><th>campaign_id</th><th>Match?</th><th>Revenue</th></tr>
+                </thead>
+                <tbody>
+                  <tr data-row-id="opt-a-att-501">
+                    <td>att_501</td>
+                    <td>C_100</td>
+                    <td class="cell-match">app_id match</td>
+                    <td>$8.50</td>
+                  </tr>
+                  <tr data-row-id="opt-a-att-502">
+                    <td>att_502</td>
+                    <td>C_200</td>
+                    <td class="cell-match">app_id match</td>
+                    <td class="cell-miss">$8.50 (unearned)</td>
+                  </tr>
+                  <tr data-row-id="opt-a-att-503">
+                    <td>att_503</td>
+                    <td>C_150</td>
+                    <td class="cell-match">app_id match</td>
+                    <td>$8.50</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+          <div class="alert-actions">
+            <span class="quick-action" data-action="Accept Option A: simpler join, overcount acceptable for this use case" onclick="selectAction(this)">Accept: simpler, overcount acceptable</span>
+            <span class="quick-action" data-action="Reject Option A: overcount not acceptable for DRLA precision" onclick="selectAction(this)">Reject: overcounts for DRLA</span>
+          </div>
+          <div class="alert-note-toggle" onclick="toggleNote('join-option-a')">+ Add note</div>
+          <div id="note-join-option-a" style="display:none"><textarea class="alert-note" data-id="join-option-a" placeholder="Notes..."></textarea></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- Stage 2 Aggregation Comparison -->
-  <div class="lit-section anim-up" style="--i:13">
+  <!-- ============================================================
+       VERIFICATION — Supporting Evidence
+       ============================================================ -->
+  <div class="anim-up" style="--i:13">
+    <div class="section-label">Verification</div>
+  </div>
+
+  <div class="lit-section anim-up" style="--i:14">
     <div class="lit-prose">
-      <p><span class="step-num">S2</span> <strong>Stage 2: Aggregation by parent_campaign_id</strong></p>
-      <p>Stage 2 groups attempts by <code>(partner_id, parent_campaign_id, affiliate, state, presented_rla)</code>. The join strategy from Stage 1 determines which attempts carry revenue into this grouping.</p>
-      <p>Option A double-counts revenue for C_100 and assigns unearned revenue to C_200. Option B attributes the $8.50 only to C_100's group, which is the correct outcome for DRLA training data.</p>
+      <p><span class="step-num">5</span> <strong>Stage 2 Aggregation</strong></p>
+      <p>Stage 2 groups attempts by <code>parent_campaign_id</code>. Option A double-counts revenue for C_100 and assigns unearned revenue to C_200. Option B attributes the $8.50 only to C_100's group.</p>
     </div>
     <div class="lit-code">
       <table class="comparison-table">
         <thead>
-          <tr><th>parent_campaign_id</th><th>Option A Revenue</th><th>Option B Revenue</th></tr>
+          <tr><th>parent_campaign_id</th><th>Option A</th><th>Option B</th></tr>
         </thead>
         <tbody>
           <tr>
             <td>C_100</td>
-            <td class="negative">$17.00 (double-counted)</td>
+            <td class="negative">$17.00 (double)</td>
             <td class="positive">$8.50 (correct)</td>
           </tr>
           <tr>
@@ -676,41 +651,31 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     </div>
   </div>
 
-  <!-- ============================================================
-       DIRECT BUYS — Verification
-       ============================================================ -->
-  <div class="anim-up" style="--i:14">
-    <div class="section-label">Direct Buys</div>
-  </div>
-
   <div class="lit-section anim-up" style="--i:15">
     <div class="lit-prose">
-      <p><span class="step-num">4</span> <strong>Direct Buys Work with Option B</strong></p>
-      <p>When a top-tier campaign buys directly without placing a bid, its campaign_id appears on both the attempt and the conversion. Option B's join on <code>(application_id, campaign_id)</code> matches correctly because <span data-annotation-id="direct-buy-match"><code>attempt.campaign_id (C_100) = conversion.campaign_id (C_100)</code></span>.</p>
-      <p>No revenue is lost and no revenue is double-counted. Direct buys and price reject setups both produce correct attribution under Option B.</p>
+      <p><span class="step-num">6</span> <strong>Direct Buys</strong></p>
+      <p>When a top-tier buys directly (no price reject), <span data-annotation-id="direct-buy-match"><code>campaign_id</code> matches on both sides</span>. Option B handles this correctly. No revenue is lost.</p>
     </div>
     <div class="lit-code">
       <table class="data-table" data-table-id="direct-buy-attempts">
         <thead>
-          <tr><th>Attempt</th><th>campaign_id</th><th>parent_campaign_id</th><th>approved</th></tr>
+          <tr><th>Attempt</th><th>campaign_id</th><th>approved</th></tr>
         </thead>
         <tbody>
           <tr data-row-id="direct-att-601">
             <td>att_601</td>
             <td class="cell-match">C_100</td>
-            <td>C_100</td>
             <td>true (direct buy)</td>
           </tr>
         </tbody>
       </table>
       <table class="data-table" data-table-id="direct-buy-conversion" style="margin-top: 0.75rem;">
         <thead>
-          <tr><th>conversion_id</th><th>application_id</th><th>campaign_id</th><th>price</th></tr>
+          <tr><th>conversion_id</th><th>campaign_id</th><th>price</th></tr>
         </thead>
         <tbody>
           <tr data-row-id="direct-conv-888">
             <td>conv_888</td>
-            <td>2000</td>
             <td class="cell-match">C_100</td>
             <td>$12.00</td>
           </tr>
@@ -719,15 +684,9 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
     </div>
   </div>
 
-  <!-- Summary Callout -->
+  <!-- Summary -->
   <div class="callout callout--blue anim-up" style="--i:16">
-    <strong>Recommendation: Option B.</strong> Join conversions on <code>(application_id, campaign_id)</code> instead of <code>(application_id, parent_campaign_id)</code>.
-    <ul style="margin: 0.5rem 0 0 1.25rem; font-size: 0.85rem; line-height: 1.7;">
-      <li><strong>Direct buys:</strong> campaign_id matches on both sides. Revenue is attributed correctly.</li>
-      <li><strong>Price reject:</strong> Only the negotiable attempt's campaign_id matches the conversion. Revenue flows to the correct parent_campaign_id group via Stage 2 aggregation.</li>
-      <li><strong>Unrelated campaigns:</strong> C_200 never matches C_150's conversion and correctly gets $0.</li>
-      <li><strong>Production ETL uses Option A</strong> because the overcount was acceptable for its use case. For the Dynamic RLA algorithm, precise attribution matters more.</li>
-    </ul>
+    <strong>Summary:</strong> Option B (join on <code>application_id + campaign_id</code>) produces correct attribution for both price reject setups and direct buys. The production ETL uses Option A because the overcount is acceptable for reporting. For the Dynamic RLA algorithm, precision matters more.
   </div>
 
   <!-- ============================================================
