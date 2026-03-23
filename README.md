@@ -23,11 +23,15 @@ interactive-report-engine/
 ├── interactive-report-engine.publish.md    # Publishing description
 ├── docs/
 │   ├── pattern-guide.md                    # Detailed 3-layer pattern documentation
-│   └── architecture.md                     # Concise architecture overview
+│   ├── architecture.md                     # Concise architecture overview
+│   └── skill-design-guide.md              # Layered freedom model for skill authoring
 ├── examples/
-│   ├── operations-dashboard.html           # Working example with demo data
+│   ├── operations-dashboard.html           # Triage workflow example
 │   ├── operations-dashboard-prompt.md      # Prompt template for the example
-│   └── anniversary-trip-planner.html       # Planning dashboard example
+│   ├── anniversary-trip-planner.html       # Planning dashboard with venue options
+│   ├── dois-2587-technical-review.html     # Technical ticket review with decision groups
+│   ├── config-chooser.html                 # Visual config picker (standalone variant)
+│   └── config-chooser-prompt.md            # Prompt template for config choosers
 └── .gitignore
 ```
 
