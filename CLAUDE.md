@@ -12,10 +12,16 @@ interactive-report-engine/
 ├── interactive-report-engine.publish.md    # internal docs site description
 ├── docs/
 │   ├── pattern-guide.md               # Detailed 3-layer pattern documentation
-│   └── architecture.md                # Concise architecture overview
+│   ├── architecture.md                # Concise architecture overview
+│   └── skill-design-guide.md          # Layered freedom model for skill authoring
 ├── examples/
-│   ├── operations-dashboard.html      # Working example with demo data
-│   └── operations-dashboard-prompt.md # Prompt template for the example
+│   ├── operations-dashboard.html      # Triage workflow example
+│   ├── operations-dashboard-prompt.md # Prompt template for the example
+│   ├── anniversary-trip-planner.html  # Planning dashboard with venue options
+│   ├── dois-2587-technical-review.html # Technical ticket review with decision groups
+│   ├── config-chooser.html            # Visual config picker (standalone variant)
+│   ├── config-chooser-prompt.md       # Prompt template for config choosers
+│   └── sql-query-review.html          # SQL query walkthrough with annotatable clauses
 └── .gitignore
 ```
 
@@ -28,6 +34,8 @@ The engine template is a single self-contained HTML file (~1100 lines) with inli
 3. The CSS and JS require no changes
 
 The template is domain-agnostic. It works for compliance reviews, operations dashboards, experiment triage, or any workflow where a human reviews items and makes per-item decisions.
+
+The 3-layer pattern also supports standalone variants (like `config-chooser.html`) where the engine template's alert-card model does not fit. These share the same generate-review-feedback loop but produce structured code instead of markdown.
 
 ## Key Conventions
 

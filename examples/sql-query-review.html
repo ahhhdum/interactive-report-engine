@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><!-- REPORT_TITLE: Replace with your report title --></title>
+<title>DRLA Price Reject Join Review</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ================================================================
@@ -47,6 +47,8 @@
   --blue: #60a5fa;
   --blue-dim: rgba(96,165,250,0.1);
   --slate: #475569;
+  --purple: #c084fc;
+  --purple-dim: rgba(192,132,252,0.1);
 }
 
 @media (prefers-color-scheme: light) {
@@ -71,6 +73,8 @@
     --blue: #3b82f6;
     --blue-dim: rgba(59,130,246,0.08);
     --slate: #94a3b8;
+    --purple: #9333ea;
+    --purple-dim: rgba(147,51,234,0.08);
   }
 }
 
@@ -115,29 +119,11 @@ body {
 .kpi-card--amber .kpi-card__value { color: var(--amber); }
 .kpi-card--red .kpi-card__value { color: var(--red); }
 
-/* --- Pipeline --- */
-.pipeline-section { margin-bottom: 32px; }
-.pipeline { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 4px 0 8px; }
-.pipe-step { flex: 1; min-width: 80px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 8px; text-align: center; position: relative; }
-.pipe-step--done { border-color: var(--green); background: var(--green-dim); }
-.pipe-step--active { border-color: var(--accent); background: var(--accent-dim); }
-.pipe-step--pending { border-color: var(--border); opacity: 0.5; }
-.pipe-step__num { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--text-dim); margin-bottom: 4px; }
-.pipe-step--done .pipe-step__num { color: var(--green); }
-.pipe-step--active .pipe-step__num { color: var(--accent); }
-.pipe-step__name { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--text); }
-.pipe-arrow { display: flex; align-items: center; padding: 0 4px; color: var(--border-bright); font-size: 16px; flex-shrink: 0; }
-
 /* --- Section Label --- */
 .section-label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 .section-label::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 
-/* --- Decision Groups ---
-   Use when items are alternatives to each other (e.g., Option A vs B).
-   Options inside are standard alert cards wrapped in a .decision-options
-   container. They use the same state system (dismiss, notes, actions).
-   Filter bar does NOT apply to decision group cards.
-*/
+/* --- Decision Groups --- */
 .decision-group { background: var(--bg-subtle); border: 1px solid var(--border-bright); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
 .decision-header { margin-bottom: 16px; }
 .decision-question { font-family: var(--font-display); font-size: 22px; color: var(--text-bright); line-height: 1.3; margin-bottom: 6px; }
@@ -149,7 +135,7 @@ body {
 .decision-divider::before, .decision-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-bright); }
 .decision-divider span { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
 
-/* --- Comparison Table (non-interactive, inside decision groups) --- */
+/* --- Comparison Table --- */
 .comparison-table { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.5; }
 .comparison-table th { font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border-bright); }
 .comparison-table td { padding: 6px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
@@ -157,13 +143,6 @@ body {
 .comparison-table td.negative { color: var(--red); }
 .comparison-table td.neutral { color: var(--text-dim); }
 .comparison-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
-
-/* --- Filter Bar --- */
-.filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-.filter-btn { font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); cursor: pointer; transition: all 0.15s; }
-.filter-btn:hover { border-color: var(--border-bright); color: var(--text); }
-.filter-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-.filter-count { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin-left: auto; }
 
 /* --- Alert Cards --- */
 .alerts-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
@@ -180,7 +159,6 @@ body {
   transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease 0.1s, margin 0.3s ease;
 }
 
-/* Severity colors — add your own as needed */
 .alert-card.severity-action   { border-left-color: var(--red); }
 .alert-card.severity-escalate { border-left-color: var(--red); }
 .alert-card.severity-review   { border-left-color: var(--amber); }
@@ -235,7 +213,7 @@ body {
 .alert-note { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: var(--font-body); font-size: 12px; padding: 8px; margin-top: 6px; resize: vertical; min-height: 48px; }
 .alert-note:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
 
-/* --- Inline Annotations (feature: data-annotatable on body) --- */
+/* --- Inline Annotations --- */
 body[data-annotatable] [data-annotation-id] { cursor: pointer; position: relative; border-bottom: 1px dashed var(--border-bright); }
 body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--accent); }
 .annotation-input { width: 100%; background: var(--bg); border: 1px solid var(--accent); border-radius: 4px; color: var(--text); font-family: var(--font-body); font-size: 12px; padding: 6px 8px; margin-top: 4px; resize: none; min-height: 32px; }
@@ -293,217 +271,429 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
 @media (max-width: 768px) {
   body { padding: 20px 16px 80px; }
   .kpi-row { grid-template-columns: repeat(2, 1fr); }
-  .pipeline { flex-wrap: wrap; gap: 6px; }
-  .pipe-arrow { display: none; }
   .hero h1 { font-size: 32px; }
   .decision-question { font-size: 18px; }
 }
+
+/* ================================================================
+   SQL COMPONENT PATTERNS — Additional CSS
+   ================================================================ */
+
+/* Pattern 1: Annotatable SQL Blocks */
+.sql-block { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 0.75rem 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.7; overflow-x: auto; }
+.sql-clause { display: block; padding: 0.3rem 0.5rem; border-radius: 4px; border-left: 3px solid transparent; cursor: pointer; transition: all 0.15s; }
+.sql-clause:hover { background: var(--accent-dim); border-left-color: var(--accent); }
+.sql-kw { color: var(--blue); font-weight: 600; }
+.sql-str { color: var(--green); }
+.sql-fn { color: var(--purple); }
+.sql-tbl { color: var(--amber); }
+.sql-comment { color: var(--text-dim); font-style: italic; }
+
+/* Pattern 2: Literate SQL Sections */
+.lit-section { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0.5rem 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.lit-prose { padding: 1rem 1.25rem; font-size: 0.88rem; background: var(--surface); line-height: 1.6; }
+.lit-code { padding: 1rem 1.25rem; font-family: var(--font-mono); font-size: 0.8rem; background: var(--bg-subtle); line-height: 1.7; overflow-x: auto; }
+.step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; background: var(--accent-dim); color: var(--accent); border-radius: 50%; font-size: 0.72rem; font-weight: 700; margin-right: 0.5rem; font-family: var(--font-mono); }
+@media (max-width: 768px) { .lit-section { grid-template-columns: 1fr; } }
+
+/* Pattern 3: Query Comparison (diff highlighting) */
+.diff-add { background: var(--green-dim); }
+.diff-del { background: var(--red-dim); text-decoration: line-through; opacity: 0.6; }
+.diff-same { opacity: 0.5; }
+
+/* Pattern 4: Sample Data Tables (cell highlighting) */
+.cell-match { background: var(--green-dim); font-weight: 600; }
+.cell-miss { background: var(--red-dim); color: var(--red); font-weight: 500; }
+.cell-neutral { color: var(--text-dim); }
+
+/* Callout boxes */
+.callout { background: var(--amber-dim); border-left: 3px solid var(--amber); padding: 0.75rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; font-size: 0.88rem; }
+.callout strong { color: var(--amber); }
+.callout.callout--blue { background: var(--blue-dim); border-left-color: var(--blue); }
+.callout.callout--blue strong { color: var(--blue); }
 </style>
 </head>
 
-<!--
-  BODY ATTRIBUTES (feature flags):
-    data-multiaction  — allow selecting multiple action pills per card
-    data-annotatable  — enable click-to-annotate on [data-annotatable] elements
-    data-no-persist   — disable localStorage state saving
-    data-report-title — title used in the Copy Review Summary heading
-    data-report-date  — date used in the summary heading (YYYY-MM-DD)
--->
-<body data-report-title="Report" data-report-date="">
+<body data-annotatable data-report-title="DRLA Price Reject Join Review" data-report-date="2026-03-22">
 
 <div class="container">
 
   <!-- ============================================================
        HERO SECTION
-       Replace eyebrow, h1, subtitle, and meta with your content.
        ============================================================ -->
   <header class="hero anim-up" style="--i:0">
-    <div class="hero-eyebrow"><!-- HERO_EYEBROW: e.g. "Compliance Review Tool" --></div>
-    <h1><!-- HERO_TITLE: e.g. "CCPA Compliance Review" --></h1>
-    <div class="hero-sub"><!-- HERO_SUBTITLE: e.g. "Review, classify, and act on pending requests." --></div>
-    <div class="hero-meta"><!-- HERO_META: e.g. "March 20, 2026 | 13 requests | Interactive" --></div>
+    <div class="hero-eyebrow">SQL Query Review</div>
+    <h1>Price Reject Joins: How Revenue Flows</h1>
+    <div class="hero-sub">Understanding campaign attribution in DOIS for Dynamic RLA training data.</div>
+    <div class="hero-meta">DRLA Pipeline | 4 Tables | 3 Join Strategies | Interactive</div>
   </header>
 
   <!-- ============================================================
        KPI CARDS
-       Use kpi-card--accent, --green, --amber, --red for coloring.
-       Duplicate or remove cards as needed.
        ============================================================ -->
   <div class="kpi-row">
-    <div class="kpi-card anim-scale" style="--i:1">
-      <div class="kpi-card__value"><!-- KPI_1_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_1_LABEL --></div>
+    <div class="kpi-card kpi-card--accent anim-scale" style="--i:1">
+      <div class="kpi-card__value">4</div>
+      <div class="kpi-card__label">Tables</div>
     </div>
     <div class="kpi-card kpi-card--green anim-scale" style="--i:2">
-      <div class="kpi-card__value"><!-- KPI_2_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_2_LABEL --></div>
+      <div class="kpi-card__value">3</div>
+      <div class="kpi-card__label">Join Strategies</div>
     </div>
     <div class="kpi-card kpi-card--amber anim-scale" style="--i:3">
-      <div class="kpi-card__value"><!-- KPI_3_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_3_LABEL --></div>
+      <div class="kpi-card__value">1</div>
+      <div class="kpi-card__label">Recommended</div>
     </div>
     <div class="kpi-card kpi-card--red anim-scale" style="--i:4">
-      <div class="kpi-card__value"><!-- KPI_4_VALUE --></div>
-      <div class="kpi-card__label"><!-- KPI_4_LABEL --></div>
+      <div class="kpi-card__value">$8.50</div>
+      <div class="kpi-card__label">Test Revenue</div>
     </div>
   </div>
 
   <!-- ============================================================
-       PIPELINE (optional)
-       Shows workflow steps. Remove this section if not needed.
-       Use pipe-step--done, --active, --pending for state.
+       CONTEXT — The Data Model
        ============================================================ -->
-  <div class="pipeline-section anim-up" style="--i:5">
-    <div class="section-label"><!-- PIPELINE_LABEL: e.g. "Processing Pipeline" --></div>
-    <div class="pipeline">
-      <!-- PIPELINE_STEPS: Repeat this pattern for each step:
-      <div class="pipe-step pipe-step--done">
-        <div class="pipe-step__num">01</div>
-        <div class="pipe-step__name">Step Name</div>
+  <div class="anim-up" style="--i:5">
+    <div class="section-label">Context</div>
+  </div>
+
+  <div class="lit-section anim-up" style="--i:6" id="section-campaign-roles">
+    <div class="lit-prose">
+      <p><span class="step-num">1</span> <strong>Campaign Roles in Price Reject Setups</strong></p>
+      <p>One application generates multiple attempts, one per campaign pinged. Some campaigns participate in price reject setups where a top-tier campaign places a bid, and a negotiable "catcher" campaign fulfills it.</p>
+      <p>The <code>tier_campaign_buffer</code> table links negotiable campaigns to their top-tier parent via <code>parent_campaign_id</code>.</p>
+    </div>
+    <div class="lit-code">
+      <table class="data-table" data-table-id="campaign-roles">
+        <thead>
+          <tr><th>Role</th><th>negotiable</th><th>parent_campaign_id</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="role-top-tier">
+            <td>Top-Tier</td>
+            <td>false</td>
+            <td class="cell-match">= campaign_id (self)</td>
+          </tr>
+          <tr data-row-id="role-negotiable">
+            <td>Negotiable</td>
+            <td>true</td>
+            <td class="cell-match">= top-tier's campaign_id</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="lit-section anim-up" style="--i:7" id="section-example-app">
+    <div class="lit-prose">
+      <p><span class="step-num">2</span> <strong>Example: Application #1000</strong></p>
+      <p>An application enters the ping tree and gets pinged to approximately 75 campaigns. Three are relevant: a top-tier (C_100) that bids, an unrelated top-tier (C_200) that does not buy, and a negotiable (C_150) that catches C_100's bid.</p>
+    </div>
+    <div class="lit-code">
+      <table class="data-table" data-table-id="attempts">
+        <thead>
+          <tr><th>Attempt</th><th>campaign_id</th><th>parent_campaign_id</th><th>approved</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="att-501">
+            <td>att_501</td>
+            <td>C_100</td>
+            <td>C_100</td>
+            <td>false (bid $60)</td>
+          </tr>
+          <tr data-row-id="att-502">
+            <td>att_502</td>
+            <td>C_200</td>
+            <td>C_200</td>
+            <td>false</td>
+          </tr>
+          <tr data-row-id="att-503">
+            <td>att_503</td>
+            <td>C_150</td>
+            <td>C_100</td>
+            <td class="cell-match">true (accepted)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="lit-section anim-up" style="--i:8" id="section-conversion">
+    <div class="lit-prose">
+      <p><span class="step-num">3</span> <strong>The Conversion</strong></p>
+      <p>The conversion records <code>campaign_id = C_150</code> (the negotiable), not C_100 (the top-tier that bid). This mismatch is the root cause of the join problem.</p>
+    </div>
+    <div class="lit-code">
+      <table class="data-table" data-table-id="conversion">
+        <thead>
+          <tr><th>conversion_id</th><th>application_id</th><th>campaign_id</th><th>price</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="conv-999">
+            <td>conv_999</td>
+            <td>1000</td>
+            <td class="cell-match">C_150</td>
+            <td>$8.50</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       THE PROBLEM — Current Broken Join
+       ============================================================ -->
+  <div class="anim-up" style="--i:9">
+    <div class="section-label">The Problem</div>
+  </div>
+
+  <div class="lit-section anim-up" style="--i:10">
+    <div class="lit-prose">
+      <p><span class="step-num">4</span> <strong>The Current Join is Broken</strong></p>
+      <p>The existing query joins on <code>parent_campaign_id</code>, which is C_100 for both the top-tier and the negotiable. The conversion's campaign_id is C_150. The condition <span data-annotation-id="broken-join-clause"><code>parent_campaign_id = conversion.campaign_id</code></span> never matches for price reject setups, producing zero revenue for all attempts.</p>
+    </div>
+    <div class="lit-code">
+      <div class="sql-block">
+        <span class="sql-clause"><span class="sql-kw">LEFT JOIN</span> conversion_cte</span>
+        <span class="sql-clause">&nbsp;&nbsp;<span class="sql-kw">ON</span> attempt.application_id = conversion.application_id</span>
+        <span class="sql-clause">&nbsp;&nbsp;<span class="sql-kw">AND</span> attempt.parent_campaign_id = conversion.campaign_id</span>
       </div>
-      <div class="pipe-arrow">&rarr;</div>
-      -->
+      <table class="data-table" data-table-id="broken-results" style="margin-top: 0.75rem;">
+        <thead>
+          <tr><th>Attempt</th><th>parent_campaign_id</th><th>conv campaign_id</th><th>Match?</th><th>Revenue</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="broken-att-501">
+            <td>att_501</td>
+            <td>C_100</td>
+            <td>C_150</td>
+            <td class="cell-miss">C_100 != C_150</td>
+            <td class="cell-miss">$0</td>
+          </tr>
+          <tr data-row-id="broken-att-502">
+            <td>att_502</td>
+            <td>C_200</td>
+            <td>C_150</td>
+            <td class="cell-miss">C_200 != C_150</td>
+            <td class="cell-miss">$0</td>
+          </tr>
+          <tr data-row-id="broken-att-503">
+            <td>att_503</td>
+            <td>C_100</td>
+            <td>C_150</td>
+            <td class="cell-miss">C_100 != C_150</td>
+            <td class="cell-miss">$0</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <!-- ============================================================
-       DECISION GROUPS (optional)
-       Use when items are alternatives to each other (e.g., Option A
-       vs Option B for a delivery approach). Options inside are
-       standard alert cards wrapped in a .decision-options container.
-       They use the same state system (dismiss, notes, actions).
-       The filter bar does NOT apply to cards inside decision groups.
-
-       Remove this section if your report has only independent items.
+       THE DECISION — Which Join Strategy?
        ============================================================ -->
-  <!-- DECISION_GROUPS: Repeat this pattern for each decision:
-
-  <div class="anim-up" style="--i:6">
-    <div class="section-label">Decision</div>
+  <div class="anim-up" style="--i:11" id="section-join-strategies">
+    <div class="section-label">The Decision</div>
   </div>
 
-  <div class="decision-group anim-up" style="--i:7">
+  <div class="decision-group anim-up" style="--i:12">
     <div class="decision-header">
-      <div class="decision-question">What is the question being decided?</div>
-      <div class="decision-context">Instructions for the reviewer.</div>
+      <div class="decision-question">Which join strategy should replace the broken one?</div>
+      <div class="decision-context">Two viable alternatives. Select an approach and dismiss the other with a note.</div>
     </div>
     <div class="decision-options">
 
-      OPTION CARDS: Standard alert cards. Use severity to signal status:
-        routine (green)  = recommended option
-        anomaly (blue)   = viable alternative
-        review  (amber)  = option with concerns
-      Add badge--green "Recommended" badge ONLY when there is a clear rec.
-
-      <div class="alert-card severity-routine" data-alert-id="opt-a" data-severity="routine">
-        ... standard alert card structure ...
-      </div>
-      <div class="decision-divider"><span>or</span></div>
-      <div class="alert-card severity-anomaly" data-alert-id="opt-b" data-severity="anomaly">
-        ... standard alert card structure ...
-      </div>
-
-    </div>
-
-    OPTIONAL: Side-by-side comparison table (non-interactive).
-    Use .comparison-table class (no row flagging). Use .positive,
-    .negative, .neutral classes on <td> for color coding.
-
-  </div>
-
-  -->
-
-  <!-- ============================================================
-       FILTER BAR
-       Add filter buttons matching your severity types.
-       The filter bar applies only to the flat alerts-container
-       below, not to decision group cards above.
-       ============================================================ -->
-  <div class="anim-up" style="--i:6">
-    <div class="section-label"><!-- SECTION_LABEL: e.g. "Alerts" --></div>
-    <div class="filter-bar">
-      <button class="filter-btn active" onclick="filterCards('all')">All</button>
-      <!-- FILTER_BUTTONS: Add one per severity type:
-      <button class="filter-btn" onclick="filterCards('action')">Action</button>
-      <button class="filter-btn" onclick="filterCards('review')">Review</button>
-      <button class="filter-btn" onclick="filterCards('routine')">Routine</button>
-      -->
-      <span class="filter-count" id="visible-count"></span>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       ALERT CARDS
-       Each card needs:
-         data-alert-id="unique-id"
-         data-severity="action|review|anomaly|routine|ok|info|..."
-
-       Quick action pills need:
-         data-action="The literal instruction for Claude"
-
-       For collapsible tables inside cards, use <details> with
-       a .data-table inside. Table rows need data-row-id="unique".
-       ============================================================ -->
-  <div class="alerts-container" id="alerts-container">
-
-    <!-- ALERT_CARDS: Repeat this pattern for each alert:
-
-    <div class="alert-card severity-ACTION_TYPE anim-up" style="--i:N" data-alert-id="UNIQUE_ID" data-severity="TYPE">
-      <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('UNIQUE_ID')"></label>
-      <div class="alert-content">
-        <div class="alert-title">Alert Title</div>
-        <div class="alert-meta">
-          <span class="badge badge--green">Badge Text</span>
-        </div>
-        <div class="alert-desc">Description with <code>inline code</code>.</div>
-        <div class="alert-actions">
-          <span class="quick-action" data-action="Literal instruction for Claude" onclick="selectAction(this)">Button Label</span>
-        </div>
-        <div class="alert-note-toggle" onclick="toggleNote('UNIQUE_ID')">+ Add note</div>
-        <div id="note-UNIQUE_ID" style="display:none"><textarea class="alert-note" data-id="UNIQUE_ID" placeholder="Notes..."></textarea></div>
-
-        OPTIONAL: Collapsible detail table
-        <details>
-          <summary>Detail Label (N items)</summary>
-          <div style="overflow-x:auto; padding: 0 0 8px;">
-            <table class="data-table" data-table-id="TABLE_ID">
-              <thead><tr><th>Col 1</th><th class="num">Col 2</th></tr></thead>
-              <tbody>
-                <tr data-row-id="ROW_ID"><td>Value</td><td class="num">123</td></tr>
-              </tbody>
-            </table>
+      <!-- Option B: Recommended (first) -->
+      <div class="alert-card severity-routine" data-alert-id="join-option-b" data-severity="routine">
+        <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('join-option-b')"></label>
+        <div class="alert-content">
+          <div class="alert-title">Option B: Join on (application_id, campaign_id)</div>
+          <div class="alert-meta">
+            <span class="badge badge--green">Recommended</span>
+            <span class="badge badge--green">PRECISE</span>
           </div>
-        </details>
+          <div class="alert-desc">Adding <code>attempt.campaign_id = conversion.campaign_id</code> restricts the join to only the attempt whose campaign completed the conversion. Only the negotiable (C_150) matches, and its parent_campaign_id (C_100) correctly receives the revenue in Stage 2 aggregation.</div>
+          <div class="sql-block">
+            <span class="sql-clause"><span class="sql-kw">LEFT JOIN</span> conversion_cte</span>
+            <span class="sql-clause">&nbsp;&nbsp;<span class="sql-kw">ON</span> attempt.application_id = conversion.application_id</span>
+            <span class="sql-clause diff-add" data-annotation-id="option-b-campaign-join">&nbsp;&nbsp;<span class="sql-kw">AND</span> attempt.campaign_id = conversion.campaign_id</span>
+          </div>
+          <details>
+            <summary>Sample results (3 rows)</summary>
+            <div style="overflow-x:auto; padding: 0 0 8px;">
+              <table class="data-table" data-table-id="option-b-results">
+                <thead>
+                  <tr><th>Attempt</th><th>campaign_id</th><th>conv campaign_id</th><th>Match?</th><th>Revenue</th></tr>
+                </thead>
+                <tbody>
+                  <tr data-row-id="opt-b-att-501">
+                    <td>att_501</td>
+                    <td>C_100</td>
+                    <td>C_150</td>
+                    <td class="cell-neutral">C_100 != C_150</td>
+                    <td>$0</td>
+                  </tr>
+                  <tr data-row-id="opt-b-att-502">
+                    <td>att_502</td>
+                    <td>C_200</td>
+                    <td>C_150</td>
+                    <td class="cell-neutral">C_200 != C_150</td>
+                    <td>$0</td>
+                  </tr>
+                  <tr data-row-id="opt-b-att-503">
+                    <td>att_503</td>
+                    <td>C_150</td>
+                    <td>C_150</td>
+                    <td class="cell-match">C_150 = C_150</td>
+                    <td class="cell-match">$8.50</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+          <div class="alert-actions">
+            <span class="quick-action" data-action="Approve Option B: precise attribution via campaign_id match" onclick="selectAction(this)">Approve: precise attribution</span>
+          </div>
+          <div class="alert-note-toggle" onclick="toggleNote('join-option-b')">+ Add note</div>
+          <div id="note-join-option-b" style="display:none"><textarea class="alert-note" data-id="join-option-b" placeholder="Notes..."></textarea></div>
+        </div>
       </div>
+
+      <div class="decision-divider"><span>or</span></div>
+
+      <!-- Option A: Simpler but overcounts -->
+      <div class="alert-card severity-review" data-alert-id="join-option-a" data-severity="review">
+        <label class="alert-checkbox"><input type="checkbox" onchange="toggleDismiss('join-option-a')"></label>
+        <div class="alert-content">
+          <div class="alert-title">Option A: Join on application_id only</div>
+          <div class="alert-meta">
+            <span class="badge badge--amber">OVERCOUNTS</span>
+            <span class="badge badge--muted">PRODUCTION ETL</span>
+          </div>
+          <div class="alert-desc">Joining only on <code>application_id</code> matches every attempt for the same application. Revenue spreads to campaigns that had nothing to do with the sale. The production ETL uses this approach because the overcount was acceptable for its reporting use case.</div>
+          <div class="sql-block">
+            <span class="sql-clause"><span class="sql-kw">LEFT JOIN</span> conversion_cte</span>
+            <span class="sql-clause">&nbsp;&nbsp;<span class="sql-kw">ON</span> attempt.application_id = conversion.application_id</span>
+            <span class="sql-clause diff-del">&nbsp;&nbsp;<span class="sql-comment">-- missing: AND attempt.campaign_id = conversion.campaign_id</span></span>
+          </div>
+          <details>
+            <summary>Sample results (3 rows)</summary>
+            <div style="overflow-x:auto; padding: 0 0 8px;">
+              <table class="data-table" data-table-id="option-a-results">
+                <thead>
+                  <tr><th>Attempt</th><th>campaign_id</th><th>Match?</th><th>Revenue</th></tr>
+                </thead>
+                <tbody>
+                  <tr data-row-id="opt-a-att-501">
+                    <td>att_501</td>
+                    <td>C_100</td>
+                    <td class="cell-match">app_id match</td>
+                    <td>$8.50</td>
+                  </tr>
+                  <tr data-row-id="opt-a-att-502">
+                    <td>att_502</td>
+                    <td>C_200</td>
+                    <td class="cell-match">app_id match</td>
+                    <td class="cell-miss">$8.50 (unearned)</td>
+                  </tr>
+                  <tr data-row-id="opt-a-att-503">
+                    <td>att_503</td>
+                    <td>C_150</td>
+                    <td class="cell-match">app_id match</td>
+                    <td>$8.50</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+          <div class="alert-actions">
+            <span class="quick-action" data-action="Accept Option A: simpler join, overcount acceptable for this use case" onclick="selectAction(this)">Accept: simpler, overcount acceptable</span>
+            <span class="quick-action" data-action="Reject Option A: overcount not acceptable for DRLA precision" onclick="selectAction(this)">Reject: overcounts for DRLA</span>
+          </div>
+          <div class="alert-note-toggle" onclick="toggleNote('join-option-a')">+ Add note</div>
+          <div id="note-join-option-a" style="display:none"><textarea class="alert-note" data-id="join-option-a" placeholder="Notes..."></textarea></div>
+        </div>
+      </div>
+
     </div>
-
-    -->
-
   </div>
 
   <!-- ============================================================
-       STANDALONE TABLES (optional)
-       For tables outside of alert cards. Same flagging behavior.
+       VERIFICATION — Supporting Evidence
        ============================================================ -->
-  <!-- STANDALONE_TABLES: Use section-label + data-table pattern:
-
-  <div class="anim-up" style="--i:N">
-    <div class="section-label">Table Section Title</div>
-    <table class="data-table" data-table-id="TABLE_ID">
-      <thead><tr><th>Col</th><th class="num">Value</th></tr></thead>
-      <tbody>
-        <tr data-row-id="ROW_ID"><td>Name</td><td class="num">123</td></tr>
-      </tbody>
-    </table>
+  <div class="anim-up" style="--i:13">
+    <div class="section-label">Verification</div>
   </div>
 
-  -->
+  <div class="lit-section anim-up" style="--i:14">
+    <div class="lit-prose">
+      <p><span class="step-num">5</span> <strong>Stage 2 Aggregation</strong></p>
+      <p>Stage 2 groups attempts by <code>parent_campaign_id</code>. Option A double-counts revenue for C_100 and assigns unearned revenue to C_200. Option B attributes the $8.50 only to C_100's group.</p>
+    </div>
+    <div class="lit-code">
+      <table class="comparison-table">
+        <thead>
+          <tr><th>parent_campaign_id</th><th>Option A</th><th>Option B</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>C_100</td>
+            <td class="negative">$17.00 (double)</td>
+            <td class="positive">$8.50 (correct)</td>
+          </tr>
+          <tr>
+            <td>C_200</td>
+            <td class="negative">$8.50 (unearned)</td>
+            <td class="positive">$0 (correct)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="lit-section anim-up" style="--i:15">
+    <div class="lit-prose">
+      <p><span class="step-num">6</span> <strong>Direct Buys</strong></p>
+      <p>When a top-tier buys directly (no price reject), <span data-annotation-id="direct-buy-match"><code>campaign_id</code> matches on both sides</span>. Option B handles this correctly. No revenue is lost.</p>
+    </div>
+    <div class="lit-code">
+      <table class="data-table" data-table-id="direct-buy-attempts">
+        <thead>
+          <tr><th>Attempt</th><th>campaign_id</th><th>approved</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="direct-att-601">
+            <td>att_601</td>
+            <td class="cell-match">C_100</td>
+            <td>true (direct buy)</td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="data-table" data-table-id="direct-buy-conversion" style="margin-top: 0.75rem;">
+        <thead>
+          <tr><th>conversion_id</th><th>campaign_id</th><th>price</th></tr>
+        </thead>
+        <tbody>
+          <tr data-row-id="direct-conv-888">
+            <td>conv_888</td>
+            <td class="cell-match">C_100</td>
+            <td>$12.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="callout callout--blue anim-up" style="--i:16">
+    <strong>Summary:</strong> Option B (join on <code>application_id + campaign_id</code>) produces correct attribution for both price reject setups and direct buys. The production ETL uses Option A because the overcount is acceptable for reporting. For the Dynamic RLA algorithm, precision matters more.
+  </div>
 
   <!-- ============================================================
        FOOTER
        ============================================================ -->
   <div class="footer anim-up" style="--i:99">
-    <!-- FOOTER_TEXT: e.g. "Generated by Claude Code on March 20, 2026." -->
+    Generated by Claude Code on March 22, 2026.
     <br>Keyboard shortcuts: press <kbd>?</kbd> for help.
   </div>
 

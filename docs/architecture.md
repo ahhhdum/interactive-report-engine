@@ -116,6 +116,10 @@ Adding `data-annotatable` to the body element enables click-to-annotate on any e
 
 The engine saves all review state to localStorage by default. Dismissed items, selected actions, notes, and flagged rows survive page reloads and browser restarts. Adding `data-no-persist` to the body element disables this behavior.
 
+### Decision Groups
+
+When a dashboard presents alternatives the reviewer must choose between (Option A vs Option B), wrap those options in a `.decision-group` container instead of listing them as flat alert cards. The decision group frames a question, presents options as standard alert cards, and optionally includes a side-by-side comparison table. The filter bar does not apply to cards inside decision groups. Cards inside decision groups use the same state system as flat cards: dismiss, notes, actions, and keyboard navigation all work identically.
+
 ### Shareable URL State
 
 The Share State button encodes review state as a URL hash fragment. Opening a shared URL imports the state on first load, then strips the hash from the URL. Subsequent reloads and edits persist via localStorage.
