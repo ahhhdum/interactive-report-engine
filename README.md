@@ -4,6 +4,13 @@ Turn any review workflow into a visual, interactive HTML dashboard that Claude C
 
 No backend. No build step. No dependencies. One HTML file.
 
+## Live Examples
+
+- [Anniversary Trip Planner](https://docs.epcvip.vip/public/anniversary-trip-planner.html) (planning dashboard with venue comparison)
+- [Config Chooser](https://docs.epcvip.vip/public/config-chooser.html) (visual config picker, standalone variant)
+
+Requires EPCVIP login. See `examples/` for the source files.
+
 ## What It Looks Like
 
 ### Operations Dashboard
