@@ -104,6 +104,18 @@ Place it after the existing component documentation, before Step 4 (Feature Flag
 
 Anthropic's March 2026 guidance for Claude 4.5/4.6 models: these models respond well to normal prompting and may overtrigger on aggressive language like "CRITICAL: You MUST use this tool when..." Use plain language: "Use this skill when..." and "Do not use for..." The current description is already reasonable but should be checked against this standard.
 
+## Implementation Status
+
+**Implemented 2026-03-26.** All five improvements applied in a single cohesive rewrite of `SKILL.md`:
+
+1. Contract table replaced ~200 lines of inline HTML (468 lines to 302)
+2. Domain adaptation heuristic added as Step 1.5
+3. Custom components contract with 5 requirements
+4. "Why" explanations on non-obvious constraints
+5. Language softened: NEVER/ALWAYS kept for silent-bug guardrails, style guidance changed to recommendations
+
+Planning use case added to discovery questions and domain adaptation section. SQL component patterns reference doc verified complete.
+
 ## Validation
 
 After implementing changes, test with three scenarios:

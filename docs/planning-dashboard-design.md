@@ -72,6 +72,6 @@ They are complementary. Brainstorming produces the options. The dashboard struct
 
 1. ~~Build the planning example HTML~~ Done: `examples/anniversary-trip-planner.html`
 2. ~~Test all interactions~~ Done: verified in browser and via automated checks
-3. Update the /action-report skill to mention planning as a use case with examples
-4. Publish as the showcase example on docs.epcvip.vip
+3. ~~Update the /action-report skill to mention planning as a use case with examples~~ Done (2026-03-26): skill rewritten with domain adaptation heuristic, planning mentioned in discovery questions and Step 1.5
+4. ~~Publish as the showcase example~~ Done (2026-03-26): published to share.epcvip.vip/anniversary-trip-2026-planning-dashboard-fc4a
 5. ~~Update the README with the planning use case~~ Done
