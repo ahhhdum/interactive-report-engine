@@ -48,7 +48,8 @@ The 3-layer pattern also supports standalone variants (like `config-chooser.html
 ## Related Skills
 
 - `/action-report` skill (at `~/.claude/skills/action-report/`) generates reports from this template
-- The template path referenced by skills is `~/repos/interactive-report-engine/interactive-report-engine.html`
+- The skill ships its own copy of the template in `references/interactive-report-engine.html`
+- After modifying the template in this repo, run `bash sync-skill.sh` to update the skill copy
 
 ## Writing Style
 
