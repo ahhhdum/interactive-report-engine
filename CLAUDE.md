@@ -26,7 +26,7 @@ interactive-report-engine/
 
 ## How This Repo Works
 
-The engine template is a single self-contained HTML file (~1100 lines) with inline CSS and JS. To use it:
+The engine template is a single self-contained HTML file (~1250 lines) with inline CSS and JS. To use it:
 
 1. Copy `interactive-report-engine.html` to a new file
 2. Replace the placeholder comments with domain-specific content

@@ -1225,7 +1225,10 @@ details.standalone .details-content { padding: 0 16px 16px; }
   };
 
   // --- Share State (URL hash) ---
+  // Only useful when the report is at a shared URL (http/https).
+  // On local file:// URLs the generated link would not work for anyone else.
   window.shareState = function() {
+    if (location.protocol === 'file:') return;
     try {
       var json = JSON.stringify(state);
       var encoded = btoa(unescape(encodeURIComponent(json)));
@@ -1494,6 +1497,11 @@ details.standalone .details-content { padding: 0 16px 16px; }
   });
 
   // --- Init ---
+  // Hide Share State on local files (useless without a shared URL)
+  if (location.protocol === 'file:') {
+    document.getElementById('share-btn').style.display = 'none';
+  }
+
   // Priority: URL hash > localStorage
   if (!restoreFromHash()) {
     restoreFromStorage();
