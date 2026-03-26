@@ -184,7 +184,8 @@ body {
 .alert-checkbox { display: flex; align-items: flex-start; margin-right: 14px; padding-top: 2px; flex-shrink: 0; }
 .alert-checkbox input[type="checkbox"] { accent-color: var(--green); width: 16px; height: 16px; cursor: pointer; }
 
-.alert-card.dismissed { max-height: 0; padding: 0 20px; margin: 0; opacity: 0; overflow: hidden; border-left-color: var(--slate) !important; }
+.alert-card.dismissed { opacity: 0.45; border-left-color: var(--slate) !important; padding: 10px 20px; }
+.alert-card.dismissed .alert-content > :not(.alert-title) { display: none; }
 .alert-card.dismissed .alert-title { text-decoration: line-through; color: var(--text-dim) !important; }
 
 .alert-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
@@ -1157,7 +1158,10 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   };
 
   // --- Share State (URL hash) ---
+  // Only useful when the report is at a shared URL (http/https).
+  // On local file:// URLs the generated link would not work for anyone else.
   window.shareState = function() {
+    if (location.protocol === 'file:') return;
     try {
       var json = JSON.stringify(state);
       var encoded = btoa(unescape(encodeURIComponent(json)));
@@ -1325,7 +1329,7 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   var hintTimeout;
 
   function getVisibleCards() {
-    return Array.from(document.querySelectorAll('.alert-card[data-alert-id]:not(.dismissed)')).filter(function(c) {
+    return Array.from(document.querySelectorAll('.alert-card[data-alert-id]')).filter(function(c) {
       return c.style.display !== 'none';
     });
   }
@@ -1426,6 +1430,11 @@ body[data-annotatable] [data-annotation-id]:hover { border-bottom-color: var(--a
   });
 
   // --- Init ---
+  // Hide Share State on local files (useless without a shared URL)
+  if (location.protocol === 'file:') {
+    document.getElementById('share-btn').style.display = 'none';
+  }
+
   // Priority: URL hash > localStorage
   if (!restoreFromHash()) {
     restoreFromStorage();

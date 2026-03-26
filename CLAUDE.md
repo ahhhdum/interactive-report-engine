@@ -26,7 +26,7 @@ interactive-report-engine/
 
 ## How This Repo Works
 
-The engine template is a single self-contained HTML file (~1100 lines) with inline CSS and JS. To use it:
+The engine template is a single self-contained HTML file (~1250 lines) with inline CSS and JS. To use it:
 
 1. Copy `interactive-report-engine.html` to a new file
 2. Replace the placeholder comments with domain-specific content
@@ -48,7 +48,8 @@ The 3-layer pattern also supports standalone variants (like `config-chooser.html
 ## Related Skills
 
 - `/action-report` skill (at `~/.claude/skills/action-report/`) generates reports from this template
-- The template path referenced by skills is `~/repos/interactive-report-engine/interactive-report-engine.html`
+- The skill ships its own copy of the template in `references/interactive-report-engine.html`
+- After modifying the template in this repo, run `bash sync-skill.sh` to update the skill copy
 
 ## Writing Style
 
